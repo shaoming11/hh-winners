@@ -106,8 +106,17 @@ class SimDemo:
             try: r = ex.run('pourer', segs[:PRE_POUR_SEGS], label=step.label + ' to pre-pour')
             except TaskFailed as e: raise StepFailed(e.code, e.detail)
             arm = self.bb.arms['pourer']; th, qs = manifold_table(self.planner, segs, info); tilt = ManifoldTilt(arm, th, qs, float(arm.goal()[5]))
+            # absent = nothing has been put in this beaker yet (empty, 0 g); present but None = an auger
+            # dose went in that no VERIFY_MASS has weighed yet (dose_yeast's convention).  A relative pour
+            # adds on top of the live scale reading and does not need the number; an absolute one cannot be
+            # computed without it, and must say so rather than add to None (which the sequencer would
+            # rewrite into a bogus SAFE_STOP).
             base_g = self.scale(32); content0 = ctx.state['contents_g'].get(p['beaker'], 0.0)
-            target = p['target_g'] if p.get('relative') else p['target_g'] - content0
+            if p.get('relative'): target = p['target_g']
+            elif content0 is None:
+                raise StepFailed('CONTENT_UNKNOWN', '%s holds a dose that has not been weighed; VERIFY_MASS it first, '
+                                                    'or pour relative to the scale' % p['beaker'])
+            else: target = p['target_g'] - content0
             cfg = self.params['pour']; rho = DENSITY[p['reagent']]
             pc = PourController(cfg, beaker_cylinder(self.params), rho, target, p['tol_g'], p['reagent'])
             trace = []
@@ -131,9 +140,9 @@ class SimDemo:
             try: ex.run('pourer', segs[AFTER_UNTILT:], label=step.label + ' return', start_holding='grasp_side')
             except TaskFailed as e: raise StepFailed(e.code, e.detail)
             ctx.state['active_arm'] = None
-            ctx.state['contents_g'][p['beaker']] = content0 + added
+            ctx.state['contents_g'][p['beaker']] = None if content0 is None else content0 + added
             self._save_pour_trace(step, res, trace)
-            meas = dict(added_g=round(added, 3), content_g=round(content0 + added, 3), outcome=res.outcome, theta_first_deg=res.theta_first_deg,
+            meas = dict(added_g=round(added, 3), content_g=None if content0 is None else round(content0 + added, 3), outcome=res.outcome, theta_first_deg=res.theta_first_deg,
                         theta_cut_deg=res.theta_cut_deg, pour_time_s=res.time_s, topup_pulses=res.topup_pulses, grip_h_mm=info['grip_h_used'],
                         spilled_total_g=round(self.L.spilled_mass(), 3), sim_truth_receiver_g=round(self.L.mass(p['beaker']), 3))
             tgt = dict(added_g=round(target, 3), tol_g=p['tol_g'])

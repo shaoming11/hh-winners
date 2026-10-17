@@ -2,9 +2,9 @@
 helpers (expiry, snooze, messages), and the mcp_ux / routes_ux tools built on top of them.
 
 Mirrors tests/test_backend.py's style: hand-built schema objects for the pure describe() cases,
-a tmp_path Store for delta()/approvals/messages, and a module-scoped FastAPI TestClient (which
-also exposes the in-process MCP server) for the tool-level tests - same pattern as test_backend.py's
-`client` fixture, just for the UX tools instead of the core HTTP/MCP surface.
+a tmp_path Store for delta()/approvals/messages, and - for the tool-level tests - conftest's
+session-scoped `app_client` (the one FastAPI TestClient and in-process MCP server shared by every
+module, because the MCP session manager's run() may only be called once per process).
 """
 from __future__ import annotations
 

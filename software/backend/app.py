@@ -36,7 +36,7 @@ sys.path.insert(0, str(SOFTWARE))
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response, StreamingResponse
+from fastapi.responses import JSONResponse, RedirectResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, TypeAdapter
 
@@ -48,7 +48,6 @@ from backend.store import Store
 
 OUT_DIR = SOFTWARE / "out"
 WEB = SOFTWARE / "benchsim" / "benchsim" / "dashboard" / "web"     # the dashboard page, served by the backend
-RUNS_DIR = OUT_DIR / "backend" / "runs"
 
 BACKEND = os.environ.get("WLB_BACKEND", "sim")
 RENDER = os.environ.get("WLB_RENDER", "1") != "0"
@@ -57,6 +56,7 @@ REALTIME = float(os.environ.get("WLB_RT", "1"))      # 1 = pace runs to wall-clo
 
 cfg = load()
 store = Store()
+RUNS_DIR = store.dir / "runs"        # run folders live beside the store, so WLB_BACKEND_DIR moves both
 runner = BenchRunner(store, cfg, backend=BACKEND, render=RENDER, realtime=REALTIME, out_root=RUNS_DIR)
 mcp = mcp_server.build(store, runner)
 mcp_app = mcp.streamable_http_app(streamable_http_path="/", stateless_http=True, json_response=True)
@@ -343,6 +343,14 @@ async def feed_command(cmd: str, request: Request):
     """the dashboard's verbs: start | stop | reset | speed/<x> | camera/<name>"""
     ok, msg = await asyncio.get_running_loop().run_in_executor(None, runner.feed_control, cmd)
     return JSONResponse({"ok": ok, "message": msg}, status_code=200 if ok else 409)
+
+
+@app.api_route("/mcp", methods=["GET", "POST", "DELETE"], include_in_schema=False)
+def mcp_no_slash():
+    """An MCP client configured without the trailing slash falls past the /mcp mount into the static
+    mount below (404 on GET, 405 on POST).  307 keeps the method and the body, so the client's
+    initialize POST survives the hop and the connection just works."""
+    return RedirectResponse("/mcp/", status_code=307)
 
 
 @app.get("/")

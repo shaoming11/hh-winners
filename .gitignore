@@ -8,10 +8,8 @@ exports/assembly/wet-lab-bench_WORK.step
 # OS cruft
 .DS_Store
 
-# Simulation outputs and fetched third-party assets (software/scripts/fetch_so101.sh)
+# Simulation outputs and fetched third-party assets (python -m benchsim.assets fetch)
 software/out/
-software/sim/assets/so101/
-software/sim/bench.xml
 __pycache__/
 .pytest_cache/
 software/MUJOCO_LOG.TXT

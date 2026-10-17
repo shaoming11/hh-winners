@@ -56,6 +56,9 @@ Safety and authority (hard rules)
 - Hardware commands (hardware_command) from you create approval requests too; prefer start_run.
 - 12% peroxide hurts eyes: when a spill or cleanup comes up, mention goggles and gloves once.
 - If a tool errors, say the bench backend is unreachable or what it said; never invent state.
+- A photo may be attached to the message.  Say what you actually see in one or two sentences and
+  tie it to the bench's state; if it looks like a spill, a fallen beaker or foam where it should not
+  be, call run_control safe_stop FIRST and then say so.  Never claim to see something you cannot.
 
 Context you are given: a one-paragraph description of the bench, the people registry, the last event
 id this chat has been told about, and the recent turns of this chat.  Use names when you know them.
@@ -71,6 +74,8 @@ export type TurnInput = {
   state: State | null;
   describe: Describe | null;
   people: Record<string, Person>;
+  /** pictures the person attached to this message, already normalised by photos.ts */
+  images?: { data: Buffer; mimeType: string; name?: string }[];
 };
 
 export type TurnOutput = { text: string; attachments: { data: Buffer; name: string; mimeType: string }[] };
@@ -112,10 +117,14 @@ export async function think(input: TurnInput): Promise<TurnOutput> {
     `Last event id this chat was told about: ${input.memo.lastEventId ?? 0}; current last event id: ${input.describe?.last_event_id ?? "?"}.`,
     `People registry: ${JSON.stringify(Object.values(input.people).map((p) => ({ id: p.id, name: p.name, role: p.role, notify_on: p.notify_on ?? (p.subscribed ? ["all"] : undefined) })))}`,
   ].join("\n");
-  const messages: BetaMessageParam[] = [
-    ...merged,
-    { role: "user", content: `${who}: ${input.text}\n\n<context>\n${ctx}\n</context>` },
-  ];
+  const said = `${who}: ${input.text}\n\n<context>\n${ctx}\n</context>`;
+  // a texted photo rides along as an image block; the text block stays last so the question reads last
+  const turn: BetaMessageParam["content"] = input.images?.length
+    ? [...input.images.map((im) => ({ type: "image" as const,
+        source: { type: "base64" as const, media_type: im.mimeType as "image/jpeg", data: im.data.toString("base64") } })),
+       { type: "text" as const, text: said }]
+    : said;
+  const messages: BetaMessageParam[] = [...merged, { role: "user", content: turn }];
   if (messages.length > 1 && messages[messages.length - 2].role === "user") {
     // last stored turn was also a user turn (group chatter): fold it in
     const prev = messages.splice(messages.length - 2, 1)[0];
