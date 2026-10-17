@@ -25,3 +25,4 @@ if __name__ == "__main__":
           f"tilt {result['upright_error_deg']:.2f}°")
     print(f"PASS: minimum waypoint joint margin "
           f"{min(segment['min_joint_margin_deg'] for segment in result['segments']):.1f}°")
+    print(f"PATH CONTACTS: {len(result['arm_contacts'])}")

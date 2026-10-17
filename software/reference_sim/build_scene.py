@@ -46,10 +46,13 @@ def add_cylinder(parent: ET.Element, name: str, pos: tuple[float, float, float],
 
 def prefix_robot_names(root: ET.Element, prefix: str) -> None:
     for elem in root.iter():
-        if "name" in elem.attrib and elem.tag in {"body", "joint", "site", "actuator", "position"}:
+        if "name" in elem.attrib and elem.tag in {
+                "body", "joint", "site", "geom", "actuator", "position"}:
             elem.attrib["name"] = prefix + elem.attrib["name"]
         if elem.tag == "position" and "joint" in elem.attrib:
             elem.attrib["joint"] = prefix + elem.attrib["joint"]
+    for index, geom in enumerate(root.iter("geom")):
+        geom.attrib.setdefault("name", f"{prefix}geom_{index:03d}")
 
 
 def add_robot(model: ET.Element, source: ET.Element, prefix: str, base_xy: tuple[float, float]) -> None:

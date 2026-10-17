@@ -156,9 +156,15 @@ class BenchWorld:
             arm1, arm2 = name1.startswith(prefix), name2.startswith(prefix)
             if arm1 == arm2:
                 continue
+            geom1 = mujoco.mj_id2name(self.model, mujoco.mjtObj.mjOBJ_GEOM,
+                                      int(contact.geom1)) or "unnamed"
+            geom2 = mujoco.mj_id2name(self.model, mujoco.mjtObj.mjOBJ_GEOM,
+                                      int(contact.geom2)) or "unnamed"
             contacts.append({
                 "arm_body": name1 if arm1 else name2,
                 "other_body": name2 if arm1 else name1,
+                "arm_geom": geom1 if arm1 else geom2,
+                "other_geom": geom2 if arm1 else geom1,
                 "distance_m": float(contact.dist),
             })
         return contacts

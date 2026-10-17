@@ -20,7 +20,7 @@ def play_joint_path(world: BenchWorld, bus: ArmBus, arm: str, path_rad: list[np.
     max_error_deg = 0.0
     sample_count = 0
     duration = 0.0
-    contacts: dict[tuple[str, str], int] = {}
+    contacts: dict[tuple[str, str, str, str], int] = {}
     for target in path_rad:
         target = np.asarray(target, float)
         segment = target - previous
@@ -39,11 +39,13 @@ def play_joint_path(world: BenchWorld, bus: ArmBus, arm: str, path_rad: list[np.
             sample_count += 1
             duration += segment_duration / steps
             for contact in world.arm_contact_pairs(arm):
-                key = (contact["arm_body"], contact["other_body"])
+                key = (contact["arm_body"], contact["other_body"],
+                       contact["arm_geom"], contact["other_geom"])
                 contacts[key] = contacts.get(key, 0) + 1
         previous = target
     world.step(0.20)
     return {"samples": sample_count, "duration_s": duration,
             "max_tracking_error_deg": max_error_deg,
-            "arm_contacts": [{"arm_body": a, "other_body": b, "samples": n}
-                             for (a, b), n in sorted(contacts.items())]}
+            "arm_contacts": [{"arm_body": a, "other_body": b,
+                              "arm_geom": ag, "other_geom": og, "samples": n}
+                             for (a, b, ag, og), n in sorted(contacts.items())]}

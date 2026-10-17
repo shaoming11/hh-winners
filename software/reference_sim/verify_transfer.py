@@ -24,3 +24,10 @@ if __name__ == "__main__":
           f"{result['endpoint_plan']['upright_axis_match_deg']:.3f}°")
     print(f"PASS: P1 released {result['final_site_error_mm']:.2f} mm from scale target, "
           f"tilt {result['upright_error_deg']:.2f}°")
+    if result["arm_contacts"]:
+        print(f"CONTACT AUDIT: {len(result['arm_contacts'])} stock-gripper contacts during transfer")
+        for contact in result["arm_contacts"]:
+            print(f"  {contact['phase']}: {contact['arm_geom']} with {contact['other_geom']} "
+                  f"({contact['samples']} control samples)")
+    else:
+        print("PASS: no arm-to-scene contacts along the transfer")

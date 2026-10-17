@@ -61,6 +61,11 @@ def main() -> None:
     print(f"PASS: proximity grasp latches at {motion['grasp_distance_mm']:.2f} mm and follows a wrist command")
     print(f"PASS: P1 carousel-to-scale transfer lands {transfer['final_site_error_mm']:.2f} mm off target, "
           f"tilt {transfer['upright_error_deg']:.2f}°")
+    if transfer["arm_contacts"]:
+        print(f"REVIEW: P1 transfer reports {len(transfer['arm_contacts'])} stock-gripper contacts; "
+              "carousel clearance is unresolved")
+    else:
+        print("PASS: P1 transfer has no arm-to-scene contacts")
     print(f"PASS: four carousel beakers follow a {carousel['reached_deg']:.2f}° index and stay in their pockets")
     print(f"PASS: rack-to-scale transfer lands {rack_transfer['final_site_error_mm']:.2f} mm off target, "
           f"tilt {rack_transfer['upright_error_deg']:.2f}°")

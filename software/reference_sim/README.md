@@ -71,9 +71,11 @@ degrees and actuated by the official MuJoCo position servos.
 The 10-step demo defaults to logical process transfers. With `--physical-p1-transfer`, step 1 moves
 empty P1 from the carousel to the scale; the remaining process transfers and filled-beaker handling
 are not yet validated. A separate acceptance check validates an empty rack-beaker-to-scale move.
-Grasping uses a proximity check and weld constraint; the stock SO-101 fingers
-are excluded from beaker contacts because they do not reproduce the custom fin-ray geometry. Yeast
-dosing is a calibrated grams-per-revolution equation, and the flow and auger constants are
-placeholders until measured on the assembled bench. The liquid model is not CFD. The checks
-compare geometry, dose, mechanism, and control-interface assumptions; they do not prove a hardware
-run will work unchanged.
+Grasping uses a proximity check and weld constraint. The stock SO-101 gripper mesh contacts the
+carousel during the P1 lift; the custom GR-01/02/03 geometry is not yet modeled, so this route is
+not collision-free in the current scene. Contacts are listed in the transfer result. The stock jaw
+geometries are excluded from beaker contacts because they do not reproduce the custom fin-ray
+fingers. Yeast dosing is a calibrated grams-per-revolution equation, and the flow and auger
+constants are placeholders until measured on the assembled bench. The liquid model is not CFD. The
+checks compare geometry, dose, mechanism, and control-interface assumptions; they do not prove a
+hardware run will work unchanged.

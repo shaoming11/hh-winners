@@ -155,7 +155,8 @@ def main() -> None:
             transfer = event["transfer"]
             print(f"{event['step']:02d}. {desc}: arm transfer, "
                   f"{transfer['final_site_error_mm']:.2f} mm placement error, "
-                  f"{transfer['upright_error_deg']:.2f}° tilt")
+                  f"{transfer['upright_error_deg']:.2f}° tilt, "
+                  f"{len(transfer['arm_contacts'])} modeled arm contacts")
         elif "stage_travel_mm" in event:
             print(f"{event['step']:02d}. {desc}: {event['stage_travel_mm']:.2f} mm")
         else:
