@@ -36,14 +36,14 @@
    "model_mm": [
     620.0,
     407.0,
-    63.7
+    63.68
    ],
    "source_mm": [
     620.0,
     407.0,
     63.7
    ],
-   "error_mm": 0.0,
+   "error_mm": 0.022,
    "pass_": true,
    "source": "update13_final"
   },
@@ -203,16 +203,16 @@
    "final_mm": [
     744.12,
     468.83,
-    61.69
+    61.59
    ],
    "target_mm": [
     744.12,
     468.83,
     61.7
    ],
-   "error_mm": 0.007,
-   "moved_mm": 0.057,
-   "tilt_deg": 0.005,
+   "error_mm": 0.112,
+   "moved_mm": 0.162,
+   "tilt_deg": 0.048,
    "initial_penetration_mm": 0.0,
    "pass_": true
   },
@@ -220,18 +220,18 @@
    "beaker": "P2",
    "station": "carousel_pocket_1",
    "final_mm": [
-    862.57,
+    862.56,
     459.72,
-    61.69
+    61.59
    ],
    "target_mm": [
     862.57,
     459.72,
     61.7
    ],
-   "error_mm": 0.007,
-   "moved_mm": 0.057,
-   "tilt_deg": 0.006,
+   "error_mm": 0.113,
+   "moved_mm": 0.163,
+   "tilt_deg": 0.058,
    "initial_penetration_mm": 0.0,
    "pass_": true
   },
@@ -241,16 +241,16 @@
    "final_mm": [
     192.3,
     394.6,
-    60.19
+    60.09
    ],
    "target_mm": [
     192.3,
     394.6,
     60.2
    ],
-   "error_mm": 0.005,
-   "moved_mm": 0.055,
-   "tilt_deg": 0.0,
+   "error_mm": 0.11,
+   "moved_mm": 0.16,
+   "tilt_deg": 0.038,
    "initial_penetration_mm": 0.0,
    "pass_": true
   },
@@ -260,15 +260,15 @@
    "final_mm": [
     108.5,
     574.4,
-    60.19
+    60.09
    ],
    "target_mm": [
     108.5,
     574.4,
     60.2
    ],
-   "error_mm": 0.005,
-   "moved_mm": 0.055,
+   "error_mm": 0.108,
+   "moved_mm": 0.158,
    "tilt_deg": 0.0,
    "initial_penetration_mm": 0.0,
    "pass_": true

@@ -70,6 +70,26 @@ evidence that CAD and layout agree is the feature fit of part-local STLs: the RK
 on the rack pockets to 0.000 mm, the TT-04 ring's four pocket bores on the r 84 pockets to 0.12 mm and its floor
 on the recorded beaker-bottom Z 61.7, and the WS-02 pan floor on Z 63.7.
 
+## Control interfaces (phase 4)
+
+```bash
+.venv/bin/python -m benchsim.exercise    # arms + every Mega mechanism + error/fault responses -> reports/exercise_report.json
+```
+
+- `benchsim/interfaces.py`: `Clock`, `ArmBackend` (positions, loads, rate-limited joint goals, torque enable) and
+  `MegaTransport`, plus `MegaClient`, the host side of the Mega protocol. The process controller talks only to these.
+- `benchsim/protocol.py`: one JSON-lines codec with CRC-8, shared by the simulated Mega and the serial firmware.
+  Commands are `PING TT ST AUG TARE CAL STREAM STOP CLR HB`. Replies are ack/ok/done. Errors are
+  `BADCMD RANGE BUSY STATE ESTOP CRC`, and out-of-range values are rejected, never clamped. Faults are `ESTOP AUGER_JAM
+  HOPPER_EMPTY HX_TIMEOUT WDT TT_TIMEOUT ST_TIMEOUT AUG_TIMEOUT`. Scale samples (80 Hz) and auger progress are streamed.
+- `benchsim/bench.py`: the only place a backend is chosen. `make_bench('sim')` is the default.
+  `make_bench('real', allow_hardware=True)` is the hardware path.
+- `benchsim/backends/sim.py`: the arm servos follow a rate-limited smoothstep through the upstream position actuators.
+  `read_loads` approximates Feetech `Present_Load` as actuator force over the force limit, in per-mille; the real
+  register is a duty estimate. The simulated Mega models the carousel and stage profiles with timeouts, auger
+  revolutions with the electrical.md stall rule and a ¼-turn reverse, an HX711 at 80 SPS (counts, noise, quantisation)
+  read from a slide-joint flexure, the 500 ms comm watchdog, the e-stop and busy states.
+
 ## Conventions
 
 - World: +X east, +Y north, table top at Z 0 (`docs/demo_process.md` §2.1).

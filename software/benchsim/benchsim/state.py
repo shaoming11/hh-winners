@@ -30,4 +30,6 @@ def reset(model, data, params=None):
     q = park_q(params)
     for arm in scene.ARMS:
         data.qpos[qadr(model, arm)] = q; data.ctrl[actadr(model, arm)] = q
+    j = model.joint('scale_flex')                 # start the load-cell flexure at its static deflection
+    data.qpos[j.qposadr[0]] = -model.body('scale_pan').mass[0] * 9.81 / model.jnt_stiffness[j.id]
     mujoco.mj_forward(model, data)

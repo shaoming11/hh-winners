@@ -52,6 +52,7 @@ class Builder:
         self.bench = bench or layout.load_bench()
         self.P = self.bench['params']; self.st = self.bench['stations']
         self.spec = mujoco.MjSpec(); self.spec.modelname = 'wet_lab_bench'
+        self.spec.compiler.degree = False             # every angle handed to the spec is in radians
         self.fid = Fidelity(); self.meta = {'beakers': {}, 'arms': {}, 'stations': {}}
         self._mesh_n = 0
 
@@ -255,7 +256,7 @@ class Builder:
             Ixx = b.mass * (3 * (r / 1000) ** 2 + (h / 1000) ** 2) / 12 * 0.8; b.inertia = [Ixx, Ixx, b.mass * (r / 1000) ** 2]
             b.explicitinertial = True
             self.cyl(b, (0, 0, B['floor'] / 2), r, B['floor'] / 2, cls=ALL, rgba=PP, name='beaker_%s_floor' % name, friction=[0.9, 0.01, 0.001])
-            self.ring_walls(b, (0, 0), r - B['wall'], r, 0, h, n=20, cls=ALL, rgba=(0.92, 0.95, 0.97, 0.0), name='beaker_%s' % name)
+            self.ring_walls(b, (0, 0), r - B['wall'], r, B['floor'] + 0.3, h, n=20, cls=ALL, rgba=(0.92, 0.95, 0.97, 0.0), name='beaker_%s' % name)
             V, F = meshes.tube(r - B['wall'], r, h, n=48)
             self.mesh(b, V, F, rgba=PP, name='beaker_%s_vis' % name)
             self.cyl(b, (0, 0, B['floor'] + 0.5), r - B['wall'] - 0.3, 0.5, rgba=(0.2, 0.5, 0.95, 0.8), collide=False, name='liquid_' + name, group=1)
