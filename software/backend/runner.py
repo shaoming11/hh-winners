@@ -148,7 +148,7 @@ class BenchRunner:
         self.paused = False
         self._stop_request = None
         self._current_step = None
-        out_root = self._out_root or (SOFTWARE / "out" / "backend" / "runs")
+        out_root = self._out_root or (self.store.dir / "runs")   # beside the store, so WLB_BACKEND_DIR moves run folders too
         self.run_obj = r = make_run(out_root, self.seed, dev=self.dev)
         self.b = r.bb
         w = r.bb.world

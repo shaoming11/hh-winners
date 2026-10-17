@@ -8,7 +8,7 @@ The dashboard and the Photon agent therefore share one context: what one does, t
 `benchsim.bench.make_bench`, and the live view is `benchsim.dashboard.feed.Feed` - the very feed the
 dashboard has always rendered. Every feed poll is also projected into `ExperimentState`
 (`project.py`) and written to the Store, so the two views are two projections of one poll and cannot
-drift. `software/bench/` and `software/sim/` are a separate, earlier stack; nothing here imports them.
+drift.  The earlier standalone `bench/` + `sim/` stack has been retired; benchsim is the bench.
 
 ```
 software/backend/

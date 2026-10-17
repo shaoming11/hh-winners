@@ -10,6 +10,7 @@ import { memo, remember, markSeen, allSpaces, type SpaceMemo } from "./memory.js
 import { think, SILENT } from "./brain.js";
 import { callTool, mcpClient, closeMcp } from "./mcp.js";
 import { AlertWatcher, type Sender } from "./alerts.js";
+import { inboundImage, type InboundAttachment, type InboundImage } from "./photos.js";
 
 type AnySpace = Space & { id: string; type?: "dm" | "group"; phone?: string };
 
@@ -78,9 +79,18 @@ async function main() {
 
   for await (const [space, message] of app.messages as AsyncIterable<[AnySpace, Message]>) {
     if (message.direction === "outbound") continue;
-    if (message.content.type !== "text") continue;
-    const text = message.content.text.trim();
-    if (!text) continue;
+    if (message.content.type !== "text" && message.content.type !== "attachment") continue;
+
+    // a texted photo is a question about the bench too: read it, or say why we can't
+    let images: InboundImage[] = [];
+    let text = message.content.type === "text" ? message.content.text.trim() : "";
+    if (message.content.type === "attachment") {
+      const got = await inboundImage(message.content as unknown as InboundAttachment);
+      if ("error" in got) { await message.reply(got.error); continue; }
+      images = [got.image];
+      text = "(sent a photo of the bench)";
+    }
+    if (!text && !images.length) continue;
     const platform = space.__platform;
     const isGroup = space.type === "group";
     const senderId = message.sender?.id ?? "unknown";
@@ -116,7 +126,7 @@ async function main() {
           backend.describe().catch(() => null)]);
         lastEvent = desc?.last_event_id ?? 0;
         const out = await think({ memo: m, text: prompt, messageId: message.id, sender: message.sender ? { id: senderId, name: senderName } : undefined,
-          platform, isGroup, state, describe: desc, people });
+          platform, isGroup, state, describe: desc, people, images });
         reply = out.text; pics = out.attachments;
       } catch (e) {
         console.error("[agent] think failed:", e);
