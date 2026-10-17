@@ -1,0 +1,27 @@
+WET LAB BENCH - PLACEMENT SHEET (layout Update 13, planner-verified steps 1-6, 7-8 confirming)
+Tape datums: X measured from the WEST (outer) face of the Y-left rail; Y measured from the SOUTH face of E6 (the stage crossbar).
++X = east (toward Y-right), +Y = north (toward the arm rails). Heights are given for reference only.
+
+FRAME (only change from the CAD as built):
+  - Both X rails (the arm rails) move 74 mm NORTH along the Y rails. Rear corner brackets move to the south side of their joints.
+  - Y-left, Y-right, E6, the stage (S1/S2, sled, crank) stay exactly as built.
+
+ARMS (bases on the X rails; offsets from the X rails' WEST end):
+  Pouring arm ("B", WEST)   : base axis 132.4 mm from the west end   -> tape X +152.4, Y +169.7
+  Transfer arm ("A", EAST)  : base axis 339.8 mm from the west end   -> tape X +359.8, Y +169.7
+
+SCALE: WS-01 saddle on E6, pan on the SOUTH side, pan centre 355 mm from E6's west end (tape X +375, Y -23).
+
+CAROUSEL UNIT (loose, VHB under TT-01): carousel centre tape X +562.9, Y +93.5 (east of the frame).
+  Pick pocket faces the transfer arm (tape X +499.1, Y +38.8). Auger pocket opposite (tape X +626.6, Y +148.2):
+  E5 + PS-01 + auger head sit east/outward so the auger outlet is exactly over the auger pocket (outlet dia 10 inside a 56 pocket: +-20 mm is fine).
+
+REAGENT STANDS (RK-03 x3, loose, VHB under each foot), beaker bottom 60.2 above the table:
+  Stand 1 developer : tape X  -52.7, Y  -35.4   (clears Y-left by ~15 mm)
+  Stand 2 soap      : tape X -110.4, Y  +47.1
+  Stand 3 water     : tape X -136.5, Y +144.4
+
+FUNNEL: in the flask on the sled, as built (tape X +205, Y -148).
+
+Check after placing: every rack stand and the scale pan are 290-295 mm from the pouring arm's base axis;
+the carousel pick pocket and the scale pan are ~191-193 mm from the transfer arm's base axis.

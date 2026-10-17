@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="990" viewBox="0 0 1200 990" font-family="Arial, Helvetica, sans-serif" font-size="12">
+  <title>Wet Lab Bench v2 - electrical block diagram</title>
+  <desc>Power path, minus-star ground and Mega signal connections per CDR-41..CDR-54. Servo change, 2026-10-14: the auger is a Feetech FB5311M-360 on D8 / A2 with a 3 A branch (TB6612, N20 and encoder removed). Authoritative text: docs/electrical.md.</desc>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c62828"/>
+    </marker>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1565c0"/>
+    </marker>
+    <style>
+      .box  { fill: #ffffff; stroke: #37474f; stroke-width: 1.5; }
+      .pwr  { fill: #fff3f0; stroke: #c62828; stroke-width: 1.5; }
+      .gnd  { fill: #f2f2f2; stroke: #212121; stroke-width: 2; }
+      .sig  { fill: #eef4fc; stroke: #1565c0; stroke-width: 1.2; }
+      .mcu  { fill: #f5f9ff; stroke: #1565c0; stroke-width: 2; }
+      .iso  { fill: #fbfbf2; stroke: #8d6e00; stroke-width: 1.5; stroke-dasharray: 6 4; }
+      .wp   { stroke: #c62828; stroke-width: 3; fill: none; }
+      .wg   { stroke: #212121; stroke-width: 2.5; fill: none; }
+      .ws   { stroke: #1565c0; stroke-width: 1.6; fill: none; }
+      .t    { font-size: 12px; fill: #212121; }
+      .tb   { font-size: 13px; font-weight: bold; fill: #212121; }
+      .tn   { font-size: 12px; fill: #546e7a; }
+      .tr   { font-size: 12px; fill: #c62828; }
+      .tk   { font-size: 12px; fill: #212121; font-weight: bold; }
+      .c    { text-anchor: middle; }
+      .e    { text-anchor: end; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="990" fill="#ffffff"/>
+
+  <!-- Title and legend -->
+  <text x="32" y="30" font-size="18" font-weight="bold" fill="#212121">Wet Lab Bench v2: electrical block diagram</text>
+  <text x="32" y="50" class="tn">Authoritative text and tables: docs/electrical.md (CDR-41..54). All servo-bus parts except the e-stop live in EL-02.</text>
+  <line x1="770" y1="22" x2="800" y2="22" class="wp"/><text x="806" y="26" class="t">+ power (16 / 20 / 22 AWG as labelled)</text>
+  <line x1="770" y1="40" x2="800" y2="40" class="wg"/><text x="806" y="44" class="t">ground to the minus star</text>
+  <line x1="770" y1="58" x2="800" y2="58" class="ws"/><text x="806" y="62" class="t">signal / logic (Mega 5 V, Mega GND)</text>
+
+  <!-- Main power chain, 16 AWG silicone -->
+  <text x="32" y="74" class="tr">Main path, 16 AWG silicone, XT60 to + Wago (CDR-45, CDR-47)</text>
+
+  <rect x="32"   y="80" width="128" height="70" rx="6" class="pwr"/>
+  <text x="96"  y="101" class="tb c">LiPo 2S</text>
+  <text x="96"  y="118" class="t c">7.4 V nom, 8.4 full</text>
+  <text x="96"  y="135" class="t c">4.20 V/cell charge</text>
+
+  <rect x="176"  y="80" width="128" height="70" rx="6" class="pwr"/>
+  <text x="240" y="101" class="tb c">XT60</text>
+  <text x="240" y="118" class="t c">connect only with</text>
+  <text x="240" y="135" class="t c">relay open</text>
+
+  <rect x="320"  y="80" width="128" height="70" rx="6" class="pwr"/>
+  <text x="384" y="101" class="tb c">10 A ATO</text>
+  <text x="384" y="118" class="t c">main fuse</text>
+  <text x="384" y="135" class="t c">protects 16 AWG</text>
+
+  <rect x="464"  y="80" width="128" height="70" rx="6" class="pwr"/>
+  <text x="528" y="101" class="tb c">INA226 @0x40</text>
+  <text x="528" y="118" class="t c">10 mΩ 2512 2 W</text>
+  <text x="528" y="135" class="t c">metal-strip shunt</text>
+
+  <rect x="608"  y="80" width="128" height="70" rx="6" class="pwr"/>
+  <text x="672" y="101" class="tb c">2200 µF 16 V</text>
+  <text x="672" y="118" class="t c">bulk cap across bus</text>
+  <text x="672" y="135" class="t c">after the shunt</text>
+
+  <rect x="752"  y="80" width="128" height="70" rx="6" class="pwr"/>
+  <text x="816" y="101" class="tb c">E-STOP pole 1</text>
+  <text x="816" y="118" class="t c">NC, latching 22 mm</text>
+  <text x="816" y="135" class="t c">front table edge</text>
+
+  <rect x="896"  y="80" width="128" height="70" rx="6" class="pwr"/>
+  <text x="960" y="101" class="tb c">RELAY (D25)</text>
+  <text x="960" y="118" class="t c">SRD-05VDC-SL-C</text>
+  <text x="960" y="135" class="t c">COM → NO</text>
+
+  <rect x="1040" y="80" width="128" height="70" rx="6" class="pwr"/>
+  <text x="1104" y="101" class="tb c">+ WAGO 221-415</text>
+  <text x="1104" y="118" class="t c">switched + bus</text>
+  <text x="1104" y="135" class="t c">after the relay</text>
+
+  <line x1="160" y1="115" x2="175" y2="115" class="wp" marker-end="url(#ar)"/>
+  <line x1="304" y1="115" x2="319" y2="115" class="wp" marker-end="url(#ar)"/>
+  <line x1="448" y1="115" x2="463" y2="115" class="wp" marker-end="url(#ar)"/>
+  <line x1="592" y1="115" x2="607" y2="115" class="wp" marker-end="url(#ar)"/>
+  <line x1="736" y1="115" x2="751" y2="115" class="wp" marker-end="url(#ar)"/>
+  <line x1="880" y1="115" x2="895" y2="115" class="wp" marker-end="url(#ar)"/>
+  <line x1="1024" y1="115" x2="1039" y2="115" class="wp" marker-end="url(#ar)"/>
+
+  <!-- Switched + bus and branches -->
+  <path d="M1104 150 V175 H697" class="wp"/>
+  <text x="705" y="168" class="tr">switched + bus: all branch fuses after the relay (CDR-42)</text>
+  <line x1="697"  y1="175" x2="697"  y2="199" class="wp" marker-end="url(#ar)"/>
+  <line x1="820"  y1="175" x2="820"  y2="199" class="wp" marker-end="url(#ar)"/>
+  <line x1="960"  y1="175" x2="960"  y2="199" class="wp" marker-end="url(#ar)"/>
+  <line x1="1104" y1="175" x2="1104" y2="199" class="wp" marker-end="url(#ar)"/>
+
+  <rect x="650" y="200" width="95" height="72" rx="6" class="sig"/>
+  <text x="697" y="218" class="tb c">A1 divider</text>
+  <text x="697" y="234" class="t c">33k / 10k</text>
+  <text x="697" y="250" class="t c">+ 100 nF</text>
+  <text x="697" y="266" class="t c">GND → Mega</text>
+
+  <rect x="755"  y="200" width="130" height="50" rx="6" class="pwr"/>
+  <text x="820"  y="221" class="tb c">3 A ATO</text>
+  <text x="820"  y="239" class="t c">carousel + branch</text>
+  <rect x="895"  y="200" width="130" height="50" rx="6" class="pwr"/>
+  <text x="960"  y="221" class="tb c">3 A ATO</text>
+  <text x="960"  y="239" class="t c">stage + branch</text>
+  <rect x="1039" y="200" width="130" height="50" rx="6" class="pwr"/>
+  <text x="1104" y="221" class="tb c">3 A ATO</text>
+  <text x="1104" y="239" class="t c">auger + branch</text>
+
+  <line x1="820"  y1="250" x2="820"  y2="289" class="wp" marker-end="url(#ar)"/><text x="826"  y="276" class="tr">20 AWG</text>
+  <line x1="960"  y1="250" x2="960"  y2="289" class="wp" marker-end="url(#ar)"/><text x="966"  y="276" class="tr">20 AWG</text>
+  <line x1="1104" y1="250" x2="1104" y2="289" class="wp" marker-end="url(#ar)"/><text x="1110" y="276" class="tr">20 AWG</text>
+
+  <rect x="755"  y="290" width="130" height="80" rx="6" class="box"/>
+  <text x="820"  y="308" class="tb c">CAROUSEL</text>
+  <text x="820"  y="325" class="t c">M45CHW in TT-01</text>
+  <text x="820"  y="342" class="t c">PWM D6</text>
+  <text x="820"  y="359" class="t c">0.3 m 20 AWG HD JR</text>
+
+  <rect x="895"  y="290" width="130" height="80" rx="6" class="box"/>
+  <text x="960"  y="308" class="tb c">STAGE</text>
+  <text x="960"  y="325" class="t c">M45CHW in ST-01</text>
+  <text x="960"  y="342" class="t c">1.0 m 20 AWG HD JR</text>
+  <text x="960"  y="359" class="tr c">+470 µF at JR plug</text>
+
+  <rect x="1039" y="290" width="130" height="80" rx="6" class="box"/>
+  <text x="1104" y="308" class="tb c">AUGER</text>
+  <text x="1104" y="325" class="t c">FB5311M-360</text>
+  <text x="1104" y="342" class="t c">PWM D8, fb A2</text>
+  <text x="1104" y="359" class="t c">on DH-01 v3</text>
+
+  <!-- Ground star -->
+  <rect x="330" y="395" width="310" height="80" rx="6" class="gnd"/>
+  <text x="485" y="414" class="tb c">MINUS STAR (EL-02, beside the 2200 µF)</text>
+  <text x="485" y="431" class="t c">2 × Wago 221-415 joined by 50 mm 16 AWG</text>
+  <text x="485" y="448" class="t c">lands: LiPo −, cap −, carousel −, stage −,</text>
+  <text x="485" y="465" class="t c">auger −, and ONE 22 AWG to Mega GND</text>
+
+  <path d="M60 150 V437 H330" class="wg"/>
+  <text x="66" y="300" class="tk">LiPo − (16 AWG)</text>
+  <path d="M622 150 V395" class="wg"/>
+  <text x="616" y="300" class="tk e">cap −</text>
+  <path d="M790 370 V440 H640" class="wg"/>
+  <text x="796" y="412" class="tk">20 AWG</text>
+  <path d="M930 370 V452 H640" class="wg"/>
+  <text x="936" y="412" class="tk">20 AWG</text>
+  <path d="M1046 370 V464 H640" class="wg"/>
+  <text x="1040" y="412" class="tk e">20 AWG</text>
+  <path d="M485 475 V495 H180 V510" class="wg"/>
+  <text x="200" y="490" class="tk">ONE 22 AWG wire → Mega GND (CDR-47)</text>
+
+  <!-- Mega and signal rows -->
+  <rect x="30" y="510" width="300" height="380" rx="8" class="mcu"/>
+  <text x="42" y="534" font-size="14" font-weight="bold" fill="#0d47a1">ARDUINO MEGA 2560 PRO</text>
+  <text x="42" y="552" class="t">USB-powered (CH340G), in EL-02</text>
+  <text x="42" y="570" class="t">5 V, GND for all logic below</text>
+  <text x="42" y="620" class="tk">Grounds here ONLY:</text>
+  <text x="42" y="638" class="t">HX711, INA226,</text>
+  <text x="42" y="656" class="t">relay module,</text>
+  <text x="42" y="674" class="t">A1 divider,</text>
+  <text x="42" y="692" class="t">Halls,</text>
+  <text x="42" y="710" class="t">e-stop pole 2</text>
+  <text x="42" y="740" class="tn">No RESET capacitor</text>
+  <text x="42" y="758" class="tn">(CDR-41)</text>
+
+  <g>
+    <text x="322" y="599" class="tk e">D2</text>
+    <line x1="330" y1="595" x2="379" y2="595" class="ws" marker-end="url(#ab)"/>
+    <rect x="380" y="583" width="385" height="22" rx="4" class="sig"/>
+    <text x="388" y="599" class="t">E-stop pole 2: NC to GND, INPUT_PULLUP</text>
+    <text x="775" y="599" class="tn">HIGH = F ESTOP; re-arm: LOW 500 ms + RESET + INIT</text>
+
+    <text x="322" y="624" class="tk e">D3 / D4</text>
+    <line x1="330" y1="620" x2="379" y2="620" class="ws" marker-end="url(#ab)"/>
+    <rect x="380" y="608" width="385" height="22" rx="4" class="sig"/>
+    <text x="388" y="624" class="t">HX711 DT / SCK (direct port PINE5 / PORTG5)</text>
+    <text x="775" y="624" class="tn">at WS-01 −Y face, 80 SPS mod, twisted 4-core</text>
+
+    <text x="322" y="649" class="tk e">D6 / D7</text>
+    <line x1="330" y1="645" x2="379" y2="645" class="ws" marker-end="url(#ab)"/>
+    <rect x="380" y="633" width="385" height="22" rx="4" class="sig"/>
+    <text x="388" y="649" class="t">Servo PWM carousel / stage (Timer4 OC4A / OC4B)</text>
+    <text x="775" y="649" class="tn">no Servo library; signal twisted with its ground</text>
+
+    <text x="322" y="674" class="tk e">D8</text>
+    <line x1="330" y1="670" x2="379" y2="670" class="ws" marker-end="url(#ab)"/>
+    <rect x="380" y="658" width="385" height="22" rx="4" class="sig"/>
+    <text x="388" y="674" class="t">Auger servo PWM (Timer4 OC4C, 50 Hz)</text>
+    <text x="775" y="674" class="tn">~1500 µs = stop; offset sets speed and direction</text>
+
+    <text x="322" y="699" class="tk e">D20 / D21</text>
+    <line x1="330" y1="695" x2="379" y2="695" class="ws" marker-start="url(#ab)" marker-end="url(#ab)"/>
+    <rect x="380" y="683" width="385" height="22" rx="4" class="sig"/>
+    <text x="388" y="699" class="t">INA226 SDA / SCL, address 0x40, 50 Hz</text>
+    <text x="775" y="699" class="tn">F STALL: &gt; I_trip for 300 ms, or ≥ 8.0 A at once</text>
+
+    <text x="322" y="724" class="tk e">D25</text>
+    <line x1="330" y1="720" x2="379" y2="720" class="ws" marker-end="url(#ab)"/>
+    <rect x="380" y="708" width="385" height="22" rx="4" class="sig"/>
+    <text x="388" y="724" class="t">Relay IN (10 k to GND, H jumper), coil on USB 5 V</text>
+    <text x="775" y="724" class="tn">boots OPEN; closes only on a valid INIT (CDR-41)</text>
+
+    <text x="322" y="749" class="tk e">D26 / D27</text>
+    <line x1="330" y1="745" x2="379" y2="745" class="ws" marker-start="url(#ab)"/>
+    <rect x="380" y="733" width="385" height="22" rx="4" class="sig"/>
+    <text x="388" y="749" class="t">A3144 Hall WORK / ERUPT (INPUT_PULLUP)</text>
+    <text x="775" y="749" class="tn">VHB on the drop cloth; N52 magnets under ST-04</text>
+
+    <text x="322" y="774" class="tk e">A1</text>
+    <line x1="330" y1="770" x2="379" y2="770" class="ws" marker-start="url(#ab)"/>
+    <rect x="380" y="758" width="385" height="22" rx="4" class="sig"/>
+    <text x="388" y="774" class="t">Bus-presence divider 33k / 10k + 100 nF (AVcc ref)</text>
+    <text x="775" y="774" class="tn">F SERVO_PWR if closed and &lt; 6.0 V; F RELAY_WELD</text>
+
+    <text x="322" y="799" class="tk e">A2</text>
+    <line x1="330" y1="795" x2="379" y2="795" class="ws" marker-start="url(#ab)"/>
+    <rect x="380" y="783" width="385" height="22" rx="4" class="sig"/>
+    <text x="388" y="799" class="t">Auger servo position feedback (analog, AVcc ref)</text>
+    <text x="775" y="799" class="tn">stall: &lt; 5° in 150 ms → stop, reverse ¼ rev, retry</text>
+
+    <text x="322" y="824" class="tk e">USB</text>
+    <line x1="330" y1="820" x2="379" y2="820" class="ws" marker-start="url(#ab)" marker-end="url(#ab)"/>
+    <rect x="380" y="808" width="385" height="22" rx="4" class="sig"/>
+    <text x="388" y="824" class="t">Powered hub, port MEGA → laptop (on battery)</text>
+    <text x="775" y="824" class="tn">identity probe 'OK &lt;seq&gt; WLB-MEGA v1' (CDR-54)</text>
+
+    <text x="380" y="852" class="tn">Servo change, 2026-10-14: TB6612 and N20 encoder removed; D11, D18/D19, D22-D24 freed.</text>
+    <text x="380" y="870" class="tn">Auger servo on its own 3 A branch; never runs during a carousel / stage move (CDR-42).</text>
+  </g>
+
+  <!-- Arms, isolated -->
+  <rect x="30" y="905" width="1140" height="72" rx="6" class="iso"/>
+  <text x="42" y="924" class="tb">SO-101 ARMS A / B: separate supplies, NOT on the LiPo or the minus star (CDR-47, CDR-50)</text>
+  <text x="42" y="942" class="t">Two Class II (2-prong) adapters ≥ 6.5 A, one voltage family only (5 V 8 A or 12 V 8 A), 5.5 × 2.1 mm centre-positive, red/blue bands, 'ARM A/B &lt;V&gt;' labels.</text>
+  <text x="42" y="960" class="t">Adapters only on the switched strip 'ARMS OFF' (last resort, drops the beaker). Arm USB to hub ports A / B. Host: warn &lt; 0.92·V_idle, F ARM_SUPPLY &lt; 0.85·V_idle for &gt; 200 ms.</text>
+</svg>
