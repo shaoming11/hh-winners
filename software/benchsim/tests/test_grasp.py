@@ -1,4 +1,14 @@
+import tempfile
+from pathlib import Path
+
+import pytest
+
 from benchsim import grasp_demo
+
+
+@pytest.fixture(autouse=True)
+def _tmp_out(monkeypatch):
+    monkeypatch.setattr(grasp_demo, 'OUT', Path(tempfile.mkdtemp()))     # keep reports/grasp_demo clean
 
 
 def test_carousel_to_scale_transfer_and_hold():

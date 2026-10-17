@@ -22,7 +22,7 @@
   "cut_law_mean_g": 0.462,
   "spill_margin_min_g": 5.631,
   "tilt_lag_max_deg": 0.38,
-  "wall_s": 34.6
+  "wall_s": 31.1
  },
  "trials": [
   {
@@ -72,7 +72,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 33.15,
-   "wall_s": 4.2,
+   "wall_s": 3.8,
    "setup": [
     "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
     "dev filled with 48.0 mL developer (49.92 g) in the Ledger"
@@ -190,7 +190,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 32.67,
-   "wall_s": 4.2,
+   "wall_s": 3.7,
    "setup": [
     "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
     "dev filled with 51.5 mL developer (53.56 g) in the Ledger"
@@ -308,7 +308,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 32.27,
-   "wall_s": 4.1,
+   "wall_s": 3.5,
    "setup": [
     "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
     "dev filled with 55.0 mL developer (57.20 g) in the Ledger"
@@ -426,7 +426,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 31.87,
-   "wall_s": 4.0,
+   "wall_s": 3.5,
    "setup": [
     "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
     "dev filled with 58.5 mL developer (60.84 g) in the Ledger"
@@ -544,7 +544,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 31.42,
-   "wall_s": 4.0,
+   "wall_s": 3.5,
    "setup": [
     "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
     "dev filled with 62.0 mL developer (64.48 g) in the Ledger"
@@ -662,7 +662,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 31.07,
-   "wall_s": 4.0,
+   "wall_s": 3.4,
    "setup": [
     "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
     "dev filled with 65.5 mL developer (68.12 g) in the Ledger"
@@ -780,7 +780,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 30.6,
-   "wall_s": 3.9,
+   "wall_s": 3.4,
    "setup": [
     "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
     "dev filled with 69.0 mL developer (71.76 g) in the Ledger"
@@ -898,7 +898,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 30.3,
-   "wall_s": 4.0,
+   "wall_s": 3.5,
    "setup": [
     "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
     "dev filled with 72.5 mL developer (75.40 g) in the Ledger"
@@ -1016,7 +1016,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 29.87,
-   "wall_s": 3.9,
+   "wall_s": 3.4,
    "setup": [
     "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
     "dev filled with 76.0 mL developer (79.04 g) in the Ledger"
@@ -1134,7 +1134,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 29.4,
-   "wall_s": 3.9,
+   "wall_s": 3.4,
    "setup": [
     "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
     "dev filled with 80.0 mL developer (83.20 g) in the Ledger"
@@ -1253,7 +1253,7 @@
   ],
   "prepour_sim_s": 11.1,
   "sim_s": 25.9,
-  "wall_s": 3.2,
+  "wall_s": 2.8,
   "setup": [
    "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
    "dev filled with 40.0 mL developer (41.60 g) in the Ledger"
@@ -1357,7 +1357,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 25.9,
-   "wall_s": 3.4,
+   "wall_s": 3.0,
    "setup": [
     "scale pan shifted by (-20.2, 28.6) mm from its update13_final position",
     "P1 teleported to scale_pan at (599.8, 435.6, 63.8) mm",
@@ -1465,7 +1465,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 28.17,
-   "wall_s": 3.5,
+   "wall_s": 3.0,
    "setup": [
     "scale pan shifted by (-30.7, 5.2) mm from its update13_final position",
     "P1 teleported to scale_pan at (589.3, 412.2, 63.8) mm",
@@ -1584,7 +1584,7 @@
    ],
    "prepour_sim_s": 11.1,
    "sim_s": 32.6,
-   "wall_s": 4.0,
+   "wall_s": 3.4,
    "setup": [
     "scale pan shifted by (-30.7, 5.2) mm from its update13_final position",
     "P1 teleported to scale_pan at (589.3, 412.2, 63.8) mm",
@@ -1696,7 +1696,7 @@
    "P1 holds 39.0 g developer in the Ledger (the scale pour result)"
   ],
   "sim_s": 22.98,
-  "wall_s": 2.8,
+  "wall_s": 2.4,
   "landing_theta_range": [
    71.3,
    105.0

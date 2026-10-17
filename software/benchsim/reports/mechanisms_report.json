@@ -113,6 +113,11 @@
    ],
    "pocket_inner_r": 28.3,
    "pocket_wall_r": 30.3,
+   "pocket_bore_r": 30.6,
+   "pocket_rib_z": [
+    3.0,
+    6.0
+   ],
    "ring_z": [
     58.6,
     70.6
@@ -212,7 +217,11 @@
   "gripper": {
    "cad_to_mj_offset_deg": 55.0,
    "contact_tol_deg": 3.0,
-   "miss_margin_deg": 2.5
+   "miss_margin_deg": 2.5,
+   "squeeze_deg": 6.0,
+   "contact_deg_side": 7.72,
+   "contact_deg_td": 22.94,
+   "scale_delta_min_g": 8.0
   },
   "recipe": {
    "developer_g": 39.0,
@@ -222,6 +231,90 @@
    "water_g": 30.0,
    "water_tol_g": 2.0,
    "activate_wait_s": 60.0
+  },
+  "vision": {
+   "roi_margin_px": 4,
+   "beaker_s_max": 0.25,
+   "beaker_v_min": 0.55,
+   "beaker_min_frac": 0.495,
+   "reference_diff_min": 8.0,
+   "foam_rgb": [
+    245.0,
+    245.0,
+    240.0
+   ],
+   "foam_rgb_tol": 45.0,
+   "foam_row_min_frac": 0.3,
+   "foam_max_gap_rows": 2
+  },
+  "liquid": {
+   "cd": 0.62,
+   "lip_width_mm": 14.0,
+   "hold_head_mm": 0.5,
+   "exit_velocity_coeff": 1.0,
+   "transport_delay_s": 0.03,
+   "jet_radius_mm": 3.0,
+   "impact_force": true,
+   "funnel_delay_s": 0.8,
+   "residual_film_ml": 0.4,
+   "drip_ml": 0.1,
+   "drip_tau_s": 0.5
+  },
+  "pour": {
+   "control_dt_s": 0.025,
+   "fit_window_s": 0.5,
+   "outlier_sigma": 5.0,
+   "outlier_sigma_floor_g": 0.07,
+   "outlier_reset_n": 4,
+   "theta_start_deg": 40.0,
+   "theta_max_deg": 105.0,
+   "fast_rate_deg_s": 120.0,
+   "ramp_rate_deg_s": 3.0,
+   "first_drop_q_g_s": 0.5,
+   "first_drop_n": 3,
+   "first_drop_dm_g": 0.3,
+   "kp_deg_per_gs": 0.15,
+   "ki_deg_per_s_per_gs": 1.5,
+   "max_rate_deg_s": 10.0,
+   "q_gain_per_s": 0.6,
+   "q_min_g_s": 1.0,
+   "q_ceiling_g_s": 8.0,
+   "cut_a_g": 0.3,
+   "cut_b_s": 0.15,
+   "untilt_fast_deg": 5.0,
+   "untilt_fast_big_deg": 8.0,
+   "untilt_big_q_g_s": 5.0,
+   "untilt_rate_deg_s": 60.0,
+   "untilt_total_deg": 15.0,
+   "drip_hold_s": 1.5,
+   "settle_window_s": 0.5,
+   "settle_timeout_s": 5.0,
+   "settle_sigma_g": 0.15,
+   "settle_flow_g_s": 0.25,
+   "topup_back_deg": 3.0,
+   "topup_ramp_deg_s": 10.0,
+   "topup_step_deg": 0.5,
+   "topup_period_s": 0.6,
+   "topup_flow_g_s": 0.3,
+   "max_topup_pulses": 6,
+   "max_pour_s": 45.0,
+   "spill_check": true,
+   "spill_allow_g": 8.0,
+   "spill_allow_s": 1.5,
+   "spill_ratio": 0.6,
+   "spill_hold_s": 1.0,
+   "spill_arm_s": 2.0,
+   "funnel_theta_deg": 105.0,
+   "funnel_rate_deg_s": 10.0,
+   "funnel_hold_s": 3.0,
+   "developer": {
+    "low_fill_ml": 46.0,
+    "fill_offset_ml": 9.2
+   },
+   "water": {
+    "low_fill_ml": 36.0,
+    "fill_offset_ml": 9.2
+   }
   },
   "auger_model": {
    "true_over_nominal": 1.0,
@@ -259,6 +352,37 @@
     0.95
    ],
    "update_dt_s": 0.01
+  },
+  "mega": {
+   "baud": 250000,
+   "wdt_ms": 500,
+   "progress_ms": 200,
+   "settle_ms": 150,
+   "estop_release_ms": 500,
+   "hx_timeout_min_ms": 100,
+   "hx_timeout_intervals": 4,
+   "tare_samples": 8,
+   "home_tt_deg": 0.0,
+   "servo_us_min": 500,
+   "servo_us_max": 2500,
+   "tt_us_at_zero": 568.9655,
+   "tt_us_per_deg": 6.896552,
+   "st_us_at_zero": 944.4445,
+   "st_us_per_deg": 7.407407,
+   "aug_us_stop": 1500,
+   "aug_us_offset": 200,
+   "aug_dir_sign": 1,
+   "aug_fb_sign": 1,
+   "aug_fb_adc_min": 0,
+   "aug_fb_adc_max": 1023,
+   "aug_fb_max_step_deg": 45.0,
+   "aug_fb_glitch_resync": 20
+  },
+  "sts3215": {
+   "goal_velocity_unit_ticks_s": 1.0,
+   "acceleration_unit_ticks_s2": 100.0,
+   "acceleration_reg_max": 254,
+   "load_unit_permille": 1.0
   }
  },
  "carousel": {
@@ -347,13 +471,13 @@
     "beakers": {
      "P1": {
       "pocket": 0,
-      "offset_mm": 0.193,
+      "offset_mm": 0.195,
       "tilt_deg": 0.042
      },
      "P2": {
       "pocket": 1,
-      "offset_mm": 0.226,
-      "tilt_deg": 0.024
+      "offset_mm": 0.227,
+      "tilt_deg": 0.028
      }
     }
    },
@@ -383,13 +507,13 @@
     "beakers": {
      "P1": {
       "pocket": 0,
-      "offset_mm": 0.155,
-      "tilt_deg": 0.038
+      "offset_mm": 0.157,
+      "tilt_deg": 0.039
      },
      "P2": {
       "pocket": 1,
-      "offset_mm": 0.228,
-      "tilt_deg": 0.028
+      "offset_mm": 0.223,
+      "tilt_deg": 0.024
      }
     }
    },
@@ -419,13 +543,13 @@
     "beakers": {
      "P1": {
       "pocket": 0,
-      "offset_mm": 0.059,
-      "tilt_deg": 0.026
+      "offset_mm": 0.061,
+      "tilt_deg": 0.023
      },
      "P2": {
       "pocket": 1,
-      "offset_mm": 0.193,
-      "tilt_deg": 0.058
+      "offset_mm": 0.187,
+      "tilt_deg": 0.051
      }
     }
    },
@@ -455,13 +579,13 @@
     "beakers": {
      "P1": {
       "pocket": 0,
-      "offset_mm": 0.108,
-      "tilt_deg": 0.227
+      "offset_mm": 0.092,
+      "tilt_deg": 0.236
      },
      "P2": {
       "pocket": 1,
-      "offset_mm": 0.2,
-      "tilt_deg": 0.133
+      "offset_mm": 0.199,
+      "tilt_deg": 0.13
      }
     }
    },
@@ -491,13 +615,13 @@
     "beakers": {
      "P1": {
       "pocket": 0,
-      "offset_mm": 0.132,
-      "tilt_deg": 0.374
+      "offset_mm": 0.136,
+      "tilt_deg": 0.343
      },
      "P2": {
       "pocket": 1,
-      "offset_mm": 0.205,
-      "tilt_deg": 0.166
+      "offset_mm": 0.206,
+      "tilt_deg": 0.158
      }
     }
    },
@@ -527,13 +651,13 @@
     "beakers": {
      "P1": {
       "pocket": 0,
-      "offset_mm": 0.186,
-      "tilt_deg": 0.435
+      "offset_mm": 0.184,
+      "tilt_deg": 0.412
      },
      "P2": {
       "pocket": 1,
-      "offset_mm": 0.195,
-      "tilt_deg": 0.188
+      "offset_mm": 0.209,
+      "tilt_deg": 0.181
      }
     }
    }
@@ -826,7 +950,7 @@
   "cv": 0.06,
   "landing": {
    "receiver": "P2",
-   "outlet_to_axis_mm": 0.382,
+   "outlet_to_axis_mm": 0.391,
    "limit_mm": 21.8,
    "outlet_above_lip_mm": 33.92
   },
@@ -2065,5 +2189,5 @@
  },
  "pass_": true,
  "failed": [],
- "wall_s": 187.9
+ "wall_s": 162.4
 }

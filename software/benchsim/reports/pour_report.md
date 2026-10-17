@@ -103,7 +103,7 @@ The ramp lag is kinematic, not the liquid load: the same lag appears with an emp
 - Receiver: P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm. Developer: dev filled with 48.0 mL developer (49.92 g) in the Ledger.
 - The pourer runs the first 6 segments of the native step-2 plan (grip height 44 mm from reports/native_plans.json) through the phase-5 Executor; the grasp is classified from the jaw angle (grasped 8.26 deg vs 7.72) and held by the phase-5 weld. Pre-pour reached at 11.1 s sim.
 - Tilt actuator: theta -> joint goal by linear interpolation of the plan's tilt-in (theta from forward kinematics of the held beaker) and the 1-deg pour manifold; goals go to SimArm.set_goal at 40 Hz. Largest commanded - actual beaker tilt while pouring: 0.38 deg.
-- Scale samples come from MegaClient (STREAM, TARE) on the simulated HX711 (80 Hz, 0.07 g noise). The flexure reading includes the stream impact. Total wall time 35 s (5 processes).
+- Scale samples come from MegaClient (STREAM, TARE) on the simulated HX711 (80 Hz, 0.07 g noise). The flexure reading includes the stream impact. Total wall time 31 s (5 processes).
 - Traces (`reports/pour_traces/*.csv`, every 2nd control tick): t, state, theta_cmd, theta_beaker (actual), m_f, q_hat, q_set, scale_w (latest raw sample), m_true (Ledger), q_lip (true lip flow g/s), in_flight, spilled, src_g.
 
 ## Known gaps
