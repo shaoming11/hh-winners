@@ -102,10 +102,15 @@ def make_handler(hub, control, web=WEB, extra_files=None):
         def _mjpeg(self):
             self.send_response(200); self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=frame')
             self.send_header('Cache-Control', 'no-store'); self.end_headers(); ver = -1
+            # Chrome shows a part only once the NEXT part's headers arrive, so each frame is followed at once by the
+            # boundary and headers of the next one (no Content-Length: it isn't known yet, and the boundary delimits the
+            # part anyway). Otherwise a single idle push (a camera switch between runs) stays hidden, one switch behind.
+            part = b'--frame\r\nContent-Type: image/jpeg\r\n\r\n'
+            self.wfile.write(part)
             while True:
                 nv, jpg = hub.wait('jpeg', ver, timeout=10.0)
                 if jpg is None or nv == ver: continue
-                self.wfile.write(b'--frame\r\nContent-Type: image/jpeg\r\nContent-Length: %d\r\n\r\n' % len(jpg) + jpg + b'\r\n')
+                self.wfile.write(jpg + b'\r\n' + part)
                 self.wfile.flush(); ver = nv
     return Handler
 

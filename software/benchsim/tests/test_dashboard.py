@@ -104,6 +104,24 @@ def test_server_endpoints():
         srv.shutdown()
 
 
+def test_mjpeg_closes_each_frame_with_the_next_parts_headers():
+    """Chrome shows a multipart part only once the next part's headers arrive; a lone idle frame must not wait for them"""
+    import socket, time
+    from benchsim.dashboard import server
+    hub = server.Hub(); srv = server.serve(hub, lambda c: (False, ''), port=0)
+    s = socket.create_connection(('127.0.0.1', srv.server_address[1])); s.settimeout(0.2)
+    try:
+        s.sendall(b'GET /stream.mjpg HTTP/1.1\r\nHost: x\r\n\r\n'); hub.frame(b'\xff\xd8one\xff\xd9')
+        buf = b''; end = time.time() + 1.0
+        nxt = b'\r\n--frame\r\nContent-Type: image/jpeg\r\n\r\n'
+        while time.time() < end and not buf.endswith(nxt):
+            try: buf += s.recv(4096)
+            except socket.timeout: pass
+        assert buf.endswith(b'\xff\xd8one\xff\xd9' + nxt), buf[-60:]
+    finally:
+        s.close(); srv.shutdown()
+
+
 def test_video_frames_and_auto_camera():
     from benchsim.bench import make_bench
     from benchsim.dashboard import server, video as V

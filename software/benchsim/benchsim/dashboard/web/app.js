@@ -86,12 +86,13 @@ function renderCams(s) {
   const v = s.probes && s.probes.video;
   if (!v) { $('cams').hidden = true; return; }
   const names = ['auto'].concat(v.cameras);
-  const key = v.camera + '|' + v.shown + '|' + names.join(',');
-  if (key === camKey) return;
-  camKey = key;
   $('cams').hidden = false;
-  $('cams').innerHTML = names.map((n) => '<button data-cam="' + esc(n) + '" class="' + (n === v.camera ? 'on' : '') + '">' + esc(CAM[n] || n) +
-    (n === 'auto' && v.camera === 'auto' ? ' <span class="live">· ' + esc(CAM[v.shown] || v.shown) + '</span>' : '') + '</button>').join('');
+  if (names.join(',') !== camKey) {   // rebuild only when the camera list changes, so a click is never lost mid-rebuild
+    camKey = names.join(',');
+    $('cams').innerHTML = names.map((n) => '<button data-cam="' + esc(n) + '">' + esc(CAM[n] || n) + (n === 'auto' ? '<span class="live"></span>' : '') + '</button>').join('');
+  }
+  for (const b of $('cams').children) b.classList.toggle('on', b.dataset.cam === v.camera);
+  $('cams').querySelector('.live').textContent = v.camera === 'auto' ? ' · ' + (CAM[v.shown] || v.shown) : '';
 }
 $('cams').addEventListener('click', (e) => { const b = e.target.closest('button[data-cam]'); if (b) command('camera/' + b.dataset.cam); });
 

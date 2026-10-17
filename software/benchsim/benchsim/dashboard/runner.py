@@ -139,6 +139,7 @@ class Runner:
         if cmd.startswith('camera/'):
             name = cmd.split('/', 1)[1]
             if self.video is None or not self.video.set_camera(name): return False, 'unknown camera %s' % name
+            self.cmds.put('camera')   # between runs, redraw now rather than at the next 0.5 s idle tick
             return True, 'camera: %s' % name
         return False, 'unknown command %s' % cmd
 
@@ -197,4 +198,5 @@ class Runner:
             if cmd == 'quit': return
             if cmd == 'start': self._start()
             elif cmd == 'reset': self.build()
+            elif cmd == 'camera': self.video.idle(); self.feed.flush(); continue
             idle_since = time.monotonic()
