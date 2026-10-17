@@ -17,7 +17,7 @@ from . import cadmap, paths, poses, scene, trajectories
 from .kinematics import RULE
 
 REPORTS = paths.SIM_ROOT / 'reports'
-STATION_SEGS = ('descend', 'close', 'lift from', 'lower', 'release', 'lift out', 'lift 20', 'slide', 'lower to channel')
+STATION_SEGS = ('descend', 'close', 'lift from', 'lower', 'release', 'lift out', 'lift 20', 'slide', 'lower to channel', 'touch', 'move fixed finger')
 
 
 def free_clearance(rows):
@@ -38,6 +38,7 @@ def pose_rows(P, plans):
             site = s['grasp']; p, R = K.site(arm, q, site)
             if arm == 'transfer': tgt = P.station(v['src'] if s['gripper'] == 'close' else v['dst'])
             else: tgt = P.station(v['src']) + [0, 0, v['info']['grip_h_used']]
+            if s['gripper'] == 'open': tgt = tgt + [0, 0, poses.PLACE_CLEAR_MM]      # placements release 1.5 mm up
             mg = K.min_margin(arm, q); phase = 'pick' if s['gripper'] == 'close' else 'place'
             rows.append(dict(step=name, pose='%s (%s)' % (phase, s['name']), arm=arm, endpoint_error_mm=round(float(np.linalg.norm(p - tgt)), 3),
                              axis_tilt_deg=round(math.degrees(math.acos(np.clip(abs(R[2, 2]), -1, 1))), 3), min_margin_deg=round(mg[0], 2),

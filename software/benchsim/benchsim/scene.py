@@ -21,6 +21,13 @@ BEAKERS = {                                        # name -> initial station (de
     'P1': 'carousel_pocket_0', 'P2': 'carousel_pocket_1', 'dev': 'rack_1', 'water': 'rack_3',
 }
 STATIC, STAGE, CAROUSEL, PAN, ALL = 1, 2, 4, 8, 15
+FINGER, BEAKER = 16, 32
+# contype / conaffinity pairs. MuJoCo collides two geoms if (contype1 & conaffinity2) or (contype2 & conaffinity1).
+# Gripper geoms (finger boxes and GR-01/GR-02 hulls) and beakers get their own bits so that SimWorld.attach can drop
+# exactly the finger <-> held-beaker pair (clear FINGER from the held beaker's conaffinity) while both keep
+# colliding with everything else.
+GRIPPER_BITS = (FINGER, ALL)
+BEAKER_BITS = (BEAKER, ALL | FINGER | BEAKER)
 FRAME_RGBA = (0.62, 0.64, 0.67, 1)
 PLA = (0.93, 0.93, 0.93, 1)
 PLA_DARK = (0.25, 0.27, 0.30, 1)
@@ -62,7 +69,8 @@ class Builder:
         g = body.add_geom(type=kind, size=list(m(np.asarray(size_mm, float))) + [0] * (3 - len(size_mm)), pos=m(pos_mm),
                           quat=list(quat), rgba=list(rgba), group=group)
         if name: g.name = name
-        g.contype = cls if collide else 0; g.conaffinity = cls if collide else 0
+        if isinstance(cls, tuple): g.contype, g.conaffinity = cls if collide else (0, 0)
+        else: g.contype = cls if collide else 0; g.conaffinity = cls if collide else 0
         for k, v in kw.items(): setattr(g, k, v)
         return g
 
@@ -75,7 +83,8 @@ class Builder:
         mname = name or 'mesh%d' % self._mesh_n
         spec.add_mesh(name=mname, uservert=list(m(np.asarray(V_mm, float)).reshape(-1)), userface=list(np.asarray(F, int).reshape(-1)))
         g = body.add_geom(type=mujoco.mjtGeom.mjGEOM_MESH, meshname=mname, rgba=list(rgba), pos=m(pos), quat=list(quat), group=group)
-        g.contype = cls if collide else 0; g.conaffinity = cls if collide else 0
+        if isinstance(cls, tuple): g.contype, g.conaffinity = cls if collide else (0, 0)
+        else: g.contype = cls if collide else 0; g.conaffinity = cls if collide else 0
         return g
 
     def ring_walls(self, body, c, r_in, r_out, z0, z1, n=24, cls=STATIC, rgba=PLA, collide=True, name=None):
@@ -147,15 +156,17 @@ class Builder:
         pockets = []
         for k, a in enumerate(C['pocket_ids_deg']):
             p = (C['pitch_r'] * math.cos(math.radians(a)), C['pitch_r'] * math.sin(math.radians(a)))
-            self.ring_walls(deck, p, C['pocket_inner_r'], C['pocket_wall_r'], floor, rz1, n=20, cls=CAROUSEL, rgba=(0.95, 0.75, 0.2, 1),
+            self.ring_walls(deck, p, C['pocket_bore_r'], C['pocket_bore_r'] + 2.0, floor, rz1, n=20, cls=CAROUSEL, rgba=(0.95, 0.75, 0.2, 1),
                             name='pocket%d' % k)
+            self.ring_walls(deck, p, C['pocket_inner_r'], C['pocket_bore_r'], floor + C['pocket_rib_z'][0], floor + C['pocket_rib_z'][1], n=20,
+                            cls=CAROUSEL, rgba=(0.95, 0.75, 0.2, 1), name='pocket%drib' % k)
             deck.add_site(name='pocket%d' % k, pos=m([p[0], p[1], floor]))
             pockets.append(dict(angle_deg=a, local_xy=p))
         a = self.spec.add_actuator(name='carousel', target='carousel', trntype=mujoco.mjtTrn.mjTRN_JOINT)
         a.set_to_position(kp=8.0, kv=1.0); a.forcerange = [-4.4, 4.4]; a.forcelimited = True    # M45CHW ~45 kg.cm
         a.ctrlrange = list(np.radians(C['deck_range_deg'])); a.ctrllimited = True
         self.meta['stations']['carousel'] = dict(centre=c, pockets=pockets, floor_z=floor)
-        self.fid.add('carousel TT-01/TT-02/TT-04 v4', 'procedural', 'cylinders + 20-box pocket walls',
+        self.fid.add('carousel TT-01/TT-02/TT-04 v4', 'procedural', 'cylinders + 20-box pocket bore (r 30.6) + 3 mm rib band (r 28.3)',
                      'update13_final carousel + layout_final.py pocket walls r28.3-30.3', 'deck on a hinge with a position servo')
 
     def auger(self):
@@ -255,8 +266,8 @@ class Builder:
             b.mass = B['empty_mass_g'] / 1000; b.ipos = m([0, 0, h * 0.45])
             Ixx = b.mass * (3 * (r / 1000) ** 2 + (h / 1000) ** 2) / 12 * 0.8; b.inertia = [Ixx, Ixx, b.mass * (r / 1000) ** 2]
             b.explicitinertial = True
-            self.cyl(b, (0, 0, B['floor'] / 2), r, B['floor'] / 2, cls=ALL, rgba=PP, name='beaker_%s_floor' % name, friction=[0.9, 0.01, 0.001])
-            self.ring_walls(b, (0, 0), r - B['wall'], r, B['floor'] + 0.3, h, n=20, cls=ALL, rgba=(0.92, 0.95, 0.97, 0.0), name='beaker_%s' % name)
+            self.cyl(b, (0, 0, B['floor'] / 2), r, B['floor'] / 2, cls=BEAKER_BITS, rgba=PP, name='beaker_%s_floor' % name, friction=[0.9, 0.01, 0.001])
+            self.ring_walls(b, (0, 0), r - B['wall'], r, B['floor'] + 0.3, h, n=20, cls=BEAKER_BITS, rgba=(0.92, 0.95, 0.97, 0.0), name='beaker_%s' % name)
             V, F = meshes.tube(r - B['wall'], r, h, n=48)
             self.mesh(b, V, F, rgba=PP, name='beaker_%s_vis' % name)
             self.cyl(b, (0, 0, B['floor'] + 0.5), r - B['wall'] - 0.3, 0.5, rgba=(0.2, 0.5, 0.95, 0.8), collide=False, name='liquid_' + name, group=1)
@@ -311,7 +322,8 @@ class Builder:
         tip = BF + L * d; shift = (tip[1] + self.P['beaker']['od'] / 2 + self.TD_CLEAR) - c2[1]
         self.meta['td_taught_shift_mm'] = float(shift)
         sites = dict(grasp_side=((c0 - pb) @ Rb, Rb.T @ Rside), grasp_td=((bottom_td - pb) @ Rb, Rb.T @ Rtd),
-                     grasp_td_taught=((bottom_td + shift * e2 - pb) @ Rb, Rb.T @ Rtd))
+                     grasp_td_taught=((bottom_td + shift * e2 - pb) @ Rb, Rb.T @ Rtd),
+                     grasp_td_contact=((bottom_td + (shift - self.TD_CLEAR) * e2 - pb) @ Rb, Rb.T @ Rtd))
         hinge = dict(pos=(gp - pb) @ Rb, axis=Rb.T @ g)
         return out, boxes, sites, hinge
 
@@ -328,16 +340,16 @@ class Builder:
                 for k, item in enumerate(geo[bname]):
                     mg = self.mesh(b, item['V'], item['F'], rgba=item['rgba'], name='%s_%s_%d' % (arm, bname, k), spec=c, group=2)
                     if item['file'].startswith(('GR-01', 'GR-02')):
-                        mg2 = self.mesh(b, item['V'], item['F'], rgba=item['rgba'], name='%s_%s_%dc' % (arm, bname, k), spec=c, group=3, collide=True, cls=ALL)
+                        mg2 = self.mesh(b, item['V'], item['F'], rgba=item['rgba'], name='%s_%s_%dc' % (arm, bname, k), spec=c, group=3, collide=True, cls=GRIPPER_BITS)
             for bx in boxes:
-                gg = self.box(c.body(bx['body']), bx['pos'], bx['half'], quat=mat_to_quat(bx['R']), cls=ALL, rgba=(0.1, 0.5, 0.9, 0.0),
+                gg = self.box(c.body(bx['body']), bx['pos'], bx['half'], quat=mat_to_quat(bx['R']), cls=GRIPPER_BITS, rgba=(0.1, 0.5, 0.9, 0.0),
                               name='finger_%s' % ('fixed' if bx['body'] == 'gripper' else 'moving'), group=3)
                 gg.friction = [1.2, 0.02, 0.002]; gg.solref = [0.006, 1.0]; gg.solimp = [0.9, 0.98, 0.002, 0.5, 2]
             gb = c.body('gripper')
             for sname, (p, R) in sites.items():
                 gb.add_site(name=sname, pos=m(p), quat=list(mat_to_quat(R)), size=[0.004, 0, 0], group=4)
             for gg in self._iter_geoms(c.worldbody):
-                if gg.contype != 0 and gg.classname.name != 'visual': gg.contype = ALL; gg.conaffinity = ALL
+                if gg.contype != 0 and gg.classname.name != 'visual' and gg.contype != FINGER: gg.contype = ALL; gg.conaffinity = ALL
             c.actuator('gripper').forcerange = [-A['grip_force_limit_nm'], A['grip_force_limit_nm']]
             base = self.st['%s_base' % arm]['xy']
             R = cadmap.base_rotation(A['base_yaw_deg'])
@@ -363,7 +375,7 @@ class Builder:
             for bk in BEAKERS:
                 e = self.spec.add_equality(type=mujoco.mjtEq.mjEQ_WELD, name='hold_%s_%s' % (arm, bk), objtype=mujoco.mjtObj.mjOBJ_BODY)
                 e.name1 = '%s/gripper' % arm; e.name2 = 'beaker_' + bk; e.active = False
-                e.solref = [0.004, 1.0]
+                e.solref = [0.002, 1.0]; e.solimp = [0.95, 0.99, 0.001, 0.5, 2]
 
     CAD_HIDES = {'RK-03': ('rk03_',), 'TT-04': ('tt04_floor', 'pocket'), 'TT-02': ('tt02_deck',), 'WS-02': ('scale_pan_floor', 'scale_ring'),
                  'ST-11': ('st11_sled',), 'ST-12': ('st12_bridge',), 'ST-13': ('st13_crank',), 'ST-14': ('st14_rod',),

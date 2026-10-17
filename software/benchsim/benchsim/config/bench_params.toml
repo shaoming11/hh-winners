@@ -62,8 +62,10 @@ quant_counts = 1                            # one count quantisation
 # TT-04 v4 ring, 4 pockets at r 84 (update13_final + layout_final.py World: pocket walls r 28.3-30.3, Z 58.6-70.6)
 pitch_r = 84.0
 pocket_ids_deg = [220.6, 310.6, 40.6, 130.6]   # pocket angles at deck angle 0 (pick, +90, auger, +270); layout_final.py LAY
-pocket_inner_r = 28.3
+pocket_inner_r = 28.3                       # locating ribs (TT-04 v4 STL: r 28.25 over local Z 6.1-9.0)
 pocket_wall_r = 30.3
+pocket_bore_r = 30.6                        # TT-04 v4 STL bore above and below the ribs (benchsim.meshfit profile)
+pocket_rib_z = [3.0, 6.0]                   # rib band above the beaker bottom (STL local Z 6.1-9.0, floor at 3.1)
 ring_z = [58.6, 70.6]
 ring_od = 216.6                             # TT-04 v4 STL extent
 deck_od = 236.0                             # TT-02 STL extent
@@ -136,6 +138,13 @@ cup_inner_r = 28.6                          # 0.6 mm radial clearance: assumed
 cad_to_mj_offset_deg = 55.0
 contact_tol_deg = 3.0                       # observed jaw angle within this of the expected contact angle = grasp
 miss_margin_deg = 2.5                       # observed jaw closing this far past the contact angle = miss
+squeeze_deg = 6.0                           # close command this far past contact (torque limit stops the jaw); firmware SQUEEZE 4 in gripper_design
+# expected jaw angle at contact (MJCF gripper joint, deg). side: gripper_design.json q_contact(56) + offset = 7.72; the
+# simulated closes stop at 7.56-8.35. top-down: beaker 16 mm toward the moving jaw, fixed finger touching before the
+# close; the simulated close stops at 22.94 (benchsim.grasp_demo --calibrate). Both must be re-taught on the real gripper.
+contact_deg_side = 7.72
+contact_deg_td = 22.94
+scale_delta_min_g = 8.0                     # a lift/place must change the scale by at least this (empty beaker ~18 g)
 
 [recipe]
 # demo_process 1: targets and design tolerances

@@ -75,10 +75,19 @@ class SimWorld:
         # weld data: anchor (3), relpose pos (3), relpose quat (4), torquescale (1); relpose = body2 in body1 frame
         self.m.eq_data[e, 0:3] = 0.0; self.m.eq_data[e, 3:6] = rel_p; self.m.eq_data[e, 6:10] = q; self.m.eq_data[e, 10] = 1.0
         self.d.eq_active[e] = 1; self.held[arm] = beaker; self.log('attach', arm=arm, beaker=beaker)
+        self._finger_contact(beaker, False)
+
+    def _finger_contact(self, beaker, on):
+        """while held, the weld replaces the compliant finger contact: drop the FINGER bit from the beaker's conaffinity"""
+        from ..scene import FINGER
+        bid = self.m.body('beaker_' + beaker).id
+        for g in range(self.m.ngeom):
+            if self.m.geom_bodyid[g] == bid and self.m.geom_contype[g]:
+                self.m.geom_conaffinity[g] = (self.m.geom_conaffinity[g] | FINGER) if on else (self.m.geom_conaffinity[g] & ~FINGER)
 
     def detach(self, arm):
         bk = self.held.pop(arm, None)
-        if bk is not None: self.d.eq_active[self.welds[(arm, bk)]] = 0; self.log('detach', arm=arm, beaker=bk)
+        if bk is not None: self.d.eq_active[self.welds[(arm, bk)]] = 0; self._finger_contact(bk, True); self.log('detach', arm=arm, beaker=bk)
         return bk
 
     # ------------------------------------------------------------------ helpers
@@ -123,7 +132,7 @@ class SimArm(Plugin):
         self.dadr = np.array([m.jnt_dofadr[m.joint('%s/%s' % (arm, j)).id] for j in state.ARM_JOINTS])
         self.vmax = math.radians(world.P['arm']['max_speed_deg_s'])
         self.gain0 = m.actuator_gainprm[self.aid].copy(); self.bias0 = m.actuator_biasprm[self.aid].copy()
-        self.torque = True; self.traj = None; self.connected = False
+        self.torque = True; self.traj = None; self.connected = False; self.jaw_stop = None
         self.frange = m.actuator_forcerange[self.aid, 1].copy()
         world.add_plugin(self)
 
@@ -169,10 +178,41 @@ class SimArm(Plugin):
         return self.w.d.ctrl[self.aid] - self.w.d.qpos[self.qadr]
 
     def pre_step(self, w):
-        if self.traj is None or not self.torque: return
-        t0, q0, q1, dur = self.traj; s = smoothstep((w.time - t0) / dur)
-        w.d.ctrl[self.aid] = q0 + (q1 - q0) * s
-        if s >= 1.0: self.traj = None
+        if self.traj is not None and self.torque:
+            t0, q0, q1, dur = self.traj; s = smoothstep((w.time - t0) / dur)
+            w.d.ctrl[self.aid] = q0 + (q1 - q0) * s
+            if s >= 1.0: self.traj = None
+            self.cmd6 = float(w.d.ctrl[self.aid[5]])
+        elif not hasattr(self, 'cmd6'): self.cmd6 = float(w.d.ctrl[self.aid[5]])
+        if getattr(self, 'jaw_stop', None) is not None:     # the held beaker stops the jaw where it closed
+            w.d.ctrl[self.aid[5]] = max(self.cmd6, self.jaw_stop)
+
+    # ------------------------------------------------------------------ grasp physics (simulator only)
+    GRASP_CHECK_S = 0.01
+
+    def post_step(self, w):
+        """holding model: the fin-ray fingers are compliant TPU, which MuJoCo contacts do not capture, so a held
+        beaker is a weld constraint. It engages only when both finger contact boxes touch the same beaker while
+        the jaw is being driven closed (gripper goal below the measured jaw angle); it releases as soon as the
+        jaw is driven open. The process layer never sees the weld; it classifies grasps from the jaw angle."""
+        if w.time - getattr(self, '_last_grasp_check', -1) < self.GRASP_CHECK_S: return
+        self._last_grasp_check = w.time
+        q6 = w.d.qpos[self.qadr[5]]; goal6 = getattr(self, 'cmd6', w.d.ctrl[self.aid[5]])
+        held = w.held.get(self.name)
+        if held is not None:
+            if goal6 > self.jaw_stop + 0.03 or not self.torque: w.detach(self.name); self.jaw_stop = None
+            return
+        if goal6 >= q6 - 0.005: return                    # not closing
+        touch = {}
+        for i in range(w.d.ncon):
+            c = w.d.contact[i]
+            for ga, gb in ((c.geom1, c.geom2), (c.geom2, c.geom1)):
+                n = w.m.geom(ga).name
+                if n in ('%s/finger_fixed' % self.name, '%s/finger_moving' % self.name):
+                    bn = w.m.body(w.m.geom_bodyid[gb]).name
+                    if bn.startswith('beaker_'): touch.setdefault(bn[7:], set()).add(n.rsplit('_', 1)[1])
+        for bk, sides in touch.items():
+            if sides == {'fixed', 'moving'}: w.attach(self.name, bk); self.jaw_stop = float(q6); break
 
 
 # ======================================================================= Mega

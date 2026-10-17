@@ -30,6 +30,7 @@ CONTACT_MM = 0.5             # report contacts deeper than this (beaker walls ar
                              # is meant to touch the beaker at the grasp)
 SIDE_CLEAR_MM = 4.0          # side grasp: descend with the fixed finger this far off the beaker wall, then close the gap
 GH_STEP_MAX_MM = 15.0        # side grasp: raise the grip height at most this much to meet the pick margin rule
+PLACE_CLEAR_MM = 1.5         # placements release this far above the floor (the beaker drops onto it)
 UP = np.array([0, 0, 1.0])
 
 
@@ -92,19 +93,23 @@ class Planner:
         q = self.ik('transfer', 'grasp_td_taught', self.station(station), UP, seed); q[5] = self.q6_wide; return q
 
     def plan_transfer(self, beaker, src, dst):
-        """carousel <-> scale with the top-down taught grasp (demo_process steps 1, 4, 6, 9)"""
+        """carousel <-> scale with the top-down taught grasp (demo_process steps 1, 4, 6, 9). Descend with the fixed
+        finger 3 mm off the beaker (site grasp_td_taught), move the hand 3 mm so it touches (grasp_td_contact), close;
+        at the destination release, move back 3 mm, lift 20 mm and slide out along the finger channel."""
         rec = self.rec['T1' if src == 'carousel_pick' else 'T2']['anim_paths'][0]['qs']
         seed_a = np.r_[cadmap.cad_to_mj(rec[0]), self.q6_wide]; seed_b = np.r_[cadmap.cad_to_mj(rec[-1]), self.q6_wide]
-        site = 'grasp_td_taught'
+        site, cs = 'grasp_td_taught', 'grasp_td_contact'
         qa = self.td_grasp(src, seed_a); qb = self.td_grasp(dst, seed_b)
-        pa = self.station(src); pb = self.station(dst)
+        pa = self.station(src); pb = self.station(dst) + [0, 0, PLACE_CLEAR_MM]
         qa_up = self.ik('transfer', site, pa + [0, 0, TD_ABOVE_MM], UP, qa); qa_up[5] = self.q6_wide
         descend = self.line('transfer', site, qa_up, pa, UP, q6=self.q6_wide)
-        lift = self.line('transfer', site, np.r_[qa[:5], self.q6_contact], pa + [0, 0, TD_ABOVE_MM], UP, q6=self.q6_contact)
-        qb_above = self.ik('transfer', site, pb + [0, 0, TD_ABOVE_MM], UP, qb); qb_above[5] = self.q6_contact
-        lower = self.line('transfer', site, qb_above, pb, UP, q6=self.q6_contact)
+        touch = self.line('transfer', cs, descend[-1], pa, UP, steps_mm=1.0, q6=self.q6_wide)
+        lift = self.line('transfer', cs, np.r_[touch[-1][:5], self.q6_contact], pa + [0, 0, TD_ABOVE_MM], UP, q6=self.q6_contact)
+        qb_above = self.ik('transfer', cs, pb + [0, 0, TD_ABOVE_MM - PLACE_CLEAR_MM], UP, qb); qb_above[5] = self.q6_contact
+        lower = self.line('transfer', cs, qb_above, pb, UP, q6=self.q6_contact)
         q_rel = np.r_[lower[-1][:5], self.q6_wide]
-        up20 = self.line('transfer', site, q_rel, pb + [0, 0, TD_ABOVE_MM], UP, q6=self.q6_wide)
+        untouch = self.line('transfer', site, q_rel, pb, UP, steps_mm=1.0, q6=self.q6_wide)
+        up20 = self.line('transfer', site, untouch[-1], pb + [0, 0, TD_ABOVE_MM], UP, q6=self.q6_wide)
         slide = self._channel_line(up20[-1], pb + [0, 0, TD_ABOVE_MM], out=True)
         slide_in = self._channel_line(qa_up, pa + [0, 0, TD_ABOVE_MM], out=False)
         q_hi = slide_in[0].copy(); q_hi[1] -= math.radians(12.0)          # raise the upper arm: hand up and back
@@ -113,11 +118,13 @@ class Planner:
                 self.seg('lower to channel entry', 'joint', 'approach', [q_hi, slide_in[0]], 'open'),
                 self.seg('slide in along finger channel', 'cartesian', 'approach', slide_in, 'open'),
                 self.seg('descend to %s' % src, 'cartesian', 'approach', descend, 'open'),
-                self.seg('close on %s' % beaker, 'grip', 'pick', [descend[-1], np.r_[descend[-1][:5], self.q6_contact]], 'close', grasp=site),
-                self.seg('lift from %s' % src, 'cartesian', 'carry', lift, 'hold', beaker, site),
-                self.seg('carry %s->%s' % (src, dst), 'joint', 'carry', [lift[-1], qb_above], 'hold', beaker, site),
-                self.seg('lower onto %s' % dst, 'cartesian', 'carry', lower, 'hold', beaker, site),
-                self.seg('release', 'grip', 'place', [lower[-1], q_rel], 'open', grasp=site),
+                self.seg('touch fixed finger to %s' % beaker, 'cartesian', 'approach', touch, 'open'),
+                self.seg('close on %s' % beaker, 'grip', 'pick', [touch[-1], np.r_[touch[-1][:5], self.q6_contact]], 'close', grasp=cs),
+                self.seg('lift from %s' % src, 'cartesian', 'carry', lift, 'hold', beaker, cs),
+                self.seg('carry %s->%s' % (src, dst), 'joint', 'carry', [lift[-1], qb_above], 'hold', beaker, cs),
+                self.seg('lower onto %s' % dst, 'cartesian', 'carry', lower, 'hold', beaker, cs),
+                self.seg('release', 'grip', 'place', [lower[-1], q_rel], 'open', grasp=cs),
+                self.seg('move fixed finger off %s' % beaker, 'cartesian', 'retreat', untouch, 'open'),
                 self.seg('lift 20 mm', 'cartesian', 'retreat', up20, 'open'),
                 self.seg('slide out along finger channel', 'cartesian', 'retreat', slide, 'open'),
                 self.seg('return to park', 'joint', 'park', [slide[-1], q_hi_out, self.park_open()], 'open')]
@@ -240,8 +247,9 @@ class Planner:
         go_in = down + self.line('pourer', 'grasp_side', down[-1], pick_up, sgn * UP, steps_mm=1.0, q6=self.q6_open)[1:]
         q_hold = np.r_[go_in[-1][:5], self.q6_contact]
         lift = self.line('pourer', 'grasp_side', q_hold, np.r_[ps[:2], Z_CARRY], sgn * UP, q6=self.q6_contact)
-        q_rel = np.r_[go_in[-1][:5], self.q6_open]
-        side = self.line('pourer', 'grasp_side', q_rel, off, sgn * UP, steps_mm=1.0, q6=self.q6_open)
+        lower = self.line('pourer', 'grasp_side', lift[-1], pick_up + [0, 0, PLACE_CLEAR_MM], sgn * UP, q6=self.q6_contact)
+        q_rel = np.r_[lower[-1][:5], self.q6_open]
+        side = self.line('pourer', 'grasp_side', q_rel, off + [0, 0, PLACE_CLEAR_MM], sgn * UP, steps_mm=1.0, q6=self.q6_open)
         back = side + self.line('pourer', 'grasp_side', side[-1], off + [0, 0, APPROACH_MM], sgn * UP, q6=self.q6_open)[1:]
         # carry at Z_CARRY to above the pre-pour pose, then straight down to it
         p_pre, _ = self.K.site('pourer', q_pre, 'grasp_side')
@@ -258,14 +266,39 @@ class Planner:
                 self.seg('untilt to pre-pour', 'pour', 'pour', tilt[::-1], 'hold', beaker, 'grasp_side'),
                 self.seg('raise from pre-pour', 'cartesian', 'carry', to_pre[::-1], 'hold', beaker, 'grasp_side'),
                 self.seg('carry back above %s' % src, 'joint', 'carry', [q_above, lift[-1]], 'hold', beaker, 'grasp_side'),
-                self.seg('lower into %s' % src, 'cartesian', 'carry', lift[::-1], 'hold', beaker, 'grasp_side'),
-                self.seg('release', 'grip', 'place', [q_hold, q_rel], 'open', grasp='grasp_side'),
+                self.seg('lower into %s' % src, 'cartesian', 'carry', lower, 'hold', beaker, 'grasp_side'),
+                self.seg('release', 'grip', 'place', [lower[-1], q_rel], 'open', grasp='grasp_side'),
                 self.seg('lift out', 'cartesian', 'retreat', back, 'open'),
                 self.seg('return to park', 'joint', 'park', [back[-1], q_high, self.park], 'open')]
         info = dict(sign=sgn, dvec=dvec.tolist(), manifold_thetas=list(np.arange(thetas[0], thetas[1] + 0.01, 1.0)), lip_above_rim=lip_above,
                     receiver=recv, lip_drift_mm=round(lip_drift, 2), lip_offset_along_d_mm=[round(off_of(t) + dd, 1) for t, dd in
                                                                              zip(np.arange(thetas[0], thetas[1] + 0.01, 1.0), drift)], **ghinfo)
         return segs, info
+
+    def plan_side_transfer(self, beaker, src, dst, gh, seed_step='P_dev', seed_dst='P_fun'):
+        """pourer side-grasp transfer (e.g. rack -> scale): pick, lift to Z_CARRY, joint carry, lower, release, retreat"""
+        qa, sgn = self.side_grasp(src, gh, np.r_[cadmap.cad_to_mj(np.radians(self.rec[seed_step]['q_pick'])), self.q6_open])
+        qb, sgn_b = self.side_grasp(dst, gh, np.r_[cadmap.cad_to_mj(np.radians(self.rec[seed_dst]['q_pick'])), self.q6_open])
+        if sgn_b != sgn: raise PlanError('hinge sign differs between %s and %s' % (src, dst))
+        pa = self.station(src) + [0, 0, gh]; pb = self.station(dst) + [0, 0, gh]
+        q_up_a = self.ik('pourer', 'grasp_side', pa + [0, 0, APPROACH_MM], sgn * UP, qa); q_up_a[5] = self.q6_open
+        q_hi_a = self.ik('pourer', 'grasp_side', pa + [0, 0, APPROACH_MM + 60.0], sgn * UP, q_up_a); q_hi_a[5] = self.q6_open
+        down = self.line('pourer', 'grasp_side', q_up_a, pa, sgn * UP, q6=self.q6_open)
+        q_hold = np.r_[down[-1][:5], self.q6_contact]
+        lift = self.line('pourer', 'grasp_side', q_hold, np.r_[pa[:2], Z_CARRY], sgn * UP, q6=self.q6_contact)
+        q_above_b = self.ik('pourer', 'grasp_side', np.r_[pb[:2], Z_CARRY], sgn * UP, qb); q_above_b[5] = self.q6_contact
+        lower = self.line('pourer', 'grasp_side', q_above_b, pb + [0, 0, PLACE_CLEAR_MM], sgn * UP, q6=self.q6_contact)
+        q_rel = np.r_[lower[-1][:5], self.q6_open]
+        out = self.line('pourer', 'grasp_side', q_rel, pb + [0, 0, APPROACH_MM], sgn * UP, q6=self.q6_open)
+        return [self.seg('approach park->above %s' % src, 'joint', 'approach', [self.park, q_hi_a, q_up_a], 'open'),
+                self.seg('descend to %s' % src, 'cartesian', 'approach', down, 'open'),
+                self.seg('close on %s' % beaker, 'grip', 'pick', [down[-1], q_hold], 'close', grasp='grasp_side'),
+                self.seg('lift from %s' % src, 'cartesian', 'carry', lift, 'hold', beaker, 'grasp_side'),
+                self.seg('carry %s->%s' % (src, dst), 'joint', 'carry', [lift[-1], q_above_b], 'hold', beaker, 'grasp_side'),
+                self.seg('lower onto %s' % dst, 'cartesian', 'carry', lower, 'hold', beaker, 'grasp_side'),
+                self.seg('release', 'grip', 'place', [lower[-1], q_rel], 'open', grasp='grasp_side'),
+                self.seg('lift out', 'cartesian', 'retreat', out, 'open'),
+                self.seg('return to park', 'joint', 'park', [out[-1], self.park], 'open')]
 
     # ------------------------------------------------------------------ the eight arm steps
     STEPS = [('1 P1 carousel->scale', 'transfer', ('P1', 'carousel_pick', 'scale_pan'), {}),

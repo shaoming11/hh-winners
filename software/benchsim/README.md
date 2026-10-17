@@ -90,6 +90,34 @@ on the recorded beaker-bottom Z 61.7, and the WS-02 pan floor on Z 63.7.
   revolutions with the electrical.md stall rule and a ¼-turn reverse, an HX711 at 80 SPS (counts, noise, quantisation)
   read from a slide-joint flexure, the 500 ms comm watchdog, the e-stop and busy states.
 
+## Grasping and transfer (phase 5)
+
+```bash
+.venv/bin/python -m benchsim.grasp_demo      # carousel->scale, rack->scale, deliberate miss -> reports/grasp_demo/
+mjpython -m benchsim view                    # (macOS) interactive viewer; the demo videos are in reports/grasp_demo/*.mp4
+```
+
+- **Holding model (simulator only).** The TPU fin-ray fingers are compliant, which rigid MuJoCo contacts cannot
+  capture. A held beaker is therefore a weld constraint. It engages only when both finger contact boxes touch the
+  same beaker while the jaw is driven closed. At that moment the jaw is mechanically stopped where it closed, and
+  finger-to-beaker contact is switched off through the collision bits. The weld releases as soon as the jaw is
+  commanded open.
+- **Grasp classification (backend independent, `process/motion.py`).** The jaw is closed under its torque limit
+  (0.6 N·m), 6° past contact, and classified from where it stopped: within 3° of the expected contact angle is a
+  grasp, closing 2.5° past it is a miss, anything else is ambiguous. The side-grasp contact angle predicted from
+  `gripper_design.json` is 7.72°, and simulated closes stop at 7.56–8.35°. The taught top-down angle is
+  calibrated in simulation at 22.94° and must be re-taught on hardware.
+- **Top-down technique.** Descend with the fixed finger 3 mm off the beaker (demo_process §3), move the hand 3 mm
+  so the finger touches, then close. Reverse that at release, lift 20 mm and slide out along the finger channel.
+  Closing straight onto the 3 mm gap pushes the beaker sideways against the TT-04 locating ribs, and the lift
+  then binds.
+- **Observed-state checks (`process/executor.py`).** The other arm must be parked. Every close is classified. The
+  jaw must still be at contact after the lift. The scale must change by at least 8 g on a lift from the pan or a
+  place onto it. Placements release 1.5 mm above the floor.
+- **Evidence.** Carousel→scale grasps at 23.12° (expected 22.94°): the held beaker slips 0.01 mm and tilts 0.08°,
+  and the scale rises 18.0 g on place. Rack→scale (pourer, GRIP_H 48) grasps at 8.09° (expected 7.72°) and the
+  scale rises 19.3 g. With P1 removed, the jaw closes to 16.96°: a miss, so the step fails and the arm backs out.
+
 ## Conventions
 
 - World: +X east, +Y north, table top at Z 0 (`docs/demo_process.md` §2.1).
