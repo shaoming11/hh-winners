@@ -33,7 +33,47 @@ function toast(msg) {
 
 // ------------------------------------------------------------------ render
 function render(s) {
-  renderBar(s); renderCams(s); renderTimeline(s); renderCaption(s); renderNow(s); renderTwin(s); renderWire(s); renderErrors(s);
+  renderBar(s); renderSpeeds(s); renderCams(s); renderTimeline(s); renderCaption(s); renderNow(s); renderChem(s); renderTwin(s);
+  renderWire(s); renderErrors(s);
+}
+
+const SPEEDS = [0.5, 1, 2, 4, 8];
+let speedKey = '';
+function renderSpeeds(s) {
+  const r = s.probes && s.probes.runner; const cur = r ? r.speed : null;
+  if (String(cur) === speedKey) return;
+  speedKey = String(cur);
+  $('speeds').innerHTML = SPEEDS.map((x) => '<button data-speed="' + x + '" class="' + (x === cur ? 'on' : '') + '" title="' + x + '× real time">' + x + '×</button>').join('');
+}
+$('speeds').addEventListener('click', (e) => { const b = e.target.closest('button[data-speed]'); if (b) command('speed/' + b.dataset.speed); });
+
+// Chemistry: categorical slots in fixed order (validated: dataviz validator, both themes); text carries every value too
+const SPECIES = [['developer', 'H₂O₂ developer', '--s1'], ['yeast', 'yeast', '--s2'], ['water', 'water', '--s3'], ['soap', 'soap', '--s4'], ['dye', 'dye', '--s5']];
+const VESSELS = [['dev', 'Peroxide beaker'], ['water', 'Water beaker'], ['hopper', 'Yeast hopper'], ['P1', 'Beaker P1'], ['P2', 'Beaker P2'], ['flask', 'Flask']];
+const FULL_G = 100;   // bar scale shared by every vessel, so lengths compare
+function renderChem(s) {
+  if (!s.vessels) return;
+  if (!$('chem-legend').childElementCount) {
+    $('chem-legend').innerHTML = SPECIES.map(([, label, c]) => '<span style="--c: var(' + c + ')">' + esc(label) + '</span>').join('');
+  }
+  const top = Math.max(FULL_G, ...VESSELS.map(([v]) => Object.values(s.vessels[v] || {}).reduce((a, b) => a + b, 0)));
+  $('chem').innerHTML = VESSELS.map(([v, label]) => {
+    const comp = s.vessels[v] || {};
+    const parts = SPECIES.filter(([k]) => (comp[k] || 0) > 0.05);
+    const total = parts.reduce((a, [k]) => a + comp[k], 0);
+    const bar = parts.map(([k, , c]) => '<i style="--c: var(' + c + '); width: ' + (comp[k] / top * 100) + '%" title="' + esc(k) + ' ' + fmt(comp[k], 1) + ' g"></i>').join('');
+    const txt = parts.length ? parts.map(([k]) => k + ' ' + fmt(comp[k], 1)).join(' · ') + ' g' : 'empty';
+    return '<div class="vessel' + (parts.length ? '' : ' empty') + '"><span class="name">' + esc(label) + '</span><span class="bar">' + bar + '</span>' +
+      '<span class="txt">' + esc(txt) + (parts.length > 1 ? ' (' + fmt(total, 1) + ' g)' : '') + '</span></div>';
+  }).join('');
+  const f = s.probes && s.probes.foam; const bits = [];
+  if (s.spilled_g !== null && s.spilled_g !== undefined) bits.push('spilled <b>' + fmt(s.spilled_g, 2) + ' g</b>');
+  if (f && f.t_contact !== null) {
+    bits.push('O₂ released <b>' + fmt(f.o2_ml, 0) + ' mL</b>', 'foam column <b>' + fmt(f.column_mm, 0) + ' mm</b>');
+    if (f.peak_mm) bits.push('peak <b>' + fmt(f.peak_mm, 0) + ' mm</b>');
+    if (f.h2o2_left_g !== null) bits.push('H₂O₂ left <b>' + fmt(f.h2o2_left_g, 2) + ' g</b>');
+  }
+  $('foam').innerHTML = bits.join('');
 }
 
 const CAM = { auto: 'Auto', overview: 'Overview', bench_cam: 'Close-up', top: 'Top', foam_cam: 'Flask' };

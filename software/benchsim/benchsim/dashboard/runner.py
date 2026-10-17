@@ -1,9 +1,9 @@
 """Runs a protocol for the dashboard on the main thread (MuJoCo's offscreen renderer on macOS wants that thread).
 
 A "run" object owns one bench, one Sequencer and the protocol: ``bb, seq, steps, name, ledger, probes, run(),
-finish(out)``. The full demo comes from ``benchsim.demo_run`` once that module lands (see ``make_run``). Until then
-``DevRun`` gives a 3-step development protocol (P1 carousel -> scale, verify empty, back), built the way
-tests/test_sequencer.py builds its sequencer. Nothing here fakes a step.
+finish(out)``. ``DemoRun`` is the full 12-step demo on ``benchsim.demo_run.SimDemo``. ``DevRun`` is a quick 3-step
+protocol (P1 carousel -> scale, verify empty, back), built the way tests/test_sequencer.py builds its sequencer, used
+with --dev or when demo_run is missing. Nothing here fakes a step.
 
 HTTP threads only queue commands (start / reset) or raise the stop flag. Everything is acted on in this thread; the
 stop flag becomes ``ctx.request_stop`` inside a tick or frame hook, so the sequencer's own safe-stop path runs.
@@ -26,7 +26,7 @@ DEV_PROTOCOL = [S.Step('TRANSFER', dict(beaker='P1', src='carousel_pick', dst='s
 
 
 class DevRun:
-    name = 'development protocol (3 steps): the full demo runner is not merged yet'
+    name = 'development protocol (3 steps, transfer arm only)'
 
     def __init__(self, out_root=OUT, seed=0):
         params = load_params(); self.bb = bb = make_bench('sim', seed=seed); planner = poses.Planner(bb.world.m, bb.world.b)
@@ -47,7 +47,39 @@ class DevRun:
         return self.rl.finish(dict(passed=out['passed'], failed=out['failed'], skipped=out['skipped']), events=self.seq.ctx.events)
 
 
-def make_run(out_root=OUT, seed=0):
+class DemoRun:
+    """the full demo of docs/demo_process.md 4 on demo_run.SimDemo (liquid, auger and foam models). SimDemo.run builds
+    its Sequencer inside run(), where the feed cannot reach it, so this mirrors SimDemo.run; keep the two in step
+    (tests/test_dashboard.py runs this to DONE). The dashboard renders its own video, so SimDemo's recorder is off."""
+    name = 'full demo (12 steps, docs/demo_process.md 4) via benchsim.demo_run'
+    OBSERVE_S = 14.0                                   # foam watched after the last step, as SimDemo.run does
+
+    def __init__(self, out_root=OUT, seed=0):
+        from .. import demo_run
+        self.d = d = demo_run.SimDemo(out_root, seed=seed, video=False)
+        self.bb = d.bb; self.rl = d.rl; self.ledger = d.L; self.steps = S.demo_protocol(); self._t_wall = time.time()
+        self.seq = sequencer.Sequencer(d.bb, d.make_skills(), d.rl, safe_stop=skills.safe_stop(d.bb, state.park_q()), precheck=d.precheck)
+        self.probes = dict(foam=d.foam.state, hopper_g=lambda: round(d.L.mass('hopper'), 2))
+
+    def run(self):
+        self.d.frame('overview', 'start'); self._t_wall = time.time()
+        return self.seq.run(self.steps, approved_by='operator (dashboard)')
+
+    def finish(self, out):
+        d = self.d; t0 = d.w.time
+        while d.w.time - t0 < self.OBSERVE_S:
+            d.bb.clock.sleep(0.5); d.L.update_visuals(); d.bb.mega.heartbeat()
+            if int((d.w.time - t0) * 2) % 4 == 0: d.frame('foam_cam', 'foam t+%.1f s' % (d.w.time - t0))
+        d.rec.close(); d._write(out, self.seq, time.time() - self._t_wall, False)
+
+
+def make_run(out_root=OUT, seed=0, dev=False):
+    if not dev:
+        try:
+            from .. import demo_run  # noqa: F401
+            return DemoRun(out_root, seed)
+        except ImportError:
+            pass
     return DevRun(out_root, seed)
 
 
@@ -56,12 +88,17 @@ class Pacer:
     since the run started, so planning pauses (no physics while IK runs) show up honestly but do not make it jump"""
 
     def __init__(self, clock, speed=1.0):
-        self.clock = clock; self.speed = speed; self.rtf = None; self.reset()
+        self.clock = clock; self.speed = speed; self.rtf = None; self._pending = None; self.reset()
 
     def reset(self):
         self.t0 = self.clock.now(); self.w0 = time.monotonic(); self._start = (self.w0, self.t0)
 
+    def set_speed(self, speed):
+        """from any thread; applied at the next frame"""
+        self._pending = speed
+
     def __call__(self, w=None):
+        if self._pending is not None: self.speed = self._pending; self._pending = None; self.reset()
         now_w = time.monotonic(); now_s = self.clock.now()
         if now_w - self._start[0] >= 1.0: self.rtf = round((now_s - self._start[1]) / (now_w - self._start[0]), 2)
         if not self.speed: return
@@ -72,6 +109,8 @@ class Pacer:
 
 class Runner:
     """phases: ready -> running -> finished (-> reset -> ready)"""
+
+    SPEEDS = (0.5, 1.0, 2.0, 4.0, 8.0)
 
     def __init__(self, hub, make_run=make_run, speed=1.0, video=None, out_root=OUT, seed=0):
         self.hub = hub; self.make_run = make_run; self.speed = speed; self.video = video; self.out_root = out_root; self.seed = seed
@@ -88,6 +127,13 @@ class Runner:
         if cmd == 'reset':
             if self.phase in ('running', 'starting', 'building'): return False, 'cannot reset while %s' % self.phase
             self.phase = 'building'; self.cmds.put('reset'); return True, 'rebuilding the bench'
+        if cmd.startswith('speed/'):
+            try: x = float(cmd.split('/', 1)[1])
+            except ValueError: x = None
+            if x not in self.SPEEDS: return False, 'speed must be one of %s' % ', '.join('%g' % v for v in self.SPEEDS)
+            self.speed = x
+            if self.phase != 'building': self.pacer.set_speed(x)
+            return True, 'speed %g\u00d7' % x
         if cmd.startswith('camera/'):
             name = cmd.split('/', 1)[1]
             if self.video is None or not self.video.set_camera(name): return False, 'unknown camera %s' % name

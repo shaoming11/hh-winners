@@ -124,3 +124,21 @@ def test_twin_error_is_small_when_settled_and_shows_lag_while_moving():
     assert moving and max(moving) > 1.0                               # the streamed goal runs ahead of the servo
     last = tw[-1]; assert len(last['commanded_mm']) == 3 and set(last['joint_err_deg']) == {'shoulder_pan', 'shoulder_lift', 'elbow_flex', 'wrist_flex', 'wrist_roll'}
     assert 'error_mm' not in snaps[-1]['arms']['pourer']['twin']       # the pourer never moved in this protocol
+
+
+def test_full_demo_through_the_dashboard_runner(tmp_path):
+    """the DemoRun adapter mirrors demo_run.SimDemo.run; this catches drift between the two"""
+    from benchsim.dashboard import runner as R, server
+    hub = server.Hub(); snaps = []; pub = hub.publish
+    hub.publish = lambda s: (snaps.append(s), pub(s))
+    r = R.Runner(hub, make_run=R.make_run, speed=0, out_root=tmp_path); r.build()
+    assert isinstance(r.run_obj, R.DemoRun) and len(snaps[-1]['steps']) == 12
+    r.control('start'); r._start()
+    assert r.result['state'] == 'DONE' and r.result['passed'] == 12, [(x['label'], x['reason']) for x in r.result['steps'] if x['status'] != 'passed']
+    last = snaps[-1]
+    assert last['vessels']['flask'].get('developer', 0) > 30 and last['vessels']['flask'].get('yeast', 0) > 5
+    assert last['probes']['foam']['peak_mm'] > 0 and last['probes']['runner']['phase'] == 'finished'
+    pours = [s['current'] for s in snaps if s['current'] and s['current']['type'] == 'POUR_TO_SCALE']
+    assert pours and all(p['scale_start_g'] is not None for p in pours)
+    assert any('"cmd":"AUG"' in w['text'] for s in snaps for w in s['wire']) and any('"cmd":"ST"' in w['text'] for s in snaps for w in s['wire'])
+    assert (r.run_obj.rl.dir / 'run_log.json').exists()
