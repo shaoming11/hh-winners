@@ -48,13 +48,14 @@ class MegaClient:
         self.t = transport; self.clock = clock; self.seq = 0
         self.replies = {}; self.samples = []; self.faults = []; self.progress = {}; self.log = []
         self.last_sample = None; self.last_tx = -1e9; self.keepalive = True
+        self.sample_log = []                          # append-only (t_ms, grams, raw) archive for run traces
 
     def _pump(self):
         for line in self.t.read_lines():
             try: msg = protocol.decode(line)
             except protocol.ProtocolError as e:
                 self.log.append(('bad-line', line, str(e))); continue
-            if 'w' in msg: self.samples.append(msg); self.last_sample = msg
+            if 'w' in msg: self.samples.append(msg); self.last_sample = msg; self.sample_log.append((msg.get('t'), msg['w'], msg.get('raw')))
             elif 'fault' in msg: self.faults.append(msg); self.log.append(('fault', msg))
             elif 'aug' in msg: self.progress[msg['seq']] = msg
             elif 'seq' in msg: self.replies.setdefault(msg['seq'], []).append(msg); self.log.append(('reply', msg))
