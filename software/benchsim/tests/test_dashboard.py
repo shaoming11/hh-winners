@@ -113,11 +113,11 @@ def test_mjpeg_closes_each_frame_with_the_next_parts_headers():
     try:
         s.sendall(b'GET /stream.mjpg HTTP/1.1\r\nHost: x\r\n\r\n'); hub.frame(b'\xff\xd8one\xff\xd9')
         buf = b''; end = time.time() + 1.0
-        nxt = b'\r\n--frame\r\nContent-Type: image/jpeg\r\n\r\n'
-        while time.time() < end and not buf.endswith(nxt):
+        want = b'\xff\xd8one\xff\xd9\r\n--frame\r\nContent-Type: image/jpeg\r\n\r\n'
+        while time.time() < end and not buf.endswith(want):
             try: buf += s.recv(4096)
             except socket.timeout: pass
-        assert buf.endswith(b'\xff\xd8one\xff\xd9' + nxt), buf[-60:]
+        assert buf.endswith(want), buf[-60:]
     finally:
         s.close(); srv.shutdown()
 
