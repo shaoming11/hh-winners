@@ -70,6 +70,7 @@ def test_narration_covers_the_demo():
         assert d['title'] and d['detail'] is not None
     funnel_p2 = [s for s in S.demo_protocol() if s.type == 'POUR_TO_FUNNEL' and s.params['beaker'] == 'P2'][0]
     assert 'O₂' in narration.describe(funnel_p2.to_dict())['science']['equation']
+    assert 'ERUPTION' in narration.describe(funnel_p2.to_dict())['title']
     assert narration.clearance(dict(type='POUR_TO_FUNNEL', params={}))['mm'] == 5.3
 
 
@@ -153,9 +154,11 @@ def test_full_demo_through_the_dashboard_runner(tmp_path):
     hub = server.Hub(); snaps = []; pub = hub.publish
     hub.publish = lambda s: (snaps.append(s), pub(s))
     r = R.Runner(hub, make_run=R.make_run, speed=0, out_root=tmp_path); r.build()
-    assert isinstance(r.run_obj, R.DemoRun) and len(snaps[-1]['steps']) == 12
+    assert isinstance(r.run_obj, R.DemoRun) and len(snaps[-1]['steps']) == 11
     r.control('start'); r._start()
-    assert r.result['state'] == 'DONE' and r.result['passed'] == 12, [(x['label'], x['reason']) for x in r.result['steps'] if x['status'] != 'passed']
+    assert r.result['state'] == 'DONE' and r.result['passed'] == 11, [(x['label'], x['reason']) for x in r.result['steps'] if x['status'] != 'passed']
+    reaction = [x for x in r.result['steps'] if x['type'] == 'POUR_TO_FUNNEL' and x['params']['erupt']][0]
+    assert reaction['measured']['erupt_crank_deg'] > 140 and reaction['measured']['erupt_done_s'] < reaction['t_end']   # pushed before the return
     last = snaps[-1]
     assert last['vessels']['flask'].get('developer', 0) > 30 and last['vessels']['flask'].get('yeast', 0) > 5
     assert last['probes']['foam']['peak_mm'] > 0 and last['probes']['runner']['phase'] == 'finished'

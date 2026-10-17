@@ -29,7 +29,7 @@ from .llm import LLMUnavailable
 PARAMS = {
     'TRANSFER': dict(beaker='string', src='string', dst='string'),
     'POUR_TO_SCALE': dict(reagent='string', beaker='string', target_g='number', tol_g='number', relative='boolean'),
-    'POUR_TO_FUNNEL': dict(beaker='string'),
+    'POUR_TO_FUNNEL': dict(beaker='string', erupt='boolean'),
     'CAROUSEL': dict(beaker='string', station='string'),
     'DOSE_YEAST': dict(beaker='string', target_g='number', tol_g='number', max_topups='integer'),
     'VERIFY_MASS': dict(beaker='string', target_g='number', tol_g='number'),
@@ -73,12 +73,14 @@ def system_prompt(params=None):
         '  TRANSFER: beaker, src, dst - transfer arm moves P1/P2 between carousel_pick and scale_pan',
         '  POUR_TO_SCALE: reagent, beaker, target_g, tol_g, relative - pourer pours a reagent onto the beaker on the scale, closed loop; '
         'relative=true adds target_g on top of the current reading (use it for water onto yeast)',
-        '  POUR_TO_FUNNEL: beaker - pourer empties the beaker on the scale into the flask through the funnel',
+        '  POUR_TO_FUNNEL: beaker, erupt - pourer empties the beaker on the scale into the flask through the funnel; erupt=true moves the '
+        'stage to ERUPT as soon as the pourer has lifted clear, before it carries the beaker back (set it on the pour that starts the reaction)',
         '  CAROUSEL: beaker, station - turn the carousel so the beaker\'s pocket is at pick or auger',
         '  DOSE_YEAST: beaker, target_g, tol_g, max_topups - auger doses yeast into a carousel beaker',
         '  VERIFY_MASS: beaker, target_g, tol_g - check the mass of the beaker on the scale',
         '  WAIT: seconds, reason',
-        '  STAGE: position - WORK or ERUPT; ERUPT is last and starts the show',
+        '  STAGE: position - WORK or ERUPT. A separate ERUPT step waits for the pourer\'s return, so the foam is out before the push: '
+        'prefer erupt=true on the reaction pour. After ERUPT only returning a beaker to the carousel may run',
         '',
         'Limits: pours 1-%g g, tolerance at least %g g, a beaker holds at most %g g, yeast 0.5-%g g with at most %d top-ups, waits 0-%g s, '
         'the flask holds at most %g mL.' % (lim['max_pour_g'], lim['min_tol_g'], lim['max_beaker_ml'], lim['max_yeast_g'], lim['max_topups'],

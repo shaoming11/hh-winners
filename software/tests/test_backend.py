@@ -450,7 +450,8 @@ def test_mcp_read_tools(rig, mcp):
 
 def test_mcp_plan_tools(mcp):
     p = call(mcp, "preset_plan", developer_g=39, yeast_g=7, water_g=30, activate_s=60)
-    assert p["source"] == "preset" and p["steps"][-1]["type"] == "STAGE"
+    assert p["source"] == "preset" and p["steps"][-1]["type"] == "TRANSFER"
+    assert [s["params"].get("erupt") for s in p["steps"] if s["type"] == "POUR_TO_FUNNEL"] == [False, True]   # ERUPT rides on the reaction pour
     v = call(mcp, "validate_plan", plan=p)
     assert v["ok"] is True
     bad = {"title": "bad", "steps": [{"type": "POUR_TO_SCALE",

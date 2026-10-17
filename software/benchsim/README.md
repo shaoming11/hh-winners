@@ -196,11 +196,15 @@ and the ones marked *assumed* have no measurement behind them.
   deterministic validator (`process/steps.validate`) checks them and the operator must approve (type `approve`, or
   pass `--approve` on the command line). It never produces actuator commands. Without an API key it falls back to
   the preset; `reports/demo_ai_protocol/` is that path run through simulation and the notebook.
-- **Process finding** (it depends on assumed foam parameters). In the documented order, step 9 (P2 back to the
-  carousel) comes before ERUPT. With the assumed kinetics (2 s induction, about 8 s half-life) the foam reaches the
-  flask neck 4.3 s after the slurry hits the peroxide, while the stage reaches ERUPT 35 s later, so the eruption
-  happens at WORK. `--erupt-before-return` swaps steps 9 and 10, but the pourer's own return still takes about
-  20 s. The real induction time needs measuring before relying on an eruption at the audience position.
+- **Process finding** (it depends on assumed foam parameters). ERUPT used to be a separate last step, after the
+  pourer's return and P2's trip back to the carousel: the sled reached ERUPT 35 s after the slurry hit the peroxide.
+  It now rides on the reaction pour (`POUR_TO_FUNNEL` with `erupt=true`): the pourer lifts the beaker clear of the
+  funnel, the stage pushes, and only then does the pourer carry P2 back. In simulation the push starts 11.0 s after
+  contact and ends at 13.2 s (was 32.2 s and 34.8 s), with held P2 at least 33 mm and the arm at least 49 mm from
+  the sled during the push. With the assumed kinetics (2 s induction, about 8 s half-life) the foam still reaches the
+  neck first, 4.3 s after contact, so the real induction time decides where the eruption happens: measure it, and
+  slow the reaction (cooler water or less yeast) if it beats the push. The evidence run in `reports/demo_run/`
+  predates this change (12 rows, separate ERUPT step).
 
 ## Hardware handoff (phase 10)
 
@@ -314,7 +318,7 @@ Known disagreements found so far (the JSON coordinates are authoritative):
 
 A browser page for the audience. It shows the sim camera with the current step drawn over it (auto camera: close-up
 for transfers and dosing, pour and funnel close-ups for the pours, a wide eruption camera from the moment the foam
-leaves the neck) and a 12-step timeline. Four cards sit beside them:
+leaves the neck) and an 11-step timeline. Four cards sit beside them:
 - **Now:** what is happening, the chemical and amount, the timeout, and the tightest verified gap.
 - **Chemistry:** contents of every vessel from the ledger, plus O₂ and the foam column.
 - **Twin:** where the plan puts each gripper vs where the servos say it is, in mm, against the step's clearance.

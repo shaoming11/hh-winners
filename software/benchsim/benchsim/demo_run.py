@@ -1,9 +1,8 @@
-"""Full deterministic demo in simulation: the 10 steps of docs/demo_process.md through the sequencer, with the
+"""Full deterministic demo in simulation: the 9 steps of docs/demo_process.md through the sequencer, with the
 analytic liquid, auger and foam models, a video, camera frames, a machine-readable run log and the lab notebook.
 
     python -m benchsim.demo_run                         # preset protocol (demo_process 4)
     python -m benchsim.demo_run --protocol-text FILE    # language layer: proposal -> validation -> approval -> run
-    python -m benchsim.demo_run --erupt-before-return   # steps 8 -> 10 -> 9 (architecture doc order), see README
     python -m benchsim.demo_run --stop-during-pour      # safe-stop demonstration: operator stop mid-pour
 
 Outputs go to runs/<run_id>/ (run_log.json, scale.csv, joints.csv, pour traces, frames/, demo.mp4, notebook.*).
@@ -36,6 +35,7 @@ from .record import Recorder
 
 PRE_POUR_SEGS = 6          # approach, descend, close, lift, carry to above pre-pour, lower to pre-pour
 AFTER_UNTILT = 9           # raise from pre-pour, carry back, lower, release, lift out, park
+CLEAR_SEGS = 1             # raise from pre-pour: after it the held beaker is clear of the funnel and the sled may move
 INITIAL = dict(developer_ml=58.0, water_ml=50.0, hopper_g=30.0)       # rough operator loads (demo_process 5.2)
 NATIVE = paths.SIM_ROOT / 'reports' / 'native_plans.json'
 STEP_KEY = {('developer', 'P1'): ('P_dev', 'dev', 'rack_1', 45.0, '2 developer pour'), ('water', 'P2'): ('P_wat', 'water', 'rack_3', 45.0, '7 water pour')}
@@ -61,7 +61,7 @@ class SimDemo:
         self.rec = Recorder(w, self.dir, camera='overview', fps=fps, width=960, height=544, video_name='demo.mp4' if video else None)
         from .vision import SimCamera
         self.cams = {n: SimCamera(w, n, 640, 480) for n in ('bench_cam', 'foam_cam', 'overview')}
-        self.pour_traces = []; self.notes = []; self.dose = {}
+        self.pour_traces = []; self.notes = []; self.dose = {}; self.erupt_done_s = None
         self.L.update_visuals()
 
     # ------------------------------------------------------------------ helpers
@@ -164,7 +164,13 @@ class SimDemo:
             prof = funnel_pour(self.params['pour'], self.bb.clock, set_theta)
             untilt(); ctx.state['pouring'] = None
             self.bb.clock.sleep(self.params['liquid']['funnel_delay_s'] + 0.5)
-            try: ex.run('pourer', segs[AFTER_UNTILT:], scale_station='dst', label=step.label + ' return', start_holding='grasp_side')
+            back = segs[AFTER_UNTILT:]; erupt = None
+            if step.params.get('erupt'):
+                # the reaction is under way: lift the beaker clear of the funnel, push the sled out, then carry the beaker back
+                try: ex.run('pourer', back[:CLEAR_SEGS], label=step.label + ' lift clear', start_holding='grasp_side')
+                except TaskFailed as e: raise StepFailed(e.code, e.detail)
+                erupt = sk['STAGE'](Step('STAGE', dict(position='ERUPT'), step.label + ' ERUPT'), ctx); back = back[CLEAR_SEGS:]
+            try: ex.run('pourer', back, scale_station='dst', label=step.label + ' return', start_holding='grasp_side')
             except TaskFailed as e: raise StepFailed(e.code, e.detail)
             ctx.state['active_arm'] = None
             tare, how = (ctx.state['tare_g'].get(bk) or ctx.state['tare_g'].get('P1'), 'measured' if bk in ctx.state['tare_g'] else 'assumed = P1')
@@ -172,6 +178,7 @@ class SimDemo:
             meas = dict(left_in_beaker_g=round(left, 3), tare=how, sim_truth_delivered_to_flask_g=round(self.L.mass('flask') - flask0, 3),
                         sim_truth_poured_from_beaker_g=round(src0 - self.L.mass(bk), 3), spilled_total_g=round(self.L.spilled_mass(), 3),
                         profile_time_s=prof.get('time_s'))
+            if erupt: meas['erupt_crank_deg'] = erupt['measured']['crank_deg']; meas['erupt_done_s'] = self.erupt_done_s
             if left > 2.0: raise StepFailed('FUNNEL_INCOMPLETE', '%.2f g left in %s' % (left, bk), meas)
             return dict(target=dict(left_in_beaker_g=0.0, tol_g=2.0), measured=meas, detail='%.2f g left in %s' % (left, bk))
         sk['POUR_TO_FUNNEL'] = pour_to_funnel
@@ -209,7 +216,9 @@ class SimDemo:
         sk['VERIFY_MASS'] = verify_mass
 
         def stage(step, ctx):
-            res = base['STAGE'](step, ctx); self.frame('foam_cam', 'stage at %s' % step.params['position']); return res
+            res = base['STAGE'](step, ctx); self.frame('foam_cam', 'stage at %s' % step.params['position'])
+            if step.params['position'] == 'ERUPT': self.erupt_done_s = round(self.w.time, 3); ctx.log('erupt_done', label=step.label)
+            return res
         sk['STAGE'] = stage
         return sk
 
@@ -277,8 +286,7 @@ class SimDemo:
                        final_state=dict(held=dict(self.w.held), torque={a: x.torque_enabled() for a, x in self.bb.arms.items()},
                                         beaker_tilt_deg={b: round(float(np.degrees(np.arccos(np.clip(self.w.d.body('beaker_' + b).xmat[8], -1, 1)))), 2)
                                                          for b in ('P1', 'P2', 'dev', 'water')},
-                                        foam_at_neck_s=fs.get('t_foam_at_neck'), erupt_done_s=next((r['t_end'] for r in out['steps']
-                                                                                                   if r['type'] == 'STAGE' and r['status'] == 'passed'), None)),
+                                        foam_at_neck_s=fs.get('t_foam_at_neck'), erupt_done_s=self.erupt_done_s),
                        assumptions=['P2 tare taken equal to P1 (never weighed empty in the documented run)',
                                     'liquid, auger and foam parameters are analytic-model values from bench_params.toml (many assumed)',
                                     'MuJoCo-native arm plans (CAD recorded paths are not hardware-calibrated)'])
@@ -295,7 +303,6 @@ def main(argv=None):
     ap = argparse.ArgumentParser(prog='python -m benchsim.demo_run')
     ap.add_argument('--protocol-text', help='protocol text file for the language layer (proposal -> validation -> approval)')
     ap.add_argument('--approve', action='store_true', help='approve a valid proposal non-interactively (scripted demo only)')
-    ap.add_argument('--erupt-before-return', action='store_true', help='run step 10 (ERUPT) before step 9 (P2 back to the carousel)')
     ap.add_argument('--stop-during-pour', action='store_true', help='request a safe stop in the middle of the developer pour')
     ap.add_argument('--no-video', action='store_true'); ap.add_argument('--seed', type=int, default=0)
     ap.add_argument('--out', default=str(paths.RUNS))
@@ -311,8 +318,6 @@ def main(argv=None):
         steps = list(res.steps); source = res.proposal.source if hasattr(res, 'proposal') else 'llm'; approval = res.to_dict().get('approval')
     else:
         steps = demo_protocol()
-    if a.erupt_before_return:
-        i9 = next(i for i, s in enumerate(steps) if s.label.startswith('9')); s9 = steps.pop(i9); steps.append(s9)
     demo = SimDemo(Path(a.out), seed=a.seed, video=not a.no_video)
     out = demo.run(steps, source=source, text=text, approval=approval, stop_during_pour=a.stop_during_pour)
     print('run %s -> %s' % (out['state'], demo.dir))

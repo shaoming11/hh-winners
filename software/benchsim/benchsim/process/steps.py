@@ -9,7 +9,9 @@ Vocabulary (type: params):
     TRANSFER        beaker, src, dst              transfer arm, top-down: carousel_pick <-> scale_pan
     POUR_TO_SCALE   reagent, beaker, target_g, tol_g, relative   pourer, closed loop on the scale; relative=True
                                                   means target is added on top of the current scale reading
-    POUR_TO_FUNNEL  beaker                        pourer, the beaker on the scale is emptied into the flask
+    POUR_TO_FUNNEL  beaker, erupt                 pourer, the beaker on the scale is emptied into the flask; erupt=True moves
+                                                  the stage to ERUPT as soon as the pourer has lifted clear of the funnel, before
+                                                  it carries the beaker back, so the foam leaves at the audience end, not at the arms
     CAROUSEL        beaker, station               turn the deck so the beaker's pocket is at 'pick' or 'auger'
     DOSE_YEAST      beaker, target_g, tol_g, max_topups   auger into the beaker at the auger station, scale verify later
     VERIFY_MASS     beaker, target_g, tol_g       beaker on the scale; fails if outside tolerance
@@ -39,22 +41,21 @@ class Step:
 
 
 def demo_protocol(recipe=None):
-    """docs/demo_process.md section 4, steps 1-10"""
+    """docs/demo_process.md section 4, steps 1-9"""
     r = recipe or dict(developer_g=39.0, developer_tol_g=2.0, yeast_g=7.0, yeast_tol_g=0.7, water_g=30.0, water_tol_g=2.0, activate_wait_s=60.0)
     return [
         Step('TRANSFER', dict(beaker='P1', src='carousel_pick', dst='scale_pan'), '1 P1 carousel -> scale'),
         Step('POUR_TO_SCALE', dict(reagent='developer', beaker='P1', target_g=r['developer_g'], tol_g=r['developer_tol_g'], relative=False),
              '2 developer onto P1'),
-        Step('POUR_TO_FUNNEL', dict(beaker='P1'), '3 P1 -> funnel'),
+        Step('POUR_TO_FUNNEL', dict(beaker='P1', erupt=False), '3 P1 -> funnel'),
         Step('TRANSFER', dict(beaker='P1', src='scale_pan', dst='carousel_pick'), '4 P1 -> carousel'),
         Step('DOSE_YEAST', dict(beaker='P2', target_g=r['yeast_g'], tol_g=r['yeast_tol_g'], max_topups=2), '5 yeast dose into P2'),
         Step('TRANSFER', dict(beaker='P2', src='carousel_pick', dst='scale_pan'), '6 P2 -> scale'),
         Step('VERIFY_MASS', dict(beaker='P2', target_g=r['yeast_g'], tol_g=r['yeast_tol_g']), '6 verify yeast'),
         Step('POUR_TO_SCALE', dict(reagent='water', beaker='P2', target_g=r['water_g'], tol_g=r['water_tol_g'], relative=True), '7 water onto P2'),
         Step('WAIT', dict(seconds=r['activate_wait_s'], reason='yeast activation'), '7 activate'),
-        Step('POUR_TO_FUNNEL', dict(beaker='P2'), '8 P2 -> funnel (reaction starts)'),
+        Step('POUR_TO_FUNNEL', dict(beaker='P2', erupt=True), '8 P2 -> funnel, then ERUPT (reaction starts)'),
         Step('TRANSFER', dict(beaker='P2', src='scale_pan', dst='carousel_pick'), '9 P2 -> carousel'),
-        Step('STAGE', dict(position='ERUPT'), '10 ERUPT'),
     ]
 
 
@@ -97,6 +98,9 @@ def validate(steps, initial=None):
             if stage != 'WORK': problems.append('%s: the stage must be at WORK' % tag)
             flask_ml += content.get(p['beaker'], 0.0); content[p['beaker']] = 0.0
             if flask_ml > LIMITS['max_flask_ml']: problems.append('%s: flask would hold %.0f mL (> %.0f)' % (tag, flask_ml, LIMITS['max_flask_ml']))
+            if p.get('erupt', False):
+                if flask_ml <= 15.0: problems.append('%s: ERUPT with nothing poured into the flask' % tag)
+                stage = 'ERUPT'
         elif st.type == 'CAROUSEL':
             if not need('beaker', 'station'): continue
             if p['station'] not in ('pick', 'auger'): problems.append('%s: station must be pick or auger' % tag)

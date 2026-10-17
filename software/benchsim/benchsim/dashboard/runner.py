@@ -1,7 +1,7 @@
 """Runs a protocol for the dashboard on the main thread (MuJoCo's offscreen renderer on macOS wants that thread).
 
 A "run" object owns one bench, one Sequencer and the protocol: ``bb, seq, steps, name, ledger, probes, run(),
-finish(out)``. ``DemoRun`` is the full 12-step demo on ``benchsim.demo_run.SimDemo``. ``DevRun`` is a quick 3-step
+finish(out)``. ``DemoRun`` is the full 11-step demo on ``benchsim.demo_run.SimDemo``. ``DevRun`` is a quick 3-step
 protocol (P1 carousel -> scale, verify empty, back), built the way tests/test_sequencer.py builds its sequencer, used
 with --dev or when demo_run is missing. Nothing here fakes a step.
 
@@ -52,7 +52,7 @@ class DemoRun:
     """the full demo of docs/demo_process.md 4 on demo_run.SimDemo (liquid, auger and foam models). SimDemo.run builds
     its Sequencer inside run(), where the feed cannot reach it, so this mirrors SimDemo.run; keep the two in step
     (tests/test_dashboard.py runs this to DONE). The dashboard renders its own video, so SimDemo's recorder is off."""
-    name = 'full demo (12 steps, docs/demo_process.md 4) via benchsim.demo_run'
+    name = 'full demo (11 steps, docs/demo_process.md 4) via benchsim.demo_run'
     OBSERVE_S = 14.0                                   # foam watched after the last step, as SimDemo.run does
 
     def __init__(self, out_root=OUT, seed=0):

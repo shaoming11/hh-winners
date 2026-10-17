@@ -5,4 +5,4 @@ Elephant toothpaste, the standard bench demo. The flask already holds the dish s
 3. Dose one packet of instant yeast, about 7 g (within 0.7 g, at most two top-ups), into P2 with the auger.
 4. Bring P2 to the scale and check the yeast weight.
 5. Add 30 g of warm water on top of the yeast (within 2 g) and let it activate for 60 seconds.
-6. Pour the yeast slurry into the flask, put P2 back in the carousel, then move the stage to ERUPT.
+6. Pour the yeast slurry into the flask and move the stage to ERUPT as soon as the pourer is clear, then put P2 back in the carousel.

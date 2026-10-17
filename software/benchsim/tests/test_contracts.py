@@ -18,6 +18,18 @@ def test_validator_rejects_bad_orders():
     assert not steps.validate(bad)[0]
 
 
+def test_erupt_rides_on_the_reaction_pour():
+    demo = steps.demo_protocol()
+    assert [s.params['erupt'] for s in demo if s.type == 'POUR_TO_FUNNEL'] == [False, True] and 'STAGE' not in [s.type for s in demo]
+    late = demo + [steps.Step('WAIT', dict(seconds=5))]                     # the stage is at ERUPT after the reaction pour
+    ok, problems = steps.validate(late)
+    assert not ok and any('after ERUPT' in p for p in problems)
+    empty = [steps.Step('TRANSFER', dict(beaker='P1', src='carousel_pick', dst='scale_pan')),
+             steps.Step('POUR_TO_FUNNEL', dict(beaker='P1', erupt=True))]
+    ok, problems = steps.validate(empty)
+    assert not ok and any('nothing poured' in p for p in problems)
+
+
 def test_ledger_weight_reaches_scale():
     w = SimWorld(); L = Ledger(w)
     L.add('dev', 'developer', 50.0)

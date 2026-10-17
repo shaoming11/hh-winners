@@ -54,6 +54,10 @@ def describe(step):
             out['title'] = 'Pouring the hydrogen peroxide into the flask'
             out['chemical'] = REAGENT['developer']
         out['detail'] = 'Pourer arm empties %s through the funnel. Soap and dye are already in the flask.' % p['beaker']
+        if p.get('erupt'):
+            out['title'] = out['title'].split(':')[0] + ', then ERUPTION: the sled carries the flask toward you'
+            out['detail'] += (' As soon as the arm has lifted the beaker clear, a crank slides the flask 97 mm toward the audience; '
+                              'the arm carries the beaker back after that.')
     elif t == 'DOSE_YEAST':
         out.update(title='Dosing %g g of dry yeast with the auger' % p['target_g'], chemical=YEAST, amount_g=p['target_g'])
         out['detail'] = ('The carousel turns %s under the auger. The screw turns a counted number of revolutions, and the '
