@@ -305,10 +305,10 @@ class Planner:
              ('2 developer pour', 'pourer', ('P_dev', 'dev', 'rack_1', 40.0, 45.0, 'scale_pan'), {'P1': 'scale_pan'}),
              ('3 P1 funnel pour', 'pourer', ('P_fun', 'P1', 'scale_pan', 30.0, 65.0, 'funnel'), {'P1': 'scale_pan'}),
              ('4 P1 scale->carousel', 'transfer', ('P1', 'scale_pan', 'carousel_pick'), {'P1': 'scale_pan'}),
-             ('6 P2 carousel->scale', 'transfer', ('P2', 'carousel_pick', 'scale_pan'), {'P2': 'carousel_pick', 'P1': 'carousel@296.1'}),
-             ('7 water pour', 'pourer', ('P_wat', 'water', 'rack_3', 40.0, 45.0, 'scale_pan'), {'P2': 'scale_pan', 'P1': 'carousel@296.1'}),
-             ('8 P2 funnel pour', 'pourer', ('P_fun', 'P2', 'scale_pan', 30.0, 65.0, 'funnel'), {'P2': 'scale_pan', 'P1': 'carousel@296.1'}),
-             ('9 P2 scale->carousel', 'transfer', ('P2', 'scale_pan', 'carousel_pick'), {'P2': 'scale_pan', 'P1': 'carousel@296.1'})]
+             ('6 P2 carousel->scale', 'transfer', ('P2', 'carousel_pick', 'scale_pan'), {'P2': 'carousel_pick', 'P1': 'carousel@296.5'}),
+             ('7 water pour', 'pourer', ('P_wat', 'water', 'rack_3', 40.0, 45.0, 'scale_pan'), {'P2': 'scale_pan', 'P1': 'carousel@296.5'}),
+             ('8 P2 funnel pour', 'pourer', ('P_fun', 'P2', 'scale_pan', 30.0, 65.0, 'funnel'), {'P2': 'scale_pan', 'P1': 'carousel@296.5'}),
+             ('9 P2 scale->carousel', 'transfer', ('P2', 'scale_pan', 'carousel_pick'), {'P2': 'scale_pan', 'P1': 'carousel@296.5'})]
 
     def all_plans(self):
         """the eight arm steps of the demo (demo_process 4; grip heights from the doc); yeast dose and stage have no arm motion"""

@@ -473,31 +473,31 @@
   "carousel": {
    "centre": [
     755.7,
-    291.0
+    297.0
    ],
    "rotation_deg": 180.0,
    "pick": [
-    718.8,
-    366.5
+    718.2,
+    372.2
    ],
    "auger": [
     834.5,
-    320.0
+    326.0
    ],
    "tape_centre": [
-    562.9,
-    93.5
+    510.7,
+    -133.0
    ],
    "tape_pick": [
-    499.1,
-    38.8
+    473.2,
+    -57.8
    ],
    "tape_auger": [
-    626.6,
-    148.2
+    589.5,
+    -104.0
    ],
    "beaker_bottom_z": 61.7,
-   "mount": "TRIAL: TT-01 rail saddle on Y-right; auger post on E5 bolted out from Y-right, E5 at Y 380-400"
+   "mount": "TRIAL: TT-01 rail saddle on Y-right, M4 bolts at Y 282/312 (12/42 mm from the Y-right south end, Y 270); auger post on E5 bolted out from Y-right, E5 at Y 386-406"
   },
   "rack_stands": [
    {
@@ -553,8 +553,8 @@
    },
    "transfer": {
     "carousel_pick": [
-     259.6,
-     26.1
+     254.2,
+     26.5
     ],
     "scale": [
      193.3,
