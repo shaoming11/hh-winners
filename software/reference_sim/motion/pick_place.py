@@ -19,27 +19,16 @@ def _joint_interpolation(start: np.ndarray, end: np.ndarray,
     return [start + (end - start) * (i / count) for i in range(1, count + 1)]
 
 
-def _rotation_vector(current: np.ndarray, target: np.ndarray) -> np.ndarray:
-    """Return the world-frame axis-angle vector taking current to target."""
-    delta = target @ current.T
-    cosine = float(np.clip((np.trace(delta) - 1) / 2, -1, 1))
-    angle = math.acos(cosine)
-    if angle < 1e-8:
-        return np.zeros(3)
-    skew = np.array([delta[2, 1] - delta[1, 2],
-                     delta[0, 2] - delta[2, 0],
-                     delta[1, 0] - delta[0, 1]])
-    sine = math.sin(angle)
-    if abs(sine) > 1e-7:
-        return skew * (angle / (2 * sine))
-    eigenvalues, eigenvectors = np.linalg.eig(delta)
-    axis = np.real(eigenvectors[:, int(np.argmin(np.abs(eigenvalues - 1)))])
-    axis /= np.linalg.norm(axis)
-    return axis * angle
+def _upright_error_deg(source: np.ndarray, destination: np.ndarray) -> float:
+    world_up = np.array([0.0, 0.0, 1.0])
+    relative_up = destination @ source.T @ world_up
+    cosine = float(np.clip(relative_up @ world_up, -1.0, 1.0))
+    return math.degrees(math.acos(cosine))
 
 
-def _rotation_error_deg(current: np.ndarray, target: np.ndarray) -> float:
-    return math.degrees(float(np.linalg.norm(_rotation_vector(current, target))))
+def _skew(vector: np.ndarray) -> np.ndarray:
+    x, y, z = vector
+    return np.array([[0.0, -z, y], [z, 0.0, -x], [-y, x, 0.0]])
 
 
 def _position_candidates(kinematics: ArmKinematics, target: np.ndarray,
@@ -73,8 +62,8 @@ def _match_endpoint_orientations(kinematics: ArmKinematics, source: np.ndarray,
             if destination_margin < 5.0:
                 continue
             _, destination_rot = kinematics.forward(destination_q)
-            orientation_error = _rotation_error_deg(source_rot, destination_rot)
-            pairs.append((orientation_error, min(source_margin, destination_margin),
+            axis_error = _upright_error_deg(source_rot, destination_rot)
+            pairs.append((axis_error, min(source_margin, destination_margin),
                           source_q, destination_q))
     if not pairs:
         raise IKError("No source and destination IK pair has a 5 degree joint margin")
@@ -95,20 +84,25 @@ def _match_endpoint_orientations(kinematics: ArmKinematics, source: np.ndarray,
         destination_jacp = kinematics.jacp[:, kinematics.dof_ids].copy()
         destination_jacr = kinematics.jacr[:, kinematics.dof_ids].copy()
 
-        orientation_error = _rotation_vector(source_rot, destination_rot)
+        world_up = np.array([0.0, 0.0, 1.0])
+        relative = destination_rot @ source_rot.T
+        relative_up = relative @ world_up
+        upright_error = world_up - relative_up
         if (max(np.linalg.norm(source_pos - source),
                 np.linalg.norm(destination_pos - destination)) < 0.0002
-                and np.linalg.norm(orientation_error) < math.radians(0.1)):
+                and _upright_error_deg(source_rot, destination_rot) < 0.1):
             break
 
+        source_up_jac = relative @ _skew(world_up) @ source_jacr
+        destination_up_jac = -_skew(relative_up) @ destination_jacr
         jacobian = np.block([
             [source_jacp, np.zeros((3, 5))],
             [np.zeros((3, 5)), destination_jacp],
-            [-weight * source_jacr, weight * destination_jacr],
+            [weight * source_up_jac, weight * destination_up_jac],
         ])
         error = np.concatenate((source - source_pos,
                                 destination - destination_pos,
-                                -weight * orientation_error))
+                                weight * upright_error))
         delta = jacobian.T @ np.linalg.solve(
             jacobian @ jacobian.T + 1e-6 * np.eye(9), error)
         source_q = np.clip(source_q + np.clip(delta[:5], -0.005, 0.005),
@@ -118,18 +112,18 @@ def _match_endpoint_orientations(kinematics: ArmKinematics, source: np.ndarray,
 
     source_pos, source_rot = kinematics.forward(source_q)
     destination_pos, destination_rot = kinematics.forward(destination_q)
-    orientation_error_deg = _rotation_error_deg(source_rot, destination_rot)
+    axis_error_deg = _upright_error_deg(source_rot, destination_rot)
     source_margin = float(kinematics.joint_margins_deg(source_q).min())
     destination_margin = float(kinematics.joint_margins_deg(destination_q).min())
     if (np.linalg.norm(source_pos - source) > 0.002
             or np.linalg.norm(destination_pos - destination) > 0.002
-            or orientation_error_deg > 0.25
+            or axis_error_deg > 0.25
             or min(source_margin, destination_margin) < 5.0):
         raise IKError("Endpoint orientation match failed: "
-                      f"{orientation_error_deg:.2f} deg, "
+                      f"{axis_error_deg:.2f} deg axis mismatch, "
                       f"margins {source_margin:.1f}/{destination_margin:.1f} deg")
     return source_q, destination_q, {
-        "orientation_match_deg": orientation_error_deg,
+        "upright_axis_match_deg": axis_error_deg,
         "source_position_error_mm": float(np.linalg.norm(source_pos - source) * 1000),
         "destination_position_error_mm": float(np.linalg.norm(destination_pos - destination) * 1000),
         "source_min_joint_margin_deg": source_margin,
@@ -172,8 +166,8 @@ def transfer_beaker(world: BenchWorld, arm: str, beaker: str,
                     speed_deg_s: float = 55.0) -> dict:
     """Transfer one empty beaker and verify that it lands upright on the receiver.
 
-    Endpoint IK solutions are paired so the gripper frame has nearly the same
-    orientation at pickup and placement. An outward escape waypoint clears the
+    Endpoint IK solutions are paired so the held beaker stays upright at pickup
+    and placement while allowing gripper yaw to differ. An outward escape waypoint clears the
     carousel before the higher carry path. Grasping remains the proximity plus weld
     abstraction documented in the reference simulator README.
     """

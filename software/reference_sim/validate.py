@@ -8,6 +8,7 @@ from hal.protocol import LineDecoder, decode_line, encode_line
 from verify_motion import run as verify_motion
 from verify_transfer import run as verify_transfer
 from verify_carousel import run as verify_carousel
+from verify_rack_transfer import run as verify_rack_transfer
 
 
 def main() -> None:
@@ -16,6 +17,7 @@ def main() -> None:
     motion = verify_motion()
     transfer = verify_transfer()
     carousel = verify_carousel()
+    rack_transfer = verify_rack_transfer()
 
     result = run()
     smoke = result["arm_control_smoke"]
@@ -60,6 +62,8 @@ def main() -> None:
     print(f"PASS: P1 carousel-to-scale transfer lands {transfer['final_site_error_mm']:.2f} mm off target, "
           f"tilt {transfer['upright_error_deg']:.2f}°")
     print(f"PASS: four carousel beakers follow a {carousel['reached_deg']:.2f}° index and stay in their pockets")
+    print(f"PASS: rack-to-scale transfer lands {rack_transfer['final_site_error_mm']:.2f} mm off target, "
+          f"tilt {rack_transfer['upright_error_deg']:.2f}°")
     print("PASS: SO-101 joint command, JSON-line codec, and simulated mechanism commands respond")
     print(f"PASS: 10 simulated 39 g pours mean {batch_mean:.2f} g, SD {batch_sd:.2f} g")
 
