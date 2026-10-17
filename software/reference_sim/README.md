@@ -15,6 +15,8 @@ software/reference_sim/.venv/bin/pip install -r software/reference_sim/requireme
 software/reference_sim/.venv/bin/python software/reference_sim/fetch_so101.py
 software/reference_sim/.venv/bin/python software/reference_sim/build_scene.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_layout.py
+software/reference_sim/.venv/bin/python software/reference_sim/verify_reach.py
+software/reference_sim/.venv/bin/python software/reference_sim/verify_stage.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_motion.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_transfer.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_rack_transfer.py
@@ -33,8 +35,9 @@ software/reference_sim/.venv/bin/python software/reference_sim/run_demo.py
 ```
 
 The run writes `software/reference_sim/build/reference_run.json`. The fetched upstream mesh files,
-virtual environment, generated MJCF and run output are local and gitignored. The source commit and
-hashes are recorded in `assets/so101/manifest.json`.
+virtual environment, generated MJCF and run output are local and gitignored. The upstream revision
+and SHA-256 hashes are pinned in `so101_assets.json`; setup verifies the model and meshes against
+that tracked manifest and writes a local copy to `assets/so101/manifest.json`.
 
 Run the numerical acceptance checks with:
 
@@ -54,8 +57,15 @@ degrees and actuated by the official MuJoCo position servos.
 - The 2020 frame, rack pockets, scale, carousel, auger post, flask, funnel and stage use the final
   layout coordinates. Bench and accessory collision shapes are simplified primitives.
 - The scale's beaker locating ring has a 56.6 mm bore and collision geometry.
-- The carousel is a MuJoCo hinge and the stage is a slider driven from the 50 mm crank / 80 mm rod
-  relation, calibrated to the documented 97.3 mm travel at 150 degrees.
+- `verify_reach.py` compares the live scene's station positions with Update-13 and runs deterministic,
+  multi-seed position IK for each arm's assigned rack, carousel, scale and funnel approach targets.
+  It reports position error and joint-limit margin. This is a point-reach check, not a collision-free
+  path guarantee; transfer and pour checks exercise selected paths separately.
+- The carousel is a MuJoCo hinge. The stage sled is a MuJoCo slide joint commanded over an 80 Hz
+  smoothstep profile. Its target travel comes from the 50 mm crank / 80 mm rod geometry, calibrated
+  to the documented 97.3 mm at 150 degrees. The crank and connecting rod are not dynamic bodies.
+  `verify_stage.py` checks 75, 150 and 0 degree commands through the JSON-line HAL, measures the
+  sampled sled/funnel travel, bounds each sample step, and checks return to home.
 - Liquid delivery uses a tilted-cylinder volume calculation, a weir-flow equation, 120 ms stream
   delay, noisy 80 Hz scale readings and a ballistic landing estimate. Recorded pours show a
   non-colliding capsule for that analytical stream. Yeast dosing is a calibrated grams-per-revolution

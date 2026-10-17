@@ -93,8 +93,11 @@ class SimMegaLink:
                 return {"ok": False, "error": "RANGE"}
             duration = self._duration(obj, 2500)
             travel = self.world.stage_travel_mm(degrees)
-            self.world.set_actuator_goal_rad("stage_position", -travel / 1000)
-            self._pending = {"cmd": name, "duration": duration,
+            start_travel = self.world.status()["stage_travel_mm"]
+            self._pending = {"cmd": name, "duration": duration, "elapsed": 0.0,
+                             "settle_elapsed": 0.0,
+                             "start_travel_mm": start_travel,
+                             "target_travel_mm": travel,
                              "result": {"deg": degrees, "travel_mm": travel}}
         elif name == "auger":
             revs = float(obj.get("revs", 0.0))
@@ -122,6 +125,14 @@ class SimMegaLink:
             steps = max(1, math.floor(steps_exact))
             self._step_fraction = steps_exact - steps
             elapsed = steps * self.world.model.opt.timestep
+            if self._pending is not None and self._pending["cmd"] == "stage":
+                command = self._pending
+                command["elapsed"] = min(command["duration"], command["elapsed"] + elapsed)
+                u = command["elapsed"] / command["duration"]
+                smooth = u * u * (3.0 - 2.0 * u)
+                travel = (command["start_travel_mm"] +
+                          (command["target_travel_mm"] - command["start_travel_mm"]) * smooth)
+                self.world.set_actuator_goal_rad("stage_position", -travel / 1000)
             self.world.step(elapsed)
             if self._fault:
                 if not self._last_fault_emitted:
@@ -131,14 +142,31 @@ class SimMegaLink:
             now_ms = round(self.world.data.time * 1000)
             yield {"w": [now_ms, round(self.world.scale_grams(), 3)]}
             if self._pending is not None:
-                self._pending["duration"] -= elapsed
-                if self._pending["duration"] <= 0:
+                pending = self._pending
+                if pending["cmd"] == "stage":
+                    profile_finished = pending["elapsed"] >= pending["duration"]
+                    actual = self.world.status()["stage_travel_mm"]
+                    finished = profile_finished and abs(actual - pending["target_travel_mm"]) <= 0.25
+                    if profile_finished and not finished:
+                        pending["settle_elapsed"] += elapsed
+                        if pending["settle_elapsed"] > 2.0:
+                            self._pending = None
+                            self._fault = "STAGE_TIMEOUT"
+                            self._last_fault_emitted = True
+                            yield {"f": self._fault}
+                            continue
+                else:
+                    pending["duration"] -= elapsed
+                    finished = pending["duration"] <= 0
+                if finished:
                     done = self._pending
                     self._pending = None
                     if done["cmd"] == "auger":
                         self._yeast_g += float(done["result"]["grams"])
                         self.world.set_scale_payload_g(
                             self.world.scale_payload_g + float(done["result"]["grams"]))
+                    if done["cmd"] == "stage":
+                        done["result"]["actual_travel_mm"] = self.world.status()["stage_travel_mm"]
                     self._serial.append({"done": done["cmd"], **done["result"]})
                     yield self._serial.pop(0)
 

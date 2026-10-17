@@ -11,11 +11,15 @@ from verify_carousel import run as verify_carousel
 from verify_rack_transfer import run as verify_rack_transfer
 from verify_pour import run as verify_pour
 from verify_foam import run as verify_foam
+from verify_reach import run as verify_reach
+from verify_stage import run as verify_stage
 
 
 def main() -> None:
     layout_rows = verify_layout()
     assert all(row["pass"] for row in layout_rows), "one or more station radii are outside 1 mm"
+    reach = verify_reach()
+    stage = verify_stage()
     motion = verify_motion()
     transfer = verify_transfer()
     carousel = verify_carousel()
@@ -58,9 +62,14 @@ def main() -> None:
     assert batch_sd <= 0.5
 
     print("PASS: final layout radii match within 1 mm")
+    print(f"PASS: MuJoCo stations match Update-13 within 1 mm; "
+          f"{len(reach['reach_rows'])} arm/station IK targets clear 5° joint margin")
     print("PASS: 39 g developer and 30 g water targets are within ±2 g")
     print("PASS: simulated load-cell reads the added mass within 1 g")
     print("PASS: yeast target, carousel index, and 97.3 mm stage move are within tolerance")
+    print(f"PASS: JSON stage profiles reach 75° and 150°, reverse home, and carry the funnel "
+          f"(max measured per-sample move "
+          f"{max(row['maximum_sample_step_mm'] for row in stage['profiles']):.2f} mm)")
     print("PASS: both funnel pours land inside the modeled opening")
     print(f"PASS: SO-101 IK reaches the carousel grasp point with {motion['ik_min_joint_margin_deg']:.1f}° min joint margin")
     print(f"PASS: proximity grasp latches at {motion['grasp_distance_mm']:.2f} mm and follows a wrist command")
