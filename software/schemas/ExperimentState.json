@@ -1,0 +1,1634 @@
+{
+ "$defs": {
+  "Alert": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "ts": {
+     "title": "Ts",
+     "type": "string"
+    },
+    "severity": {
+     "enum": [
+      "info",
+      "warning",
+      "critical"
+     ],
+     "title": "Severity",
+     "type": "string"
+    },
+    "code": {
+     "description": "SPILL | ESTOP | FAULT | OVERRUN | SCALE_RATE | DOSE_ERROR | COMMS | TEMP | BEAKER_MISSING | NEEDS_APPROVAL",
+     "title": "Code",
+     "type": "string"
+    },
+    "message": {
+     "title": "Message",
+     "type": "string"
+    },
+    "run_id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Run Id"
+    },
+    "step": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Step"
+    },
+    "data": {
+     "additionalProperties": true,
+     "title": "Data",
+     "type": "object"
+    },
+    "acknowledged_by": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Acknowledged By"
+    },
+    "acknowledged_at": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Acknowledged At"
+    },
+    "resolved": {
+     "default": false,
+     "title": "Resolved",
+     "type": "boolean"
+    },
+    "notified": {
+     "description": "channels/people the agent told (e.g. 'imessage:+1555')",
+     "items": {
+      "type": "string"
+     },
+     "title": "Notified",
+     "type": "array"
+    }
+   },
+   "required": [
+    "id",
+    "severity",
+    "code",
+    "message"
+   ],
+   "title": "Alert",
+   "type": "object"
+  },
+  "ApprovalRequest": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "ts": {
+     "title": "Ts",
+     "type": "string"
+    },
+    "kind": {
+     "enum": [
+      "run_plan",
+      "hardware_command"
+     ],
+     "title": "Kind",
+     "type": "string"
+    },
+    "requested_by": {
+     "description": "which system asked (agent/frontend/...)",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Requested By",
+     "type": "string"
+    },
+    "requested_by_person": {
+     "default": "",
+     "description": "the human behind the request, if known",
+     "title": "Requested By Person",
+     "type": "string"
+    },
+    "summary": {
+     "title": "Summary",
+     "type": "string"
+    },
+    "requires": {
+     "description": "why a human must decide: 'moves the arms', 'doses 20 g of 12% peroxide', ...",
+     "items": {
+      "type": "string"
+     },
+     "title": "Requires",
+     "type": "array"
+    },
+    "payload": {
+     "additionalProperties": true,
+     "description": "the HardwareCommand awaiting approval",
+     "title": "Payload",
+     "type": "object"
+    },
+    "status": {
+     "default": "pending",
+     "enum": [
+      "pending",
+      "approved",
+      "rejected",
+      "expired"
+     ],
+     "title": "Status",
+     "type": "string"
+    },
+    "expires_at": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "pending requests expire; the asker must re-request",
+     "title": "Expires At"
+    },
+    "asked_of": {
+     "description": "operators who were told about it (person ids)",
+     "items": {
+      "type": "string"
+     },
+     "title": "Asked Of",
+     "type": "array"
+    },
+    "snoozed_until": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "don't remind anyone before this",
+     "title": "Snoozed Until"
+    },
+    "decided_by": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Decided By"
+    },
+    "decided_at": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Decided At"
+    }
+   },
+   "required": [
+    "id",
+    "kind",
+    "requested_by",
+    "summary",
+    "payload"
+   ],
+   "title": "ApprovalRequest",
+   "type": "object"
+  },
+  "ArmState": {
+   "additionalProperties": false,
+   "properties": {
+    "role": {
+     "enum": [
+      "pourer",
+      "transfer"
+     ],
+     "title": "Role",
+     "type": "string"
+    },
+    "q_deg": {
+     "additionalProperties": {
+      "type": "number"
+     },
+     "description": "joint -> degrees",
+     "title": "Q Deg",
+     "type": "object"
+    },
+    "load": {
+     "additionalProperties": {
+      "type": "number"
+     },
+     "description": "joint -> load (sim: torque proxy)",
+     "title": "Load",
+     "type": "object"
+    },
+    "torque_on": {
+     "default": true,
+     "title": "Torque On",
+     "type": "boolean"
+    },
+    "holding": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "vessel latched in the jaws: P1, P2, developer, water, soap",
+     "title": "Holding"
+    },
+    "moving": {
+     "default": false,
+     "title": "Moving",
+     "type": "boolean"
+    },
+    "station": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "last commanded station, if known",
+     "title": "Station"
+    },
+    "temp_c": {
+     "anyOf": [
+      {
+       "additionalProperties": {
+        "type": "number"
+       },
+       "type": "object"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "servo temperatures; null until firmware reports them",
+     "title": "Temp C"
+    },
+    "goal_deg": {
+     "anyOf": [
+      {
+       "additionalProperties": {
+        "type": "number"
+       },
+       "type": "object"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "last commanded joint goal; null before the first move",
+     "title": "Goal Deg"
+    },
+    "twin": {
+     "anyOf": [
+      {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "commanded vs measured tool point (benchsim.dashboard.twin): measured_mm, commanded_mm, error_mm, joint_err_deg, settled",
+     "title": "Twin"
+    }
+   },
+   "required": [
+    "role"
+   ],
+   "title": "ArmState",
+   "type": "object"
+  },
+  "ChemistryState": {
+   "additionalProperties": false,
+   "description": "Sim-only plant model (null on hardware until the camera estimates replace it).",
+   "properties": {
+    "foam_h_mm": {
+     "default": 0.0,
+     "title": "Foam H Mm",
+     "type": "number"
+    },
+    "spilled_total_g": {
+     "default": 0.0,
+     "title": "Spilled Total G",
+     "type": "number"
+    },
+    "reaction_started": {
+     "default": false,
+     "title": "Reaction Started",
+     "type": "boolean"
+    },
+    "o2_released_l": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "O2 Released L"
+    },
+    "foam_peak_mm": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Foam Peak Mm"
+    },
+    "h2o2_left_g": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "H2O2 Left G"
+    },
+    "t_contact_s": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "bench time the yeast met the peroxide",
+     "title": "T Contact S"
+    }
+   },
+   "title": "ChemistryState",
+   "type": "object"
+  },
+  "Dose": {
+   "additionalProperties": false,
+   "properties": {
+    "target": {
+     "title": "Target",
+     "type": "number"
+    },
+    "actual": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Actual"
+    },
+    "error": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Error"
+    },
+    "topups": {
+     "default": 0,
+     "title": "Topups",
+     "type": "integer"
+    },
+    "theta_first": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Theta First"
+    },
+    "rev_first_pass": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Rev First Pass"
+    }
+   },
+   "required": [
+    "target"
+   ],
+   "title": "Dose",
+   "type": "object"
+  },
+  "Event": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "integer"
+    },
+    "ts": {
+     "title": "Ts",
+     "type": "string"
+    },
+    "bench_t": {
+     "default": 0.0,
+     "title": "Bench T",
+     "type": "number"
+    },
+    "level": {
+     "default": "info",
+     "enum": [
+      "debug",
+      "info",
+      "warning",
+      "error"
+     ],
+     "title": "Level",
+     "type": "string"
+    },
+    "kind": {
+     "enum": [
+      "log",
+      "step",
+      "dose",
+      "fault",
+      "alert",
+      "command",
+      "reply",
+      "approval",
+      "camera",
+      "message",
+      "state",
+      "note"
+     ],
+     "title": "Kind",
+     "type": "string"
+    },
+    "run_id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Run Id"
+    },
+    "step": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Step"
+    },
+    "source": {
+     "default": "backend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "message": {
+     "title": "Message",
+     "type": "string"
+    },
+    "data": {
+     "additionalProperties": true,
+     "title": "Data",
+     "type": "object"
+    }
+   },
+   "required": [
+    "id",
+    "kind",
+    "message"
+   ],
+   "title": "Event",
+   "type": "object"
+  },
+  "Health": {
+   "additionalProperties": false,
+   "description": "QA / monitoring. Everything here is computed by the backend's watchdog, not the sequencer.",
+   "properties": {
+    "ok": {
+     "default": true,
+     "title": "Ok",
+     "type": "boolean"
+    },
+    "comms_latency_ms": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Comms Latency Ms"
+    },
+    "scale_rate_hz": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Scale Rate Hz"
+    },
+    "arm_settle_overruns": {
+     "default": 0,
+     "description": "moves that did not settle in time (precursor to the fault that stopped run 004135)",
+     "title": "Arm Settle Overruns",
+     "type": "integer"
+    },
+    "stalls": {
+     "default": 0,
+     "title": "Stalls",
+     "type": "integer"
+    },
+    "servo_temp_max_c": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "null until the firmware reports temperatures",
+     "title": "Servo Temp Max C"
+    },
+    "spill_detected": {
+     "default": false,
+     "description": "sim: chem.spilled_total_g > threshold; real: CV on the webcam",
+     "title": "Spill Detected",
+     "type": "boolean"
+    },
+    "spilled_g": {
+     "default": 0.0,
+     "title": "Spilled G",
+     "type": "number"
+    },
+    "camera_ok": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Camera Ok"
+    },
+    "beaker_check": {
+     "additionalProperties": {
+      "type": "boolean"
+     },
+     "description": "camera: beaker present where the plan expects it",
+     "title": "Beaker Check",
+     "type": "object"
+    },
+    "last_check_ts": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Last Check Ts"
+    },
+    "open_alerts": {
+     "default": 0,
+     "title": "Open Alerts",
+     "type": "integer"
+    }
+   },
+   "title": "Health",
+   "type": "object"
+  },
+  "MediaRefs": {
+   "additionalProperties": false,
+   "properties": {
+    "live_stream_url": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "MJPEG of the sim/webcam, if the backend renders one",
+     "title": "Live Stream Url"
+    },
+    "latest_snapshot": {
+     "additionalProperties": {
+      "type": "string"
+     },
+     "description": "camera name -> URL of the latest still",
+     "title": "Latest Snapshot",
+     "type": "object"
+    },
+    "run_video_url": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Run Video Url"
+    }
+   },
+   "title": "MediaRefs",
+   "type": "object"
+  },
+  "MegaState": {
+   "additionalProperties": false,
+   "properties": {
+    "connected": {
+     "default": false,
+     "title": "Connected",
+     "type": "boolean"
+    },
+    "fw": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Fw"
+    },
+    "hx_hz": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "load-cell sample rate; closed loop needs >= control.scale.min_rate_hz",
+     "title": "Hx Hz"
+    },
+    "estop": {
+     "default": false,
+     "title": "Estop",
+     "type": "boolean"
+    },
+    "fault": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "latched fault: ESTOP|AUGER_JAM|WDT|HX_TIMEOUT|TIMEOUT",
+     "title": "Fault"
+    },
+    "carousel_deg": {
+     "default": 0.0,
+     "title": "Carousel Deg",
+     "type": "number"
+    },
+    "stage_deg": {
+     "default": 0.0,
+     "title": "Stage Deg",
+     "type": "number"
+    },
+    "stage_position": {
+     "anyOf": [
+      {
+       "enum": [
+        "WORK",
+        "ERUPT"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Stage Position"
+    },
+    "auger_rev": {
+     "default": 0.0,
+     "title": "Auger Rev",
+     "type": "number"
+    },
+    "busy": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Busy",
+     "type": "array"
+    },
+    "last_heartbeat_age_s": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Last Heartbeat Age S"
+    }
+   },
+   "title": "MegaState",
+   "type": "object"
+  },
+  "Plan": {
+   "additionalProperties": false,
+   "properties": {
+    "title": {
+     "title": "Title",
+     "type": "string"
+    },
+    "steps": {
+     "items": {
+      "$ref": "#/$defs/PlanStep"
+     },
+     "title": "Steps",
+     "type": "array"
+    },
+    "source": {
+     "default": "manual",
+     "enum": [
+      "llm",
+      "preset",
+      "manual",
+      "agent"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "notes": {
+     "default": "",
+     "title": "Notes",
+     "type": "string"
+    }
+   },
+   "required": [
+    "title",
+    "steps"
+   ],
+   "title": "Plan",
+   "type": "object"
+  },
+  "PlanStep": {
+   "additionalProperties": false,
+   "description": "One step of benchsim.process.steps.  `params` is checked by `steps.validate`, the only\ngate before execution - it is deliberately an open dict here so the two never drift.",
+   "properties": {
+    "type": {
+     "enum": [
+      "TRANSFER",
+      "POUR_TO_SCALE",
+      "POUR_TO_FUNNEL",
+      "CAROUSEL",
+      "DOSE_YEAST",
+      "VERIFY_MASS",
+      "WAIT",
+      "STAGE"
+     ],
+     "title": "Type",
+     "type": "string"
+    },
+    "params": {
+     "additionalProperties": true,
+     "description": "per-type params; see benchsim.process.steps",
+     "title": "Params",
+     "type": "object"
+    },
+    "label": {
+     "default": "",
+     "title": "Label",
+     "type": "string"
+    }
+   },
+   "required": [
+    "type"
+   ],
+   "title": "PlanStep",
+   "type": "object"
+  },
+  "Recipe": {
+   "additionalProperties": false,
+   "properties": {
+    "developer_g": {
+     "default": 39.0,
+     "title": "Developer G",
+     "type": "number"
+    },
+    "yeast_g": {
+     "default": 7.0,
+     "title": "Yeast G",
+     "type": "number"
+    },
+    "water_g": {
+     "default": 30.0,
+     "title": "Water G",
+     "type": "number"
+    },
+    "activate_s": {
+     "default": 60.0,
+     "title": "Activate S",
+     "type": "number"
+    }
+   },
+   "title": "Recipe",
+   "type": "object"
+  },
+  "RunState": {
+   "additionalProperties": false,
+   "properties": {
+    "run_id": {
+     "title": "Run Id",
+     "type": "string"
+    },
+    "backend": {
+     "enum": [
+      "sim",
+      "real"
+     ],
+     "title": "Backend",
+     "type": "string"
+    },
+    "started_at": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Started At"
+    },
+    "finished_at": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Finished At"
+    },
+    "operator": {
+     "default": "",
+     "description": "the human who approved / started it",
+     "title": "Operator",
+     "type": "string"
+    },
+    "requested_by": {
+     "default": "",
+     "description": "the human who asked for it (may differ from operator)",
+     "title": "Requested By",
+     "type": "string"
+    },
+    "protocol_text": {
+     "default": "",
+     "title": "Protocol Text",
+     "type": "string"
+    },
+    "plan": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Plan"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "validation": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Validation"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "recipe": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Recipe"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "approved_by": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Approved By"
+    },
+    "approved_at": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Approved At"
+    },
+    "steps": {
+     "items": {
+      "$ref": "#/$defs/StepState"
+     },
+     "title": "Steps",
+     "type": "array"
+    },
+    "current_step": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "index into steps",
+     "title": "Current Step"
+    },
+    "doses": {
+     "additionalProperties": {
+      "anyOf": [
+       {
+        "$ref": "#/$defs/Dose"
+       },
+       {
+        "type": "number"
+       }
+      ]
+     },
+     "description": "name -> Dose, or a scalar (tare_g, *_to_flask_g, foam_*)",
+     "title": "Doses",
+     "type": "object"
+    },
+    "faults": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Faults",
+     "type": "array"
+    },
+    "outcome": {
+     "default": "not started",
+     "enum": [
+      "not started",
+      "running",
+      "paused",
+      "complete",
+      "SAFE_STOP",
+      "aborted",
+      "rejected by validator"
+     ],
+     "title": "Outcome",
+     "type": "string"
+    },
+    "bench_seconds": {
+     "default": 0.0,
+     "title": "Bench Seconds",
+     "type": "number"
+    },
+    "wall_seconds": {
+     "default": 0.0,
+     "title": "Wall Seconds",
+     "type": "number"
+    },
+    "notebook_html": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "URL of the lab-notebook page once finished",
+     "title": "Notebook Html"
+    },
+    "progress": {
+     "default": 0.0,
+     "maximum": 1,
+     "minimum": 0,
+     "title": "Progress",
+     "type": "number"
+    }
+   },
+   "required": [
+    "run_id",
+    "backend"
+   ],
+   "title": "RunState",
+   "type": "object"
+  },
+  "RunSummary": {
+   "additionalProperties": false,
+   "properties": {
+    "run_id": {
+     "title": "Run Id",
+     "type": "string"
+    },
+    "backend": {
+     "enum": [
+      "sim",
+      "real"
+     ],
+     "title": "Backend",
+     "type": "string"
+    },
+    "started_at": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "title": "Started At"
+    },
+    "outcome": {
+     "title": "Outcome",
+     "type": "string"
+    },
+    "recipe": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Recipe"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "doses": {
+     "additionalProperties": {
+      "anyOf": [
+       {
+        "$ref": "#/$defs/Dose"
+       },
+       {
+        "type": "number"
+       }
+      ]
+     },
+     "title": "Doses",
+     "type": "object"
+    },
+    "faults": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Faults",
+     "type": "array"
+    },
+    "foam_h_mm": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Foam H Mm"
+    },
+    "bench_seconds": {
+     "default": 0.0,
+     "title": "Bench Seconds",
+     "type": "number"
+    }
+   },
+   "required": [
+    "run_id",
+    "backend",
+    "started_at",
+    "outcome",
+    "recipe"
+   ],
+   "title": "RunSummary",
+   "type": "object"
+  },
+  "ScaleState": {
+   "additionalProperties": false,
+   "properties": {
+    "gross_g": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Gross G"
+    },
+    "tare_g": {
+     "default": 0.0,
+     "title": "Tare G",
+     "type": "number"
+    },
+    "net_g": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Net G"
+    },
+    "rate_gps": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "LSQ flow estimate during a pour",
+     "title": "Rate Gps"
+    },
+    "sigma_g": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Sigma G"
+    },
+    "settled": {
+     "default": false,
+     "title": "Settled",
+     "type": "boolean"
+    },
+    "streaming": {
+     "default": false,
+     "title": "Streaming",
+     "type": "boolean"
+    },
+    "beaker_on_pan": {
+     "anyOf": [
+      {
+       "enum": [
+        "P1",
+        "P2"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Beaker On Pan"
+    }
+   },
+   "title": "ScaleState",
+   "type": "object"
+  },
+  "StepState": {
+   "additionalProperties": false,
+   "properties": {
+    "index": {
+     "title": "Index",
+     "type": "integer"
+    },
+    "name": {
+     "title": "Name",
+     "type": "string"
+    },
+    "status": {
+     "default": "pending",
+     "enum": [
+      "pending",
+      "running",
+      "ok",
+      "fault",
+      "error",
+      "skipped"
+     ],
+     "title": "Status",
+     "type": "string"
+    },
+    "detail": {
+     "default": "",
+     "title": "Detail",
+     "type": "string"
+    },
+    "type": {
+     "anyOf": [
+      {
+       "enum": [
+        "TRANSFER",
+        "POUR_TO_SCALE",
+        "POUR_TO_FUNNEL",
+        "CAROUSEL",
+        "DOSE_YEAST",
+        "VERIFY_MASS",
+        "WAIT",
+        "STAGE"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "benchsim step type; null for the precheck row",
+     "title": "Type"
+    },
+    "params": {
+     "additionalProperties": true,
+     "description": "the step's params as validated",
+     "title": "Params",
+     "type": "object"
+    },
+    "narration": {
+     "anyOf": [
+      {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "benchsim.dashboard.narration.describe(): title, detail, arm, chemical, amount_g, tol_g, science, clearance. `title` is the friendly prose for this step ('Weighing out 39 g of hydrogen peroxide'); `name` stays terse.",
+     "title": "Narration"
+    },
+    "t0": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "bench seconds",
+     "title": "T0"
+    },
+    "t1": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "T1"
+    }
+   },
+   "required": [
+    "index",
+    "name"
+   ],
+   "title": "StepState",
+   "type": "object"
+  },
+  "Validation": {
+   "additionalProperties": false,
+   "properties": {
+    "ok": {
+     "title": "Ok",
+     "type": "boolean"
+    },
+    "problems": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Problems",
+     "type": "array"
+    },
+    "summary": {
+     "default": "",
+     "title": "Summary",
+     "type": "string"
+    }
+   },
+   "required": [
+    "ok"
+   ],
+   "title": "Validation",
+   "type": "object"
+  },
+  "VesselState": {
+   "additionalProperties": false,
+   "properties": {
+    "name": {
+     "title": "Name",
+     "type": "string"
+    },
+    "at": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "station / 'pourer' / 'transfer' (held) / 'flask'",
+     "title": "At"
+    },
+    "contents_g": {
+     "additionalProperties": {
+      "type": "number"
+     },
+     "description": "reagent -> grams",
+     "title": "Contents G",
+     "type": "object"
+    },
+    "total_g": {
+     "default": 0.0,
+     "title": "Total G",
+     "type": "number"
+    }
+   },
+   "required": [
+    "name"
+   ],
+   "title": "VesselState",
+   "type": "object"
+  }
+ },
+ "additionalProperties": false,
+ "description": "THE snapshot. GET /api/state returns it; SSE /api/events streams it; MCP get_state wraps it.",
+ "properties": {
+  "v": {
+   "default": "0.1.0",
+   "title": "V",
+   "type": "string"
+  },
+  "ts": {
+   "title": "Ts",
+   "type": "string"
+  },
+  "bench_t": {
+   "default": 0.0,
+   "description": "bench seconds (sim clock, or seconds since connect)",
+   "title": "Bench T",
+   "type": "number"
+  },
+  "backend": {
+   "default": "sim",
+   "enum": [
+    "sim",
+    "real"
+   ],
+   "title": "Backend",
+   "type": "string"
+  },
+  "mode": {
+   "default": "disconnected",
+   "enum": [
+    "disconnected",
+    "idle",
+    "planning",
+    "awaiting_approval",
+    "running",
+    "paused",
+    "safe_stop",
+    "complete",
+    "error"
+   ],
+   "title": "Mode",
+   "type": "string"
+  },
+  "run": {
+   "anyOf": [
+    {
+     "$ref": "#/$defs/RunState"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null
+  },
+  "arms": {
+   "additionalProperties": {
+    "$ref": "#/$defs/ArmState"
+   },
+   "title": "Arms",
+   "type": "object"
+  },
+  "mega": {
+   "$ref": "#/$defs/MegaState"
+  },
+  "scale": {
+   "$ref": "#/$defs/ScaleState"
+  },
+  "vessels": {
+   "additionalProperties": {
+    "$ref": "#/$defs/VesselState"
+   },
+   "description": "P1, P2, developer, water, soap, flask",
+   "title": "Vessels",
+   "type": "object"
+  },
+  "chemistry": {
+   "anyOf": [
+    {
+     "$ref": "#/$defs/ChemistryState"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null
+  },
+  "health": {
+   "$ref": "#/$defs/Health"
+  },
+  "alerts": {
+   "description": "open (unresolved) alerts",
+   "items": {
+    "$ref": "#/$defs/Alert"
+   },
+   "title": "Alerts",
+   "type": "array"
+  },
+  "pending_approvals": {
+   "items": {
+    "$ref": "#/$defs/ApprovalRequest"
+   },
+   "title": "Pending Approvals",
+   "type": "array"
+  },
+  "recent_events": {
+   "description": "last ~50 log events",
+   "items": {
+    "$ref": "#/$defs/Event"
+   },
+   "title": "Recent Events",
+   "type": "array"
+  },
+  "media": {
+   "$ref": "#/$defs/MediaRefs"
+  },
+  "history": {
+   "description": "previous runs, newest first",
+   "items": {
+    "$ref": "#/$defs/RunSummary"
+   },
+   "title": "History",
+   "type": "array"
+  }
+ },
+ "title": "ExperimentState",
+ "type": "object",
+ "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

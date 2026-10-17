@@ -141,6 +141,7 @@ reagent rack on Y-right) is in git history at commit `644fa86`.
 ## Team plan and pitch
 - [docs/plan_36h.md](docs/plan_36h.md): the 36-hour build plan by person (Nick, Nehal, Shao, Jerry), with go/no-go checkpoints and fallbacks
 - [docs/pitch.md](docs/pitch.md): the pitch, judge Q&A, and what not to claim
+- [docs/manifesto.md](docs/manifesto.md): the thesis (accuracy as a closed-loop property, replication as the product), the 2026 research findings, the spoken pitch script, and the development gates it implies
 
 ## Possibility we may explore (not committed): Jev as a fast decision layer
 [Jev](https://pub.towardsai.net/what-is-jev-ai-a-practical-guide-to-system-one-and-executable-decisions-c289a750a3ae) (TypeSafe AI, public since Sept 2026) is a *decision* model, not a chatbot.

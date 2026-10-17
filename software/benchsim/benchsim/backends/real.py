@@ -705,7 +705,7 @@ def firmware_test_script(P=None):
     S.add('# --- e-stop latch'); S.add('reset')
     s1 = S.cmd('TT', 'ack', deg=90.0, ms=4000); S.run(1000); S.add('estop 1'); S.run(20)
     S.add('expect_fault ESTOP 1'); S.add('fw expect_out tt off'); S.run(1000); S.add('expect_done %d 0' % s1)
-    S.cmd('TT', 'err:ESTOP', deg=0.0, ms=8000); S.cmd('STOP', 'ok'); S.cmd('STREAM', 'err:ESTOP', on=True); S.cmd('CLR', 'err:STATE')
+    S.cmd('TT', 'err:ESTOP', deg=0.0, ms=8000); S.cmd('STOP', 'ok'); S.cmd('STREAM', 'ok', on=True); S.cmd('STREAM', 'ok', on=False); S.cmd('CLR', 'err:STATE')   # scale stays usable while latched
     S.add('estop 0'); S.run(600); S.cmd('CLR', 'ok', home=True); S.cmd('PING', 'ok')
     s = S.cmd('TT', 'ack', deg=0.0, ms=3000); S.run(3500); S.add('expect_done %d 1' % s)
 
