@@ -1,0 +1,4712 @@
+{
+ "parts": [
+  {
+   "name": "REF-SERVO",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 1044,
+   "bbox_mm": [
+    25.0,
+    25.0,
+    7.0
+   ],
+   "world_min": [
+    -12.5,
+    -12.5,
+    41.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Base_SO101 v13",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 265680,
+   "bbox_mm": [
+    120.0,
+    93.0,
+    85.6
+   ],
+   "world_min": [
+    270.1,
+    493.3,
+    20.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Rotation_Pitch_SO101 v8",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 67518,
+   "bbox_mm": [
+    75.5,
+    72.5,
+    84.3
+   ],
+   "world_min": [
+    277.9,
+    478.1,
+    52.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Parte6",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 116709,
+   "bbox_mm": [
+    102.1,
+    100.0,
+    140.7
+   ],
+   "world_min": [
+    237.1,
+    441.6,
+    137.3
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Parte8",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 92964,
+   "bbox_mm": [
+    143.2,
+    129.2,
+    70.8
+   ],
+   "world_min": [
+    139.7,
+    370.0,
+    191.1
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Base_08p v18",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 23717,
+   "bbox_mm": [
+    47.7,
+    80.2,
+    31.4
+   ],
+   "world_min": [
+    307.6,
+    510.9,
+    71.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Parte12",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 12250,
+   "bbox_mm": [
+    63.4,
+    67.0,
+    28.0
+   ],
+   "world_min": [
+    273.4,
+    471.8,
+    108.9
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Parte14",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 12633,
+   "bbox_mm": [
+    65.5,
+    69.4,
+    43.5
+   ],
+   "world_min": [
+    139.6,
+    370.5,
+    188.3
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Parte16",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 31997,
+   "bbox_mm": [
+    99.8,
+    97.1,
+    80.7
+   ],
+   "world_min": [
+    84.9,
+    329.2,
+    142.6
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Type I Cross Recessed Fillister Head Tapping Screw ANSI B18.6.4 1-42 x 0.1875 Type AB Steel Grade 2 Plain v1",
+   "path": "REF:1",
+   "qty": 8,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 19,
+   "bbox_mm": [
+    3.0,
+    3.0,
+    6.4
+   ],
+   "world_min": [
+    318.3,
+    556.4,
+    60.1
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Board",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 2142,
+   "bbox_mm": [
+    42.1,
+    1.6,
+    33.1
+   ],
+   "world_min": [
+    305.8,
+    600.9,
+    66.8
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-0603_SMD_Capacitor",
+   "path": "REF:1",
+   "qty": 14,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.8,
+    0.3,
+    1.6
+   ],
+   "world_min": [
+    321.9,
+    602.5,
+    78.3
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "2_1_200",
+   "path": "REF:1",
+   "qty": 6,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.8,
+    0.8,
+    0.3
+   ],
+   "world_min": [
+    309.6,
+    602.5,
+    78.3
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "_1_1_20001",
+   "path": "REF:1",
+   "qty": 6,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 1,
+   "bbox_mm": [
+    0.8,
+    0.8,
+    1.0
+   ],
+   "world_min": [
+    309.6,
+    602.5,
+    78.6
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "3_1_2_A",
+   "path": "REF:1",
+   "qty": 6,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.8,
+    0.8,
+    0.3
+   ],
+   "world_min": [
+    309.6,
+    602.5,
+    79.6
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOD323",
+   "path": "REF:1",
+   "qty": 8,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 2,
+   "bbox_mm": [
+    1.3,
+    1.1,
+    2.7
+   ],
+   "world_min": [
+    334.1,
+    602.5,
+    88.8
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "dc-005-5a-20",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 953,
+   "bbox_mm": [
+    9.4,
+    14.6,
+    14.0
+   ],
+   "world_min": [
+    333.2,
+    598.9,
+    66.3
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-DG350-3,5-02P",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 311,
+   "bbox_mm": [
+    8.0,
+    11.8,
+    6.8
+   ],
+   "world_min": [
+    323.0,
+    599.1,
+    66.3
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "X2564WV-03-N0SN",
+   "path": "REF:1",
+   "qty": 4,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 157,
+   "bbox_mm": [
+    10.0,
+    9.4,
+    4.9
+   ],
+   "world_min": [
+    320.4,
+    599.0,
+    94.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "_2_1_2_3_4_AF0",
+   "path": "REF:1",
+   "qty": 18,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.8,
+    0.4,
+    0.3
+   ],
+   "world_min": [
+    311.6,
+    602.5,
+    79.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "_7_1_2_AF0",
+   "path": "REF:1",
+   "qty": 18,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.8,
+    0.4,
+    1.5
+   ],
+   "world_min": [
+    311.6,
+    602.5,
+    78.4
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "5_1_2_3_400",
+   "path": "REF:1",
+   "qty": 18,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.8,
+    0.4,
+    0.3
+   ],
+   "world_min": [
+    311.6,
+    602.5,
+    78.3
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 66,
+   "bbox_mm": [
+    8.4,
+    3.6,
+    7.1
+   ],
+   "world_min": [
+    311.5,
+    601.9,
+    66.4
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (1)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.3,
+    1.5,
+    0.9
+   ],
+   "world_min": [
+    317.8,
+    602.5,
+    72.9
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (2)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.3,
+    1.5,
+    0.9
+   ],
+   "world_min": [
+    313.3,
+    602.5,
+    72.9
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (3)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.3,
+    1.5,
+    0.9
+   ],
+   "world_min": [
+    317.3,
+    602.5,
+    72.9
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (4)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.3,
+    1.5,
+    0.9
+   ],
+   "world_min": [
+    313.8,
+    602.5,
+    72.9
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (5)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.3,
+    2.1,
+    6.6
+   ],
+   "world_min": [
+    315.8,
+    602.5,
+    67.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (6)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.3,
+    2.1,
+    6.6
+   ],
+   "world_min": [
+    315.3,
+    602.5,
+    67.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (7)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.3,
+    1.6,
+    6.6
+   ],
+   "world_min": [
+    316.3,
+    602.5,
+    67.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (8)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.3,
+    1.6,
+    6.6
+   ],
+   "world_min": [
+    314.8,
+    602.5,
+    67.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (9)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.3,
+    0.3,
+    5.7
+   ],
+   "world_min": [
+    315.3,
+    603.8,
+    67.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (10)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.3,
+    0.3,
+    5.7
+   ],
+   "world_min": [
+    315.8,
+    603.8,
+    67.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (11)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.9,
+    1.6,
+    7.2
+   ],
+   "world_min": [
+    312.3,
+    602.5,
+    66.6
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (12)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.4,
+    2.1,
+    6.8
+   ],
+   "world_min": [
+    314.3,
+    602.5,
+    67.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (13)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.4,
+    0.3,
+    5.9
+   ],
+   "world_min": [
+    314.3,
+    603.8,
+    67.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (14)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.4,
+    2.1,
+    6.8
+   ],
+   "world_min": [
+    316.8,
+    602.5,
+    67.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (15)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.4,
+    0.3,
+    5.9
+   ],
+   "world_min": [
+    316.8,
+    603.8,
+    67.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (16)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.9,
+    1.6,
+    7.2
+   ],
+   "world_min": [
+    318.3,
+    602.5,
+    66.6
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (17)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.3,
+    0.3,
+    4.2
+   ],
+   "world_min": [
+    316.3,
+    604.3,
+    67.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (18)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.3,
+    0.3,
+    4.2
+   ],
+   "world_min": [
+    314.8,
+    604.3,
+    67.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (19)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 1,
+   "bbox_mm": [
+    1.1,
+    2.1,
+    7.2
+   ],
+   "world_min": [
+    312.2,
+    602.5,
+    66.6
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (20)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    1.1,
+    2.1,
+    7.2
+   ],
+   "world_min": [
+    318.1,
+    602.5,
+    66.6
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOLID (21)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 46,
+   "bbox_mm": [
+    9.6,
+    4.2,
+    7.6
+   ],
+   "world_min": [
+    310.9,
+    601.6,
+    66.1
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-QFN-16",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 8,
+   "bbox_mm": [
+    3.0,
+    0.9,
+    3.0
+   ],
+   "world_min": [
+    317.6,
+    602.5,
+    77.6
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-TO-223_1_1",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 33,
+   "bbox_mm": [
+    3.5,
+    1.6,
+    6.5
+   ],
+   "world_min": [
+    321.6,
+    602.5,
+    85.6
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-TO-223_2_1",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 2,
+   "bbox_mm": [
+    1.8,
+    0.8,
+    3.1
+   ],
+   "world_min": [
+    319.9,
+    602.5,
+    87.4
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-TO-223_3_1",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    1.8,
+    0.8,
+    0.8
+   ],
+   "world_min": [
+    325.0,
+    602.5,
+    86.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-TO-223_4_1",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    1.8,
+    0.8,
+    0.8
+   ],
+   "world_min": [
+    325.0,
+    602.5,
+    88.5
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-TO-223_5_1",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    1.8,
+    0.8,
+    0.8
+   ],
+   "world_min": [
+    325.0,
+    602.5,
+    90.8
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-sop-8",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 28,
+   "bbox_mm": [
+    5.0,
+    1.6,
+    6.1
+   ],
+   "world_min": [
+    324.3,
+    602.5,
+    76.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SOT-23",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 6,
+   "bbox_mm": [
+    3.0,
+    1.3,
+    3.0
+   ],
+   "world_min": [
+    339.6,
+    602.5,
+    88.8
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Extruded",
+   "path": "REF:1",
+   "qty": 20,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    1.2,
+    0.2,
+    0.4
+   ],
+   "world_min": [
+    335.6,
+    602.5,
+    86.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Extruded (1)",
+   "path": "REF:1",
+   "qty": 4,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 3,
+   "bbox_mm": [
+    1.4,
+    0.7,
+    3.0
+   ],
+   "world_min": [
+    334.7,
+    602.5,
+    84.5
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Extruded (2)",
+   "path": "REF:1",
+   "qty": 18,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 10,
+   "bbox_mm": [
+    1.1,
+    11.2,
+    1.1
+   ],
+   "world_min": [
+    316.7,
+    600.3,
+    97.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Extruded (3)",
+   "path": "REF:1",
+   "qty": 10,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 12,
+   "bbox_mm": [
+    4.9,
+    1.1,
+    2.3
+   ],
+   "world_min": [
+    313.6,
+    602.5,
+    97.1
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Extruded (4)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 10,
+   "bbox_mm": [
+    1.1,
+    11.2,
+    1.1
+   ],
+   "world_min": [
+    310.4,
+    600.3,
+    82.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-LED_0603_R_Pocket002",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": -1,
+   "bbox_mm": [
+    0.8,
+    0.2,
+    0.4
+   ],
+   "world_min": [
+    307.6,
+    602.5,
+    75.5
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-LED_0603_R_Pad004",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.8,
+    0.0,
+    0.4
+   ],
+   "world_min": [
+    307.6,
+    602.5,
+    76.1
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-LED_0603_R_Fillet",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.7,
+    0.4,
+    1.0
+   ],
+   "world_min": [
+    307.6,
+    602.7,
+    75.8
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-LED_0603_R_Pocket001",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.8,
+    0.2,
+    0.4
+   ],
+   "world_min": [
+    307.6,
+    602.5,
+    76.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "User_Library-LED_0603_R_Pad",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 0,
+   "bbox_mm": [
+    0.8,
+    0.2,
+    0.8
+   ],
+   "world_min": [
+    307.6,
+    602.5,
+    75.9
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "hexagonal_spacer_FF_M2.5_H06_HEX5_pass_through v1",
+   "path": "REF:1",
+   "qty": 8,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 100,
+   "bbox_mm": [
+    5.8,
+    6.0,
+    5.0
+   ],
+   "world_min": [
+    342.4,
+    594.9,
+    66.8
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "Pan Head Screw DIN EN ISO 7045 - M2.5 x 4 - H Steel 4.6 Plain v1",
+   "path": "REF:1",
+   "qty": 8,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 49,
+   "bbox_mm": [
+    5.0,
+    6.1,
+    5.0
+   ],
+   "world_min": [
+    342.8,
+    598.5,
+    66.8
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "050375033 v3",
+   "path": "REF:1",
+   "qty": 4,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 235,
+   "bbox_mm": [
+    9.9,
+    9.0,
+    4.7
+   ],
+   "world_min": [
+    315.9,
+    602.5,
+    95.1
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "ZK_122",
+   "path": "REF:1",
+   "qty": 10,
+   "materials": [
+    "ABS Plastic"
+   ],
+   "vol_mm3": 14181,
+   "bbox_mm": [
+    24.7,
+    45.2,
+    13.9
+   ],
+   "world_min": [
+    317.6,
+    514.9,
+    74.3
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "SG-ZIJI_15",
+   "path": "REF:1",
+   "qty": 10,
+   "materials": [
+    "ABS Plastic"
+   ],
+   "vol_mm3": 8496,
+   "bbox_mm": [
+    24.5,
+    45.0,
+    9.8
+   ],
+   "world_min": [
+    317.7,
+    515.0,
+    87.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "XG-ZIJI_16",
+   "path": "REF:1",
+   "qty": 10,
+   "materials": [
+    "ABS Plastic"
+   ],
+   "vol_mm3": 11128,
+   "bbox_mm": [
+    24.7,
+    45.2,
+    14.1
+   ],
+   "world_min": [
+    317.6,
+    514.9,
+    61.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "MOTOR-1723_3",
+   "path": "REF:1",
+   "qty": 10,
+   "materials": [
+    "ABS Plastic"
+   ],
+   "vol_mm3": 5286,
+   "bbox_mm": [
+    17.1,
+    17.1,
+    30.5
+   ],
+   "world_min": [
+    320.2,
+    542.0,
+    62.9
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "PCB-CHAZUO_92",
+   "path": "REF:1",
+   "qty": 10,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 1238,
+   "bbox_mm": [
+    21.1,
+    28.8,
+    7.2
+   ],
+   "world_min": [
+    319.4,
+    516.7,
+    68.9
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "GE_27",
+   "path": "REF:1",
+   "qty": 10,
+   "materials": [
+    "ABS Plastic"
+   ],
+   "vol_mm3": 825,
+   "bbox_mm": [
+    17.6,
+    17.6,
+    18.3
+   ],
+   "world_min": [
+    321.2,
+    516.2,
+    79.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "\u91d1\u5c5e\u8235\u76d8\uff08\u9a71\u52a8\uff09 v2",
+   "path": "REF:1",
+   "qty": 10,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 757,
+   "bbox_mm": [
+    19.2,
+    19.2,
+    4.5
+   ],
+   "world_min": [
+    320.4,
+    515.4,
+    94.5
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "\u91d1\u5c5e\u8235\u76d8\uff08\u4ece\u52a8\uff09 v2",
+   "path": "REF:1",
+   "qty": 8,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 566,
+   "bbox_mm": [
+    19.2,
+    19.2,
+    3.4
+   ],
+   "world_min": [
+    320.4,
+    515.4,
+    61.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "WaveShare_Mounting_Plate_SO101 v4",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 9097,
+   "bbox_mm": [
+    51.0,
+    7.6,
+    42.0
+   ],
+   "world_min": [
+    301.3,
+    587.3,
+    62.4
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "gripper_rail_base v1",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 18624,
+   "bbox_mm": [
+    67.9,
+    72.2,
+    38.7
+   ],
+   "world_min": [
+    55.3,
+    312.0,
+    98.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "gripper_finger v1",
+   "path": "REF:1",
+   "qty": 4,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 6729,
+   "bbox_mm": [
+    57.7,
+    55.8,
+    44.0
+   ],
+   "world_min": [
+    53.1,
+    318.1,
+    86.6
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "gripper_base_plate v1",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 22578,
+   "bbox_mm": [
+    67.2,
+    69.5,
+    44.2
+   ],
+   "world_min": [
+    66.6,
+    322.3,
+    111.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "MG90_ldb",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 7331,
+   "bbox_mm": [
+    42.8,
+    43.6,
+    32.1
+   ],
+   "world_min": [
+    74.4,
+    338.2,
+    115.5
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "scritta_MG90s",
+   "path": "REF:1",
+   "qty": 4,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 20,
+   "bbox_mm": [
+    16.9,
+    20.2,
+    8.0
+   ],
+   "world_min": [
+    93.7,
+    354.8,
+    127.3
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "MG90S 9g Micro Servo Medium Horn 12 holes",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 222,
+   "bbox_mm": [
+    17.9,
+    20.5,
+    8.3
+   ],
+   "world_min": [
+    82.2,
+    339.3,
+    116.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "blocco_giunto_polso",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 11266,
+   "bbox_mm": [
+    51.4,
+    53.8,
+    31.7
+   ],
+   "world_min": [
+    86.1,
+    338.6,
+    134.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "gripper_spur_gear v2",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 1017,
+   "bbox_mm": [
+    25.2,
+    25.1,
+    16.9
+   ],
+   "world_min": [
+    76.9,
+    335.8,
+    109.4
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "dito1",
+   "path": "REF:1",
+   "qty": 4,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 9943,
+   "bbox_mm": [
+    56.0,
+    45.3,
+    61.2
+   ],
+   "world_min": [
+    34.6,
+    323.5,
+    60.4
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "AS 1420 - 1973 - M3 x 10",
+   "path": "REF:1",
+   "qty": 10,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 132,
+   "bbox_mm": [
+    13.9,
+    15.1,
+    8.0
+   ],
+   "world_min": [
+    71.0,
+    350.1,
+    93.6
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "BS 4168 - M2,5 x 10(1)",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 84,
+   "bbox_mm": [
+    12.0,
+    10.5,
+    12.5
+   ],
+   "world_min": [
+    84.5,
+    343.8,
+    113.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "AS 1427 - M2 x 12(5) I",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 40,
+   "bbox_mm": [
+    10.4,
+    8.7,
+    11.9
+   ],
+   "world_min": [
+    83.2,
+    367.5,
+    126.4
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "disco120",
+   "path": "REF:1",
+   "qty": 2,
+   "materials": [
+    "Plastic"
+   ],
+   "vol_mm3": 333137,
+   "bbox_mm": [
+    164.0,
+    164.0,
+    30.0
+   ],
+   "world_min": [
+    248.1,
+    471.3,
+    -10.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "REF-LAZY-SUSAN",
+   "path": "REF:1",
+   "qty": 1,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 74699,
+   "bbox_mm": [
+    101.6,
+    101.6,
+    9.4
+   ],
+   "world_min": [
+    124.2,
+    319.2,
+    44.1
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-TABLE",
+   "path": "REF:1",
+   "qty": 1,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 62716278,
+   "bbox_mm": [
+    1829.0,
+    762.0,
+    45.0
+   ],
+   "world_min": [
+    -464.5,
+    -60.0,
+    -45.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-BEARING-G1",
+   "path": "REF:1",
+   "qty": 1,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 1005,
+   "bbox_mm": [
+    16.0,
+    16.0,
+    5.0
+   ],
+   "world_min": [
+    648.0,
+    234.0,
+    56.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-BEARING-G2",
+   "path": "REF:1",
+   "qty": 1,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 1005,
+   "bbox_mm": [
+    16.0,
+    16.0,
+    5.0
+   ],
+   "world_min": [
+    648.0,
+    234.0,
+    61.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-BIN",
+   "path": "REF:1",
+   "qty": 1,
+   "materials": [
+    "Polypropylene"
+   ],
+   "vol_mm3": 90512,
+   "bbox_mm": [
+    110.0,
+    80.0,
+    100.0
+   ],
+   "world_min": [
+    835.0,
+    390.0,
+    -0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "TT-01",
+   "path": "PRINT:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 250256,
+   "bbox_mm": [
+    151.3,
+    110.0,
+    43.0
+   ],
+   "world_min": [
+    120.0,
+    315.0,
+    -0.0
+   ],
+   "fillet_r": [
+    1.2,
+    2.0
+   ],
+   "n_fillet_sets": 2,
+   "chamfer": [
+    0.6
+   ],
+   "visible": true
+  },
+  {
+   "name": "ST-01",
+   "path": "PRINT:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 238440,
+   "bbox_mm": [
+    70.0,
+    206.9,
+    66.0
+   ],
+   "world_min": [
+    631.0,
+    103.1,
+    -0.0
+   ],
+   "fillet_r": [
+    0.5,
+    0.7,
+    1.5,
+    2.0
+   ],
+   "n_fillet_sets": 27,
+   "chamfer": [
+    0.6
+   ],
+   "visible": true
+  },
+  {
+   "name": "AR-01 (DROPPED - arms bolt to rails)",
+   "path": "PRINT:1",
+   "qty": 2,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 249668,
+   "bbox_mm": [
+    144.0,
+    117.0,
+    15.0
+   ],
+   "world_min": [
+    258.1,
+    481.3,
+    -0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "TL-01",
+   "path": "PRINT:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 18691,
+   "bbox_mm": [
+    25.0,
+    25.0,
+    40.0
+   ],
+   "world_min": [
+    377.5,
+    387.5,
+    159.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    1.0
+   ],
+   "visible": true
+  },
+  {
+   "name": "EL-01",
+   "path": "PRINT:1",
+   "qty": 1,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 82344,
+   "bbox_mm": [
+    184.0,
+    84.0,
+    58.0
+   ],
+   "world_min": [
+    18.0,
+    506.0,
+    -0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "TC-01",
+   "path": "PRINT:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 12848,
+   "bbox_mm": [
+    70.0,
+    40.0,
+    6.0
+   ],
+   "world_min": [
+    785.0,
+    60.0,
+    -0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "REF-BEAKER",
+   "path": "REF-BEAKERS-TT:2",
+   "qty": 8,
+   "materials": [
+    "Polypropylene"
+   ],
+   "vol_mm3": 11166,
+   "bbox_mm": [
+    43.0,
+    43.0,
+    61.0
+   ],
+   "world_min": [
+    234.8,
+    314.8,
+    60.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "TT-02-deck",
+   "path": "TT-02-deck:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 178833,
+   "bbox_mm": [
+    236.0,
+    236.0,
+    7.0
+   ],
+   "world_min": [
+    57.0,
+    252.0,
+    54.6
+   ],
+   "fillet_r": [
+    1.0
+   ],
+   "n_fillet_sets": 1,
+   "chamfer": [
+    0.5
+   ],
+   "visible": true
+  },
+  {
+   "name": "ST-02",
+   "path": "ST-02:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 32722,
+   "bbox_mm": [
+    156.4,
+    126.4,
+    10.0
+   ],
+   "world_min": [
+    517.8,
+    123.8,
+    56.0
+   ],
+   "fillet_r": [
+    1.0,
+    1.5
+   ],
+   "n_fillet_sets": 2,
+   "chamfer": [
+    0.5
+   ],
+   "visible": true
+  },
+  {
+   "name": "ST-03",
+   "path": "ST-03:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 31581,
+   "bbox_mm": [
+    156.4,
+    126.4,
+    10.0
+   ],
+   "world_min": [
+    517.8,
+    223.8,
+    56.0
+   ],
+   "fillet_r": [
+    1.0,
+    1.5
+   ],
+   "n_fillet_sets": 2,
+   "chamfer": [
+    0.5
+   ],
+   "visible": true
+  },
+  {
+   "name": "ST-05",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 47789,
+   "bbox_mm": [
+    126.0,
+    126.0,
+    23.0
+   ],
+   "world_min": [
+    387.0,
+    219.0,
+    11.0
+   ],
+   "fillet_r": [
+    0.8,
+    1.5
+   ],
+   "n_fillet_sets": 2,
+   "chamfer": [
+    0.5
+   ],
+   "visible": true
+  },
+  {
+   "name": "ST-06",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 25399,
+   "bbox_mm": [
+    84.0,
+    84.0,
+    50.0
+   ],
+   "world_min": [
+    408.0,
+    240.0,
+    221.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "REF-WELL",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 97213,
+   "bbox_mm": [
+    130.0,
+    130.0,
+    90.0
+   ],
+   "world_min": [
+    385.0,
+    217.0,
+    9.0
+   ],
+   "fillet_r": [
+    0.8
+   ],
+   "n_fillet_sets": 1,
+   "chamfer": [
+    0.5
+   ],
+   "visible": true
+  },
+  {
+   "name": "REF-BOTTLE",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Polyethylene, High Density"
+   ],
+   "vol_mm3": 692568,
+   "bbox_mm": [
+    65.0,
+    65.0,
+    225.0
+   ],
+   "world_min": [
+    417.5,
+    249.5,
+    11.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "REF-ROD",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Glass"
+   ],
+   "vol_mm3": 4241,
+   "bbox_mm": [
+    6.0,
+    6.0,
+    150.0
+   ],
+   "world_min": [
+    387.0,
+    397.0,
+    9.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-BEAKER-MIX",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Polypropylene"
+   ],
+   "vol_mm3": 77585,
+   "bbox_mm": [
+    42.0,
+    42.0,
+    56.0
+   ],
+   "world_min": [
+    429.0,
+    369.0,
+    9.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-GLIDE-1",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Polytetrafluoroethylene"
+   ],
+   "vol_mm3": 2022,
+   "bbox_mm": [
+    20.0,
+    20.0,
+    6.6
+   ],
+   "world_min": [
+    378.0,
+    222.0,
+    -0.0
+   ],
+   "fillet_r": [
+    2.0
+   ],
+   "n_fillet_sets": 1,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-GLIDE-2",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Polytetrafluoroethylene"
+   ],
+   "vol_mm3": 2022,
+   "bbox_mm": [
+    20.0,
+    20.0,
+    6.6
+   ],
+   "world_min": [
+    518.0,
+    222.0,
+    -0.0
+   ],
+   "fillet_r": [
+    2.0
+   ],
+   "n_fillet_sets": 1,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-GLIDE-3",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Polytetrafluoroethylene"
+   ],
+   "vol_mm3": 2022,
+   "bbox_mm": [
+    20.0,
+    20.0,
+    6.6
+   ],
+   "world_min": [
+    378.0,
+    392.0,
+    -0.0
+   ],
+   "fillet_r": [
+    2.0
+   ],
+   "n_fillet_sets": 1,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-GLIDE-4",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Polytetrafluoroethylene"
+   ],
+   "vol_mm3": 2022,
+   "bbox_mm": [
+    20.0,
+    20.0,
+    6.6
+   ],
+   "world_min": [
+    518.0,
+    392.0,
+    -0.0
+   ],
+   "fillet_r": [
+    2.0
+   ],
+   "n_fillet_sets": 1,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-BEARING-T11",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 1005,
+   "bbox_mm": [
+    16.0,
+    16.0,
+    5.0
+   ],
+   "world_min": [
+    528.0,
+    224.0,
+    56.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-BEARING-T12",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 1005,
+   "bbox_mm": [
+    16.0,
+    16.0,
+    5.0
+   ],
+   "world_min": [
+    528.0,
+    224.0,
+    61.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-BEARING-T21",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 1005,
+   "bbox_mm": [
+    16.0,
+    16.0,
+    5.0
+   ],
+   "world_min": [
+    528.0,
+    324.0,
+    56.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-BEARING-T22",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 1005,
+   "bbox_mm": [
+    16.0,
+    16.0,
+    5.0
+   ],
+   "world_min": [
+    528.0,
+    324.0,
+    61.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-FLASK-250",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Glass"
+   ],
+   "vol_mm3": 47380,
+   "bbox_mm": [
+    85.0,
+    85.0,
+    148.0
+   ],
+   "world_min": [
+    407.5,
+    239.5,
+    14.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "REF-FUNNEL-EISCO4",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "Polypropylene"
+   ],
+   "vol_mm3": 38489,
+   "bbox_mm": [
+    102.0,
+    102.0,
+    104.0
+   ],
+   "world_min": [
+    399.0,
+    231.0,
+    129.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "ST-04",
+   "path": "ST-04:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 142424,
+   "bbox_mm": [
+    176.0,
+    206.0,
+    271.1
+   ],
+   "world_min": [
+    370.0,
+    214.0,
+    -0.0
+   ],
+   "fillet_r": [
+    1.2,
+    2.0
+   ],
+   "n_fillet_sets": 3,
+   "chamfer": [
+    0.6
+   ],
+   "visible": true
+  },
+  {
+   "name": "FRAME-2020 (bought, 4 x 400 mm)",
+   "path": "FRAME-2020 (bought, 4 x 400 mm):1",
+   "qty": 1,
+   "materials": [
+    "Aluminum 6061"
+   ],
+   "vol_mm3": 312489,
+   "bbox_mm": [
+    440.0,
+    420.0,
+    20.0
+   ],
+   "world_min": [
+    245.0,
+    270.0,
+    -0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "TT-03 horn spacer",
+   "path": "TT-03 horn spacer:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 1134,
+   "bbox_mm": [
+    22.0,
+    22.0,
+    4.1
+   ],
+   "world_min": [
+    164.0,
+    359.0,
+    50.5
+   ],
+   "fillet_r": [
+    0.8
+   ],
+   "n_fillet_sets": 1,
+   "chamfer": [
+    0.4
+   ],
+   "visible": true
+  },
+  {
+   "name": "Wrist_Roll_Pitch_SO100 v15 (1)",
+   "path": "REF-SO101-STOCK-A:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 32276,
+   "bbox_mm": [
+    65.6,
+    78.6,
+    38.9
+   ],
+   "world_min": [
+    305.5,
+    405.9,
+    154.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "Wrist_Roll_Follower_SO101 v10",
+   "path": "REF-SO101-STOCK-A:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 56624,
+   "bbox_mm": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "world_min": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "Moving_Jaw_SO101 v3",
+   "path": "REF-SO101-STOCK-A:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 20693,
+   "bbox_mm": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "world_min": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "T-nut 2020 drop-in M4",
+   "path": "HARDWARE (bought):1",
+   "qty": 9,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 289,
+   "bbox_mm": [
+    11.0,
+    10.0,
+    4.3
+   ],
+   "world_min": [
+    296.8,
+    503.5,
+    14.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    2.2
+   ],
+   "visible": true
+  },
+  {
+   "name": "SHCS ISO 4762 M4x20",
+   "path": "HARDWARE (bought):1",
+   "qty": 5,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 223,
+   "bbox_mm": [
+    7.0,
+    7.0,
+    24.3
+   ],
+   "world_min": [
+    294.9,
+    574.8,
+    15.9
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    0.3
+   ],
+   "visible": true
+  },
+  {
+   "name": "BHCS ISO 7380 M4x20",
+   "path": "HARDWARE (bought):1",
+   "qty": 5,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 263,
+   "bbox_mm": [
+    7.6,
+    7.6,
+    22.5
+   ],
+   "world_min": [
+    298.5,
+    504.7,
+    16.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "SHCS ISO 4762 M5x12",
+   "path": "HARDWARE (bought):1",
+   "qty": 11,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 298,
+   "bbox_mm": [
+    8.5,
+    8.5,
+    17.3
+   ],
+   "world_min": [
+    250.7,
+    350.7,
+    15.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    0.3
+   ],
+   "visible": true
+  },
+  {
+   "name": "T-nut 2020 drop-in M5",
+   "path": "HARDWARE (bought):1",
+   "qty": 19,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 265,
+   "bbox_mm": [
+    10.0,
+    11.0,
+    4.3
+   ],
+   "world_min": [
+    250.0,
+    349.5,
+    14.1
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    2.2
+   ],
+   "visible": true
+  },
+  {
+   "name": "2020 inside corner bracket",
+   "path": "HARDWARE (bought):1",
+   "qty": 5,
+   "materials": [
+    "Aluminum 6061"
+   ],
+   "vol_mm3": 1855,
+   "bbox_mm": [
+    20.0,
+    20.0,
+    18.0
+   ],
+   "world_min": [
+    265.0,
+    478.5,
+    1.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "SHCS ISO 4762 M5x8",
+   "path": "HARDWARE (bought):1",
+   "qty": 9,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 257,
+   "bbox_mm": [
+    8.5,
+    13.2,
+    8.5
+   ],
+   "world_min": [
+    272.7,
+    490.5,
+    5.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    0.3
+   ],
+   "visible": true
+  },
+  {
+   "name": "25T Al disc horn (Treedix)",
+   "path": "HARDWARE (bought):1",
+   "qty": 3,
+   "materials": [
+    "Aluminum 6061"
+   ],
+   "vol_mm3": 712,
+   "bbox_mm": [
+    20.0,
+    20.0,
+    4.5
+   ],
+   "world_min": [
+    165.0,
+    360.0,
+    45.5
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "FlashHobby M45CHW + 25T disc horn",
+   "path": "HARDWARE (bought):1",
+   "qty": 3,
+   "materials": [
+    "Aluminum 6061"
+   ],
+   "vol_mm3": 33508,
+   "bbox_mm": [
+    55.0,
+    20.0,
+    48.0
+   ],
+   "world_min": [
+    137.5,
+    360.0,
+    2.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "SHCS ISO 4762 M3x12",
+   "path": "HARDWARE (bought):1",
+   "qty": 13,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 65,
+   "bbox_mm": [
+    5.5,
+    5.5,
+    15.2
+   ],
+   "world_min": [
+    137.9,
+    362.3,
+    21.1
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    0.3
+   ],
+   "visible": true
+  },
+  {
+   "name": "SHCS ISO 4762 M5x20",
+   "path": "HARDWARE (bought):1",
+   "qty": 4,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 422,
+   "bbox_mm": [
+    8.5,
+    8.5,
+    25.3
+   ],
+   "world_min": [
+    651.7,
+    237.7,
+    46.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    0.3
+   ],
+   "visible": true
+  },
+  {
+   "name": "ST-08 bearing race spacer",
+   "path": "HARDWARE (bought):1",
+   "qty": 7,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 19,
+   "bbox_mm": [
+    7.2,
+    7.2,
+    1.0
+   ],
+   "world_min": [
+    652.4,
+    238.4,
+    66.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "Heat-set insert M5 ruthex RX-M5x9.5",
+   "path": "HARDWARE (bought):1",
+   "qty": 4,
+   "materials": [
+    "Brass"
+   ],
+   "vol_mm3": 218,
+   "bbox_mm": [
+    7.1,
+    7.1,
+    10.0
+   ],
+   "world_min": [
+    652.4,
+    238.4,
+    45.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "BESSEY CM34DR C-clamp",
+   "path": "HARDWARE (bought):1",
+   "qty": 3,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 39451,
+   "bbox_mm": [
+    18.0,
+    100.0,
+    110.0
+   ],
+   "world_min": [
+    246.0,
+    650.0,
+    -80.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "Load cell 1 kg (ShangHJ) 75x12.7x12.7",
+   "path": "HARDWARE (bought):1",
+   "qty": 1,
+   "materials": [
+    "Aluminum 6061"
+   ],
+   "vol_mm3": 12097,
+   "bbox_mm": [
+    75.0,
+    12.7,
+    12.7
+   ],
+   "world_min": [
+    403.5,
+    468.6,
+    45.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "EISCO 50 mL beaker on scale",
+   "path": "HARDWARE (bought):1",
+   "qty": 1,
+   "materials": [
+    "Polypropylene"
+   ],
+   "vol_mm3": 88584,
+   "bbox_mm": [
+    43.0,
+    43.0,
+    61.0
+   ],
+   "world_min": [
+    446.5,
+    453.5,
+    63.7
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "EISCO 100 mL PP beaker x3 (developer, soap+dye, warm water)",
+   "path": "HARDWARE (bought):1",
+   "qty": 1,
+   "materials": [
+    "Polypropylene"
+   ],
+   "vol_mm3": 546788,
+   "bbox_mm": [
+    103.0,
+    229.0,
+    74.0
+   ],
+   "world_min": [
+    642.0,
+    386.0,
+    26.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "SHCS ISO 4762 M4x12",
+   "path": "HARDWARE (bought):1",
+   "qty": 5,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 250,
+   "bbox_mm": [
+    7.0,
+    7.0,
+    16.3
+   ],
+   "world_min": [
+    405.5,
+    471.5,
+    33.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    0.3
+   ],
+   "visible": false
+  },
+  {
+   "name": "N20 6V 60rpm gearmotor",
+   "path": "HARDWARE (bought):1",
+   "qty": 1,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 2884,
+   "bbox_mm": [
+    12.0,
+    27.5,
+    12.0
+   ],
+   "world_min": [
+    81.0,
+    271.5,
+    149.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "SHCS ISO 4762 M3x20",
+   "path": "HARDWARE (bought):1",
+   "qty": 3,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 170,
+   "bbox_mm": [
+    5.5,
+    5.5,
+    23.2
+   ],
+   "world_min": [
+    45.2,
+    259.7,
+    127.8
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    0.3
+   ],
+   "visible": true
+  },
+  {
+   "name": "TT-04 beaker locator ring",
+   "path": "TT-04 beaker locator ring:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 65874,
+   "bbox_mm": [
+    230.6,
+    230.6,
+    12.0
+   ],
+   "world_min": [
+    59.7,
+    254.7,
+    58.6
+   ],
+   "fillet_r": [
+    0.8,
+    1.5
+   ],
+   "n_fillet_sets": 4,
+   "chamfer": [
+    0.4,
+    1.0
+   ],
+   "visible": true
+  },
+  {
+   "name": "WS-01 scale base",
+   "path": "WS-01 scale base:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 113696,
+   "bbox_mm": [
+    117.0,
+    67.8,
+    45.0
+   ],
+   "world_min": [
+    395.0,
+    455.0,
+    -0.0
+   ],
+   "fillet_r": [
+    1.2,
+    2.0,
+    3.0,
+    4.0
+   ],
+   "n_fillet_sets": 6,
+   "chamfer": [
+    0.6
+   ],
+   "visible": true
+  },
+  {
+   "name": "Wrist_Roll_Pitch_SO100 v15 (1) (1)",
+   "path": "REF-SO101-STOCK-B:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 32276,
+   "bbox_mm": [
+    65.6,
+    78.6,
+    38.9
+   ],
+   "world_min": [
+    545.5,
+    405.9,
+    154.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "Wrist_Roll_Follower_SO101 v10 (1)",
+   "path": "REF-SO101-STOCK-B:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 56624,
+   "bbox_mm": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "world_min": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "Moving_Jaw_SO101 v3 (1)",
+   "path": "REF-SO101-STOCK-B:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 20693,
+   "bbox_mm": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "world_min": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "ANIM-beaker50",
+   "path": "ANIM-beaker50:1",
+   "qty": 1,
+   "materials": [
+    "Polypropylene",
+    "Steel"
+   ],
+   "vol_mm3": 208186,
+   "bbox_mm": [
+    43.0,
+    43.0,
+    61.0
+   ],
+   "world_min": [
+    -21.5,
+    -21.5,
+    -0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "ANIM-beaker100",
+   "path": "ANIM-beaker100:1",
+   "qty": 1,
+   "materials": [
+    "Polypropylene",
+    "Steel"
+   ],
+   "vol_mm3": 397321,
+   "bbox_mm": [
+    56.0,
+    56.0,
+    74.0
+   ],
+   "world_min": [
+    -28.0,
+    -28.0,
+    -0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "ANIM-foam",
+   "path": "ANIM-foam:1",
+   "qty": 1,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 3756918,
+   "bbox_mm": [
+    116.0,
+    116.0,
+    124.0
+   ],
+   "world_min": [
+    -58.0,
+    -58.0,
+    -0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "SHCS ISO 4762 M3x12 (deck)",
+   "path": "SHCS ISO 4762 M3x12 (deck):1",
+   "qty": 4,
+   "materials": [
+    "Steel"
+   ],
+   "vol_mm3": 65,
+   "bbox_mm": [
+    5.5,
+    5.5,
+    15.2
+   ],
+   "world_min": [
+    -2.8,
+    -2.8,
+    -12.2
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    0.3
+   ],
+   "visible": false
+  },
+  {
+   "name": "AG-01 auger stand",
+   "path": "AG-01 auger stand:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 299293,
+   "bbox_mm": [
+    250.0,
+    100.0,
+    135.0
+   ],
+   "world_min": [
+    20.0,
+    235.0,
+    -0.0
+   ],
+   "fillet_r": [
+    1.2,
+    1.5,
+    2.0,
+    3.0,
+    8.0
+   ],
+   "n_fillet_sets": 10,
+   "chamfer": [
+    0.6
+   ],
+   "visible": true
+  },
+  {
+   "name": "DH-01 yeast auger head",
+   "path": "DH-01 yeast auger head:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 99954,
+   "bbox_mm": [
+    67.0,
+    131.0,
+    70.0
+   ],
+   "world_min": [
+    40.0,
+    250.0,
+    135.0
+   ],
+   "fillet_r": [
+    0.6,
+    1.0,
+    1.5,
+    3.0
+   ],
+   "n_fillet_sets": 11,
+   "chamfer": [
+    0.5
+   ],
+   "visible": true
+  },
+  {
+   "name": "DH-02 auger screw",
+   "path": "DH-02 auger screw:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 3765,
+   "bbox_mm": [
+    13.0,
+    65.0,
+    12.9
+   ],
+   "world_min": [
+    80.5,
+    303.0,
+    148.6
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "WS-02 scale pan",
+   "path": "WS-02 scale pan:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 35900,
+   "bbox_mm": [
+    80.0,
+    80.0,
+    14.0
+   ],
+   "world_min": [
+    428.0,
+    435.0,
+    57.7
+   ],
+   "fillet_r": [
+    0.8,
+    1.5
+   ],
+   "n_fillet_sets": 3,
+   "chamfer": [
+    0.5,
+    2.0
+   ],
+   "visible": true
+  },
+  {
+   "name": "RK-02 reagent rack",
+   "path": "RK-02 reagent rack:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 148180,
+   "bbox_mm": [
+    121.0,
+    247.0,
+    16.0
+   ],
+   "world_min": [
+    633.0,
+    377.0,
+    20.2
+   ],
+   "fillet_r": [
+    1.0,
+    1.5
+   ],
+   "n_fillet_sets": 4,
+   "chamfer": [
+    0.5,
+    2.0
+   ],
+   "visible": true
+  },
+  {
+   "name": "ST-09 stop-post TPU sleeve",
+   "path": "ST-09 stop-post TPU sleeve:1",
+   "qty": 2,
+   "materials": [
+    "TPU 95A (FDM)"
+   ],
+   "vol_mm3": 1029,
+   "bbox_mm": [
+    20.7,
+    20.7,
+    14.0
+   ],
+   "world_min": [
+    642.6,
+    101.6,
+    54.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "CAL-01 arm calibration block",
+   "path": "CAL-01 arm calibration block:1",
+   "qty": 2,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 105279,
+   "bbox_mm": [
+    100.0,
+    64.0,
+    110.0
+   ],
+   "world_min": [
+    280.0,
+    440.0,
+    -0.0
+   ],
+   "fillet_r": [
+    1.0,
+    2.0,
+    5.0
+   ],
+   "n_fillet_sets": 5,
+   "chamfer": [
+    0.6
+   ],
+   "visible": false
+  },
+  {
+   "name": "CAL-02 calibration probe",
+   "path": "CAL-02 calibration probe:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 132374,
+   "bbox_mm": [
+    43.0,
+    43.0,
+    117.3
+   ],
+   "world_min": [
+    -171.5,
+    378.5,
+    -0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "GA-01 stage angle gauge",
+   "path": "GA-01 stage angle gauge:1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 7969,
+   "bbox_mm": [
+    80.0,
+    63.1,
+    3.0
+   ],
+   "world_min": [
+    -150.0,
+    250.0,
+    -0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": false
+  },
+  {
+   "name": "EL-02 electronics box (bought ABS)",
+   "path": "EL-02 electronics box (bought ABS):1",
+   "qty": 1,
+   "materials": [
+    "ABS Plastic"
+   ],
+   "vol_mm3": 136064,
+   "bbox_mm": [
+    200.0,
+    90.0,
+    60.0
+   ],
+   "world_min": [
+    25.0,
+    602.0,
+    -0.0
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [],
+   "visible": true
+  },
+  {
+   "name": "GR-03 fin-ray finger TPU (A fixed)",
+   "path": "GR-03 fin-ray finger TPU (A fixed):1",
+   "qty": 1,
+   "materials": [
+    "TPU 95A (FDM)"
+   ],
+   "vol_mm3": 17146,
+   "bbox_mm": [
+    34.0,
+    76.9,
+    29.0
+   ],
+   "world_min": [
+    320.1,
+    285.9,
+    132.9
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    2.0
+   ],
+   "visible": true
+  },
+  {
+   "name": "GR-03 fin-ray finger TPU (A moving)",
+   "path": "GR-03 fin-ray finger TPU (A moving):1",
+   "qty": 1,
+   "materials": [
+    "TPU 95A (FDM)"
+   ],
+   "vol_mm3": 17146,
+   "bbox_mm": [
+    34.0,
+    75.1,
+    48.2
+   ],
+   "world_min": [
+    320.1,
+    332.3,
+    233.4
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    2.0
+   ],
+   "visible": true
+  },
+  {
+   "name": "GR-01 gripper body (A)",
+   "path": "GR-01 gripper body (A):1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 48265,
+   "bbox_mm": [
+    52.4,
+    60.9,
+    68.9
+   ],
+   "world_min": [
+    308.9,
+    350.9,
+    132.9
+   ],
+   "fillet_r": [
+    1.5
+   ],
+   "n_fillet_sets": 1,
+   "chamfer": [
+    1.0,
+    2.0
+   ],
+   "visible": true
+  },
+  {
+   "name": "GR-02 moving jaw (A)",
+   "path": "GR-02 moving jaw (A):1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 19764,
+   "bbox_mm": [
+    49.7,
+    35.4,
+    75.2
+   ],
+   "world_min": [
+    311.6,
+    377.0,
+    181.3
+   ],
+   "fillet_r": [
+    1.5
+   ],
+   "n_fillet_sets": 1,
+   "chamfer": [
+    1.0,
+    2.0
+   ],
+   "visible": true
+  },
+  {
+   "name": "GR-03 fin-ray finger TPU (B fixed)",
+   "path": "GR-03 fin-ray finger TPU (B fixed):1",
+   "qty": 1,
+   "materials": [
+    "TPU 95A (FDM)"
+   ],
+   "vol_mm3": 17146,
+   "bbox_mm": [
+    34.0,
+    76.9,
+    29.0
+   ],
+   "world_min": [
+    560.1,
+    285.9,
+    132.9
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    2.0
+   ],
+   "visible": true
+  },
+  {
+   "name": "GR-03 fin-ray finger TPU (B moving)",
+   "path": "GR-03 fin-ray finger TPU (B moving):1",
+   "qty": 1,
+   "materials": [
+    "TPU 95A (FDM)"
+   ],
+   "vol_mm3": 17146,
+   "bbox_mm": [
+    34.0,
+    75.1,
+    48.2
+   ],
+   "world_min": [
+    560.1,
+    332.3,
+    233.4
+   ],
+   "fillet_r": [],
+   "n_fillet_sets": 0,
+   "chamfer": [
+    2.0
+   ],
+   "visible": true
+  },
+  {
+   "name": "GR-01 gripper body (B)",
+   "path": "GR-01 gripper body (B):1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 48265,
+   "bbox_mm": [
+    52.4,
+    60.9,
+    68.9
+   ],
+   "world_min": [
+    548.9,
+    350.9,
+    132.9
+   ],
+   "fillet_r": [
+    1.5
+   ],
+   "n_fillet_sets": 1,
+   "chamfer": [
+    1.0,
+    2.0
+   ],
+   "visible": true
+  },
+  {
+   "name": "GR-02 moving jaw (B)",
+   "path": "GR-02 moving jaw (B):1",
+   "qty": 1,
+   "materials": [
+    "PLA (FDM)"
+   ],
+   "vol_mm3": 19764,
+   "bbox_mm": [
+    49.7,
+    35.4,
+    75.2
+   ],
+   "world_min": [
+    551.6,
+    377.0,
+    181.3
+   ],
+   "fillet_r": [
+    1.5
+   ],
+   "n_fillet_sets": 1,
+   "chamfer": [
+    1.0,
+    2.0
+   ],
+   "visible": true
+  }
+ ],
+ "joints": [
+  {
+   "name": "ST-CRANK-GROUND",
+   "type": "1"
+  },
+  {
+   "name": "ST-FOLL-GROUND",
+   "type": "1"
+  },
+  {
+   "name": "ST-CRANK-TRAY",
+   "type": "1"
+  },
+  {
+   "name": "ST-FOLL-TRAY",
+   "type": "1"
+  },
+  {
+   "name": "FIX-WS01-frame",
+   "type": "0"
+  },
+  {
+   "name": "FIX-AG01-frame",
+   "type": "0"
+  },
+  {
+   "name": "FIX-DH01-AG01",
+   "type": "0"
+  },
+  {
+   "name": "AUGER-spin",
+   "type": "1"
+  },
+  {
+   "name": "FIX-WS02-WS01",
+   "type": "0"
+  },
+  {
+   "name": "FIX-RK02-frame",
+   "type": "0"
+  },
+  {
+   "name": "FIX-GR-A-GR-03",
+   "type": "0"
+  },
+  {
+   "name": "FIX-GR-A-GR-03 (1)",
+   "type": "0"
+  },
+  {
+   "name": "FIX-GR-A-GR-01",
+   "type": "0"
+  },
+  {
+   "name": "FIX-GR-A-GR-02",
+   "type": "0"
+  },
+  {
+   "name": "FIX-GR-B-GR-03",
+   "type": "0"
+  },
+  {
+   "name": "FIX-GR-B-GR-03 (1)",
+   "type": "0"
+  },
+  {
+   "name": "FIX-GR-B-GR-01",
+   "type": "0"
+  },
+  {
+   "name": "FIX-GR-B-GR-02",
+   "type": "0"
+  },
+  {
+   "name": "TT-INDEX",
+   "type": "1"
+  }
+ ],
+ "params": [
+  {
+   "name": "table_len",
+   "expr": "1829 mm",
+   "comment": "Folding table top length X"
+  },
+  {
+   "name": "table_dep",
+   "expr": "762 mm",
+   "comment": "Folding table top depth Y"
+  },
+  {
+   "name": "table_h",
+   "expr": "740 mm",
+   "comment": "Floor to table top face"
+  },
+  {
+   "name": "board_w",
+   "expr": "900 mm",
+   "comment": "Plywood board X"
+  },
+  {
+   "name": "board_d",
+   "expr": "600 mm",
+   "comment": "Plywood board Y"
+  },
+  {
+   "name": "board_t",
+   "expr": "12 mm",
+   "comment": "Plywood board thickness"
+  },
+  {
+   "name": "board_front_margin",
+   "expr": "60 mm",
+   "comment": "Board front edge to table front edge"
+  },
+  {
+   "name": "arm_ax",
+   "expr": "330 mm",
+   "comment": "Arm A pan axis X"
+  },
+  {
+   "name": "arm_bx",
+   "expr": "570 mm",
+   "comment": "Arm B pan axis X"
+  },
+  {
+   "name": "arm_y",
+   "expr": "525 mm",
+   "comment": "Arm pan axis Y"
+  },
+  {
+   "name": "arm_reach",
+   "expr": "240 mm",
+   "comment": "Comfortable reach"
+  },
+  {
+   "name": "arm_reach_max",
+   "expr": "300 mm",
+   "comment": "Stretched reach"
+  },
+  {
+   "name": "arm_riser_h",
+   "expr": "15 mm",
+   "comment": "DROPPED riser AR-01 thickness (unused)"
+  },
+  {
+   "name": "bed_x",
+   "expr": "250 mm",
+   "comment": "Usable build volume X"
+  },
+  {
+   "name": "bed_y",
+   "expr": "250 mm",
+   "comment": "Usable build volume Y"
+  },
+  {
+   "name": "bed_z",
+   "expr": "250 mm",
+   "comment": "Usable build volume Z"
+  },
+  {
+   "name": "clr",
+   "expr": "0.3 mm",
+   "comment": "Clearance per side, sliding fit"
+  },
+  {
+   "name": "wall",
+   "expr": "2.4 mm",
+   "comment": "Thin printed wall"
+  },
+  {
+   "name": "sv_body_l",
+   "expr": "40 mm",
+   "comment": "Servo case length"
+  },
+  {
+   "name": "sv_body_w",
+   "expr": "20 mm",
+   "comment": "Servo case width"
+  },
+  {
+   "name": "sv_body_h",
+   "expr": "40.5 mm",
+   "comment": "FlashHobby M45CHW case height (listing drawing)"
+  },
+  {
+   "name": "sv_ear_len",
+   "expr": "55 mm",
+   "comment": "M45CHW across ears ~54.7 (pixel est.)"
+  },
+  {
+   "name": "sv_ear_t",
+   "expr": "4 mm",
+   "comment": "M45CHW ear thickness ~4 (pixel est.) MEASURE"
+  },
+  {
+   "name": "sv_ear_z",
+   "expr": "27.3 mm",
+   "comment": "M45CHW case bottom to ear underside (listing drawing)"
+  },
+  {
+   "name": "sv_hole_dx",
+   "expr": "48.6 mm",
+   "comment": "M45CHW ear hole spacing along length"
+  },
+  {
+   "name": "sv_hole_dy",
+   "expr": "9.9 mm",
+   "comment": "Ear hole spacing Y MEASURE"
+  },
+  {
+   "name": "sv_axis_from_end",
+   "expr": "10 mm",
+   "comment": "Output axis to nearer case end MEASURE"
+  },
+  {
+   "name": "sv_horn_face_z",
+   "expr": "48 mm",
+   "comment": "Spline top 46 + 2 mm flange of 25T Al disc horn, hub down. MEASURE; shim with M3 washers"
+  },
+  {
+   "name": "horn_od",
+   "expr": "20 mm",
+   "comment": "25T aluminium disc horn (Treedix B0875ZS9KF)"
+  },
+  {
+   "name": "horn_bc",
+   "expr": "14 mm",
+   "comment": "Disc horn 4x M3 bolt circle"
+  },
+  {
+   "name": "m3_clear",
+   "expr": "3.4 mm",
+   "comment": "M3 clearance hole"
+  },
+  {
+   "name": "m3_insert",
+   "expr": "4.0 mm",
+   "comment": "M3 heat-set insert hole"
+  },
+  {
+   "name": "m5_clear",
+   "expr": "5.5 mm",
+   "comment": "M5 clearance hole"
+  },
+  {
+   "name": "m5_insert",
+   "expr": "6.4 mm",
+   "comment": "M5 heat-set insert hole"
+  },
+  {
+   "name": "brg_od",
+   "expr": "16 mm",
+   "comment": "F625ZZ outside diameter"
+  },
+  {
+   "name": "brg_w",
+   "expr": "5 mm",
+   "comment": "F625ZZ width"
+  },
+  {
+   "name": "brg_flange_od",
+   "expr": "18 mm",
+   "comment": "F625ZZ flange diameter"
+  },
+  {
+   "name": "ls_size",
+   "expr": "94 mm",
+   "comment": "3.7 in lazy Susan (B08CY2P8KZ) - fastened with VHB tape, holes not used"
+  },
+  {
+   "name": "ls_t",
+   "expr": "9.4 mm",
+   "comment": "Lazy Susan thickness (B08CY2P8KZ)"
+  },
+  {
+   "name": "ls_hole_span",
+   "expr": "84 mm",
+   "comment": "Lazy Susan hole pattern MEASURE"
+  },
+  {
+   "name": "ls_bore",
+   "expr": "53.3 mm",
+   "comment": "Lazy Susan centre bore (B08CY2P8KZ)"
+  },
+  {
+   "name": "beaker_d",
+   "expr": "43 mm",
+   "comment": "EISCO 50 mL PP beaker OD (B00BHLE5AW)"
+  },
+  {
+   "name": "beaker_h",
+   "expr": "61 mm",
+   "comment": "EISCO 50 mL PP beaker height"
+  },
+  {
+   "name": "bottle_d",
+   "expr": "85 mm",
+   "comment": "Karter 250 mL narrow-mouth Erlenmeyer base OD (B006VYY10Y)"
+  },
+  {
+   "name": "bottle_h",
+   "expr": "148 mm",
+   "comment": "Karter 250 mL Erlenmeyer height"
+  },
+  {
+   "name": "neck_od",
+   "expr": "34 mm",
+   "comment": "Erlenmeyer neck OD, typical - MEASURE"
+  },
+  {
+   "name": "rod_d",
+   "expr": "6 mm",
+   "comment": "Stir rod dia MEASURE"
+  },
+  {
+   "name": "rod_len",
+   "expr": "150 mm",
+   "comment": "Stir rod length MEASURE"
+  },
+  {
+   "name": "well_d",
+   "expr": "130 mm",
+   "comment": "Catch container dia MEASURE"
+  },
+  {
+   "name": "well_h",
+   "expr": "90 mm",
+   "comment": "Catch container height MEASURE"
+  },
+  {
+   "name": "tt_x",
+   "expr": "175 mm",
+   "comment": "Turntable axis X"
+  },
+  {
+   "name": "tt_y",
+   "expr": "370 mm",
+   "comment": "Turntable axis Y"
+  },
+  {
+   "name": "tt_pocket_r",
+   "expr": "88 mm",
+   "comment": "Pocket circle radius"
+  },
+  {
+   "name": "tt_pocket_n",
+   "expr": "8",
+   "comment": "Pocket count"
+  },
+  {
+   "name": "tt_pocket_h",
+   "expr": "18 mm",
+   "comment": "Pocket wall height"
+  },
+  {
+   "name": "tt_disc_d",
+   "expr": "236 mm",
+   "comment": "Disc diameter"
+  },
+  {
+   "name": "tt_disc_t",
+   "expr": "4 mm",
+   "comment": "Disc thickness"
+  },
+  {
+   "name": "tt_base_w",
+   "expr": "110 mm",
+   "comment": "Turntable base box width"
+  },
+  {
+   "name": "tt_floor_t",
+   "expr": "2 mm",
+   "comment": "Turntable base floor thickness"
+  },
+  {
+   "name": "work_x",
+   "expr": "450 mm",
+   "comment": "Mixing beaker X at WORK"
+  },
+  {
+   "name": "work_y",
+   "expr": "390 mm",
+   "comment": "Mixing beaker Y at WORK"
+  },
+  {
+   "name": "st_pitch",
+   "expr": "108 mm",
+   "comment": "Mixing pocket centre to bottle centre"
+  },
+  {
+   "name": "st_link",
+   "expr": "150 mm",
+   "comment": "Link length pivot to pivot"
+  },
+  {
+   "name": "st_pivot_d",
+   "expr": "100 mm",
+   "comment": "Pivot spacing, base and tray"
+  },
+  {
+   "name": "st_travel",
+   "expr": "180 mm",
+   "comment": "Stage travel WORK to ERUPT along -Y"
+  },
+  {
+   "name": "st_m_pocket_h",
+   "expr": "12 mm",
+   "comment": "Mixing pocket wall height"
+  },
+  {
+   "name": "st_glide_h",
+   "expr": "6 mm",
+   "comment": "Glide height"
+  },
+  {
+   "name": "st_floor_t",
+   "expr": "3 mm",
+   "comment": "Tray floor thickness"
+  },
+  {
+   "name": "st_base_t",
+   "expr": "5 mm",
+   "comment": "Stage base plate thickness"
+  },
+  {
+   "name": "st_servo_gap",
+   "expr": "3 mm",
+   "comment": "Gap under ST-01 servo case; keeps crank underside at Z 56"
+  },
+  {
+   "name": "st_link_t",
+   "expr": "10 mm",
+   "comment": "Link thickness"
+  },
+  {
+   "name": "st_link_w",
+   "expr": "20 mm",
+   "comment": "Link width"
+  },
+  {
+   "name": "funnel_mouth",
+   "expr": "102 mm",
+   "comment": "EISCO 4in PP funnel mouth (B017UYYKSQ)"
+  },
+  {
+   "name": "funnel_throat",
+   "expr": "20 mm",
+   "comment": "EISCO funnel stem OD"
+  },
+  {
+   "name": "funnel_h",
+   "expr": "71 mm",
+   "comment": "EISCO funnel cone height above flask neck (104 overall - 33 stem)"
+  },
+  {
+   "name": "pocket_d",
+   "expr": "beaker_d + 1.5 mm",
+   "comment": "Inside dia of every beaker pocket"
+  },
+  {
+   "name": "tt_disc_z",
+   "expr": "max(tt_floor_t + sv_horn_face_z; tt_floor_t + sv_body_h + tt_case_clr + ls_t + 2 * ls_tape)",
+   "comment": "Underside of turntable disc"
+  },
+  {
+   "name": "tt_base_h",
+   "expr": "tt_disc_z - ls_t - 2 * ls_tape",
+   "comment": "Top of turntable base"
+  },
+  {
+   "name": "st_link_z",
+   "expr": "st_base_t + st_servo_gap + sv_horn_face_z",
+   "comment": "Underside of both links"
+  },
+  {
+   "name": "clip_r",
+   "expr": "well_d / 2 + 0.5 mm + wall",
+   "comment": "Outside radius of container clip"
+  },
+  {
+   "name": "st_alpha",
+   "expr": "asin(st_travel / 2 / st_link)",
+   "comment": "Link angle at each end of travel"
+  },
+  {
+   "name": "st_gx",
+   "expr": "work_x + 86 mm + sqrt(( st_link / 1 mm ) ^ 2 - ( ( st_travel / 2 ) / 1 mm ) ^ 2) * 1 mm",
+   "comment": "X of both ground pivots"
+  },
+  {
+   "name": "sv_ear_w",
+   "expr": "18.7 mm",
+   "comment": "Ear plate width, measured X +/-9.35"
+  },
+  {
+   "name": "sv_hole_d",
+   "expr": "3.55 mm",
+   "comment": "Ear mounting hole dia, measured"
+  },
+  {
+   "name": "sv_shaft_d",
+   "expr": "6 mm",
+   "comment": "Output spline shaft dia, measured ~6.0"
+  },
+  {
+   "name": "sv_shaft_top",
+   "expr": "46 mm",
+   "comment": "M45CHW case bottom to spline top (listing drawing)"
+  },
+  {
+   "name": "horn_t",
+   "expr": "2 mm",
+   "comment": "Disc horn flange thickness"
+  },
+  {
+   "name": "sv_screw_pilot",
+   "expr": "2.5 mm",
+   "comment": "Pilot hole for the servo's own self-tapping screws"
+  },
+  {
+   "name": "foot_d",
+   "expr": "18 mm",
+   "comment": "Adhesive rubber foot diameter"
+  },
+  {
+   "name": "foot_recess",
+   "expr": "1.2 mm",
+   "comment": "Depth of the foot recess"
+  },
+  {
+   "name": "case_relief",
+   "expr": "1.0 mm",
+   "comment": "Gap under the servo case so the ears seat first"
+  },
+  {
+   "name": "rail_len",
+   "expr": "400 mm",
+   "comment": "2020 extrusion length (8 owned, 4 used)"
+  },
+  {
+   "name": "rail_xf_y",
+   "expr": "508.5 mm",
+   "comment": "Front X-rail centre Y = stock SO-101 base front through-hole row (base-local Y -24.4)"
+  },
+  {
+   "name": "rail_xb_y",
+   "expr": "578.3 mm",
+   "comment": "Back X-rail centre Y = stock SO-101 base back through-hole row (base-local Y +45.4)"
+  },
+  {
+   "name": "rail_x0",
+   "expr": "265 mm",
+   "comment": "X-rails start X (butt against left Y-rail)"
+  },
+  {
+   "name": "rail_yl_x",
+   "expr": "255 mm",
+   "comment": "Left Y-rail centre X (beside TT-01)"
+  },
+  {
+   "name": "rail_yl_y0",
+   "expr": "290 mm",
+   "comment": "Left Y-rail start Y"
+  },
+  {
+   "name": "rail_yr_x",
+   "expr": "675 mm",
+   "comment": "Right Y-rail centre X (behind ST-01)"
+  },
+  {
+   "name": "rail_yr_y0",
+   "expr": "270 mm",
+   "comment": "Right Y-rail start Y"
+  },
+  {
+   "name": "arm_base_z",
+   "expr": "20 mm",
+   "comment": "Arm base underside = top of 2020 X-rails"
+  },
+  {
+   "name": "rail_w",
+   "expr": "20 mm",
+   "comment": "2020 profile"
+  },
+  {
+   "name": "saddle_clr",
+   "expr": "0.3 mm",
+   "comment": "Saddle channel clearance per side"
+  },
+  {
+   "name": "saddle_ch_h",
+   "expr": "20.2 mm",
+   "comment": "Saddle channel height (rail 20 + 0.2)"
+  },
+  {
+   "name": "saddle_h",
+   "expr": "28 mm",
+   "comment": "Saddle top Z"
+  },
+  {
+   "name": "saddle_wall",
+   "expr": "5 mm",
+   "comment": "Saddle side wall"
+  },
+  {
+   "name": "tt_case_clr",
+   "expr": "0.5 mm",
+   "comment": "Servo case top to lazy Susan underside"
+  },
+  {
+   "name": "horn_shim",
+   "expr": "0.5 mm",
+   "comment": "Nominal gap deck boss to horn face; fill with M3 washers"
+  },
+  {
+   "name": "tt_horn_boss",
+   "expr": "tt_disc_z - tt_floor_t - sv_horn_face_z - horn_shim",
+   "comment": "Deck boss reaching down to the horn"
+  },
+  {
+   "name": "ls_tape",
+   "expr": "1.1 mm",
+   "comment": "3M 4950 VHB (B007Y7GIKI) under and over the lazy Susan"
+  }
+ ]
+}
