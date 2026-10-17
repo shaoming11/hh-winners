@@ -481,8 +481,8 @@
     366.5
    ],
    "auger": [
-    792.6,
-    215.5
+    834.5,
+    320.0
    ],
    "tape_centre": [
     562.9,
@@ -497,7 +497,7 @@
     148.2
    ],
    "beaker_bottom_z": 61.7,
-   "mount": "TRIAL: TT-01 rail saddle on Y-right, base flush with the rail front end (branch try-saddle-carousel)"
+   "mount": "TRIAL: TT-01 rail saddle on Y-right; auger post on E5 bolted out from Y-right, E5 at Y 380-400"
   },
   "rack_stands": [
    {

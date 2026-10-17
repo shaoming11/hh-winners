@@ -1,0 +1,44 @@
+{
+ "status": "PASS",
+ "args": {
+  "mega": "/dev/cu.usbserial-130",
+  "pourer": null,
+  "transfer": null,
+  "calibration": null,
+  "upto": "L2",
+  "record_reference": false,
+  "no_report": false
+ },
+ "rows": [
+  {
+   "rung": "L0",
+   "check": "hw-check (firmware, calibration, protocol)",
+   "status": "PASS",
+   "detail": "12 checks"
+  },
+  {
+   "rung": "L0",
+   "check": "mega port present",
+   "status": "PASS",
+   "detail": "/dev/cu.usbserial-130"
+  },
+  {
+   "rung": "L1",
+   "check": "Mega PING",
+   "status": "PASS",
+   "detail": "fw wlb-mega 0.1, faults 0, estop False, pos known"
+  },
+  {
+   "rung": "L1",
+   "check": "scale stream",
+   "status": "PASS",
+   "detail": "20 samples, raw 227516 +- 21"
+  },
+  {
+   "rung": "L2",
+   "check": "zero check",
+   "status": "SKIP",
+   "detail": "no arms named"
+  }
+ ]
+}
