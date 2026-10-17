@@ -101,7 +101,9 @@ button.danger:not(:disabled) { background: var(--critical); border-color: var(--
 .twin-meter { margin: 6px 0 4px; } .twin-meter .meter-track { height: 8px; } .twin-meter .meter-text { min-width: 70px; }
 .meter-fill.ok { background: var(--good); } .meter-fill.warn { background: var(--warning); } .meter-fill.crit { background: var(--critical); }
 .meter-fill.lag, .meter-fill.idle { background: var(--axis); }
-.joints span { margin-right: 10px; white-space: nowrap; }
+.facts dt { white-space: nowrap; }
+.joints { display: flex; flex-wrap: wrap; gap: 0 10px; }
+.joints span { white-space: nowrap; }
 .caveat { margin: 8px 0 0; }
 
 .wire { font: 12px/1.45 ui-monospace, "SF Mono", Menlo, monospace; height: 220px; overflow: auto; background: var(--page); border-radius: 6px; padding: 6px 8px; }
