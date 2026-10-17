@@ -22,6 +22,7 @@ software/reference_sim/.venv/bin/python software/reference_sim/verify_pour.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_carousel.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_foam.py
 software/reference_sim/.venv/bin/python software/reference_sim/run_demo.py --physical-p1-transfer
+software/reference_sim/.venv/bin/python software/reference_sim/run_demo.py --physical-pour
 software/reference_sim/.venv/bin/python software/reference_sim/viewer.py
 ```
 
@@ -74,12 +75,16 @@ degrees and actuated by the official MuJoCo position servos.
 - `verify_foam.py` checks peroxide/yeast scaling, the growth profile and the MuJoCo visual update.
 - `run_demo.py --physical-p1-transfer` runs that same arm transfer as step 1 of the analytical
   10-step scenario and records the motion metrics in `build/reference_run.json`.
+- `run_demo.py --physical-pour` also performs step 2 with both SO-101 arms, tilts a held donor
+  beaker, and reports the analytical stream and scale measurements. Remaining process transfers
+  and pours are logical events.
 
 ## Limits
 
 The 10-step demo defaults to logical process transfers and pours. With `--physical-p1-transfer`,
-step 1 moves empty P1 from the carousel to the scale. `verify_pour.py` separately checks one
-arm-driven pour; the other filled-beaker transfers are not yet validated. Grasping uses a proximity
+step 1 moves empty P1 from the carousel to the scale. `--physical-pour` also runs the developer pour
+with arm motion in step 2. `verify_pour.py` independently checks that same arm-driven pour; the
+other filled-beaker transfers are not yet validated. Grasping uses a proximity
 check and weld constraint. The custom GR-01/02/03 geometry is not yet modeled, and stock jaw
 collisions with beakers are excluded because they do not reproduce the custom fin-ray fingers.
 Contact checks currently report no arm-to-scene contact on the P1 transfer or pour tilt paths.

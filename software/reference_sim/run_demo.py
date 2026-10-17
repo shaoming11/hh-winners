@@ -9,9 +9,10 @@ from chemistry import FoamReaction, PourPlant
 from hal.protocol import decode_line, encode_line
 from hal.sim import make_sim_bench
 from motion.pick_place import transfer_beaker
+from motion.pour import pour_with_arm
 
 
-def run(*, physical_p1_transfer: bool = False) -> dict:
+def run(*, physical_p1_transfer: bool = False, physical_pour: bool = False) -> dict:
     world, pourer, transfer, mega = make_sim_bench()
     world.step(2.0)
     plant = PourPlant(seed=2026)
@@ -49,7 +50,8 @@ def run(*, physical_p1_transfer: bool = False) -> dict:
 
     events = []
     # Empty P1 is carried to the scale by the documented transfer arm sequence.
-    if physical_p1_transfer:
+    physical_receiver_transfer = physical_p1_transfer or physical_pour
+    if physical_receiver_transfer:
         transfer_result = transfer_beaker(
             world, "transfer", "carousel_beaker_1", (0.620, 0.407, 0.0957))
         events.append({"step": 1, "action": "P1 carousel to scale",
@@ -57,16 +59,33 @@ def run(*, physical_p1_transfer: bool = False) -> dict:
     else:
         events.append({"step": 1, "action": "P1 carousel to scale",
                        "physical_arm_motion": False})
-    dev = plant.pour(80.0, 39.0, receiver_radius_mm=20.0, receiver_drop_mm=20.0)
-    world.set_scale_payload_g(dev.landed_g)
+    if physical_pour:
+        donor_transfer = transfer_beaker(
+            world, "pourer", "rack_beaker_1", (0.620, 0.340, 0.180),
+            release_after=False)
+        dev = pour_with_arm(
+            world, "pourer", "rack_beaker_1", "carousel_beaker_1",
+            donor_mass_g=80.0, target_g=39.0, pour_direction_xy=(0.0, 1.0),
+            receiver_radius_mm=20.0, maximum_tilt_deg=70.0, plant=plant)
+        dev_report = dev
+        dev_landed_g = float(dev["landed_g"])
+    else:
+        dev = plant.pour(80.0, 39.0, receiver_radius_mm=20.0, receiver_drop_mm=20.0)
+        world.set_scale_payload_g(dev.landed_g)
+        dev_report = dev.__dict__
+        dev_landed_g = dev.landed_g
     world.step(1.0)
     dev_scale = scale_sample()
     dev_scale_g = dev_scale["grams"]
-    events.append({"step": 2, "action": "developer onto P1", "pour": dev.__dict__,
-                   "mujoco_scale_reading_g": dev_scale_g})
+    dev_event = {"step": 2, "action": "developer onto P1", "pour": dev_report,
+                 "mujoco_scale_reading_g": dev_scale_g,
+                 "physical_arm_motion": physical_pour}
+    if physical_pour:
+        dev_event["donor_transfer"] = donor_transfer
+    events.append(dev_event)
     world.set_scale_payload_g(0)
     world.step(1.0)
-    funnel_dev = plant.pour(dev.landed_g, dev.landed_g, receiver_radius_mm=40.0,
+    funnel_dev = plant.pour(dev_landed_g, dev_landed_g, receiver_radius_mm=40.0,
                             receiver_drop_mm=50.0, flow_target_g_s=6.0)
     events.append({"step": 3, "action": "P1 into funnel", "pour": funnel_dev.__dict__})
     events.append({"step": 4, "action": "P1 back to carousel", "virtual_arm_motion": False})
@@ -129,9 +148,11 @@ def run(*, physical_p1_transfer: bool = False) -> dict:
                             "samples": foam_samples}})
     return {
         "simulator": "independent-reference-analytical-chemistry",
-        "model_scope": "MuJoCo geometry and mechanisms; analytical liquid, yeast, and foam models",
+        "model_scope": ("MuJoCo arm motion with analytical liquid, yeast, and foam models"
+                        if physical_pour else
+                        "MuJoCo geometry and mechanisms; analytical liquid, yeast, and foam models"),
         "hardware_used": False,
-        "process_arm_trajectory_playback": physical_p1_transfer,
+        "process_arm_trajectory_playback": physical_receiver_transfer,
         "arm_bus_initial_positions_deg": arm_snapshot,
         "arm_control_smoke": {
             "joint": "pourer.wrist_roll", "start_deg": arm_start_deg,
@@ -143,9 +164,11 @@ def run(*, physical_p1_transfer: bool = False) -> dict:
         "events": events,
         "final_mujoco": world.status(),
         "notes": [
-            ("P1 carousel-to-scale uses joint-limited MuJoCo arm motion. Other process transfers "
-             "remain logical events." if physical_p1_transfer else
-             "The scenario exercises the process targets, not a calibrated arm trajectory replay."),
+            (("P1 carousel-to-scale and the developer pour use joint-limited MuJoCo arm motion. "
+              "Other process transfers and pours remain logical events.") if physical_pour else
+             ("P1 carousel-to-scale uses joint-limited MuJoCo arm motion. Other process transfers "
+              "remain logical events." if physical_receiver_transfer else
+              "The scenario exercises the process targets, not a calibrated arm trajectory replay.")),
             "Liquid flow and landing are equations, not CFD or particle physics.",
             "Foam growth duration and peak height are visual defaults, not measured reaction data.",
             "Weir coefficient and auger grams per revolution are uncalibrated defaults.",
@@ -157,10 +180,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--physical-p1-transfer", action="store_true",
                         help="move empty P1 from the carousel to the scale with the transfer arm")
+    parser.add_argument("--physical-pour", action="store_true",
+                        help="also move a developer beaker and pour into P1 with the pourer arm")
     parser.add_argument("--output", type=Path,
                         default=Path(__file__).resolve().parent / "build" / "reference_run.json")
     args = parser.parse_args()
-    result = run(physical_p1_transfer=args.physical_p1_transfer)
+    result = run(physical_p1_transfer=args.physical_p1_transfer,
+                 physical_pour=args.physical_pour)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n")
     for event in result["events"]:
@@ -169,6 +195,11 @@ def main() -> None:
         if pour:
             print(f"{event['step']:02d}. {desc}: landed {pour['landed_g']:.2f} g, "
                   f"spill {pour['spilled_g']:.2f} g, peak flow {pour['peak_flow_g_s']:.2f} g/s")
+            if event.get("physical_arm_motion") and "donor_transfer" in event:
+                donor = event["donor_transfer"]
+                print(f"    developer arm path: {donor['final_site_error_mm']:.2f} mm position error; "
+                      f"tilt {pour['peak_tilt_deg']:.1f}°, "
+                      f"{pour['minimum_joint_margin_deg']:.1f}° min joint margin")
         elif "transfer" in event:
             transfer = event["transfer"]
             print(f"{event['step']:02d}. {desc}: arm transfer, "
