@@ -140,7 +140,7 @@ def add_beaker(parent: ET.Element, name: str, xy: tuple[float, float], bottom_z:
             "rgba": "0.77 0.90 0.95 0.18", "contype": "1" if dynamic else "0",
             "conaffinity": "1" if dynamic else "0",
         })
-    ET.SubElement(body, "site", {"name": f"{name}_grasp", "pos": "0 0 0.052",
+    ET.SubElement(body, "site", {"name": f"{name}_grasp", "pos": "0 0 0.032",
                                   "size": "0.002", "rgba": "0.9 0.1 0.1 0.6"})
     return body
 

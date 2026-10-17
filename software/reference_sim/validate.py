@@ -6,12 +6,14 @@ from verify_layout import run as verify_layout
 from chemistry import PourPlant
 from hal.protocol import LineDecoder, decode_line, encode_line
 from verify_motion import run as verify_motion
+from verify_transfer import run as verify_transfer
 
 
 def main() -> None:
     layout_rows = verify_layout()
     assert all(row["pass"] for row in layout_rows), "one or more station radii are outside 1 mm"
     motion = verify_motion()
+    transfer = verify_transfer()
 
     result = run()
     smoke = result["arm_control_smoke"]
@@ -53,6 +55,8 @@ def main() -> None:
     print("PASS: both funnel pours land inside the modeled opening")
     print(f"PASS: SO-101 IK reaches the carousel grasp point with {motion['ik_min_joint_margin_deg']:.1f}° min joint margin")
     print(f"PASS: proximity grasp latches at {motion['grasp_distance_mm']:.2f} mm and follows a wrist command")
+    print(f"PASS: P1 carousel-to-scale transfer lands {transfer['final_site_error_mm']:.2f} mm off target, "
+          f"tilt {transfer['upright_error_deg']:.2f}°")
     print("PASS: SO-101 joint command, JSON-line codec, and simulated mechanism commands respond")
     print(f"PASS: 10 simulated 39 g pours mean {batch_mean:.2f} g, SD {batch_sd:.2f} g")
 

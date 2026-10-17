@@ -16,6 +16,7 @@ software/reference_sim/.venv/bin/python software/reference_sim/fetch_so101.py
 software/reference_sim/.venv/bin/python software/reference_sim/build_scene.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_layout.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_motion.py
+software/reference_sim/.venv/bin/python software/reference_sim/verify_transfer.py
 software/reference_sim/.venv/bin/python software/reference_sim/viewer.py
 ```
 
@@ -54,14 +55,16 @@ degrees and actuated by the official MuJoCo position servos.
   grams-per-revolution calculation.
 - `verify_motion.py` checks joint-limited IK to a carousel beaker, a proximity-triggered weld grasp,
   a 40 mm lift, and a small wrist move while holding the beaker.
+- `verify_transfer.py` executes the empty P1 carousel-to-scale transfer, including an outward
+  escape, a lifted carry, release, and upright-placement measurement.
 
 ## Limits
 
-The 10-step demo keeps process transfers as logical events. The separate motion check exercises one
-physical grasp, but the full recorded pick-and-place sequence is not wired into the demo. Grasping
-uses a proximity check and weld constraint; the stock SO-101 fingers are excluded from beaker
-contacts because they do not reproduce the custom fin-ray geometry. `motion/pick_place.py` is an
-experimental transfer planner and still needs a reliable upright placement path. Yeast dosing is a
-calibrated grams-per-revolution equation, and the flow and auger constants are placeholders until
-measured on the assembled bench. The liquid model is not CFD. The checks compare geometry, dose,
-mechanism, and control-interface assumptions; they do not prove a hardware run will work unchanged.
+The 10-step demo keeps process transfers as logical events. The standalone transfer check validates
+one empty P1 move from the carousel to the scale; other station pairs and filled-beaker handling are
+not yet validated. Grasping uses a proximity check and weld constraint; the stock SO-101 fingers
+are excluded from beaker contacts because they do not reproduce the custom fin-ray geometry. Yeast
+dosing is a calibrated grams-per-revolution equation, and the flow and auger constants are
+placeholders until measured on the assembled bench. The liquid model is not CFD. The checks
+compare geometry, dose, mechanism, and control-interface assumptions; they do not prove a hardware
+run will work unchanged.
