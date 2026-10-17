@@ -45,7 +45,7 @@ live whenever the pack is plugged in and the e-stop is released.
 | Pin | AVR | Use |
 |---|---|---|
 | D2 | PE4 / INT4 | E-stop pole 2, `INPUT_PULLUP`, NC to GND. Rising edge: the interrupt disconnects all three compare outputs and drives D6/D7/D8 LOW at once; the core then latches `ESTOP` |
-| D3 | PE5 | HX711 DOUT, read on `PINE` |
+| D5 | PE3 | HX711 DOUT, read on `PINE` (moved from D3 to fit the bench wiring) |
 | D4 | PG5 | HX711 SCK on `PORTG`; 25 pulses (channel A, gain 128) with interrupts off for about 25 µs |
 | D6 / D7 / D8 | PH3/OC4A, PH4/OC4B, PH5/OC4C | Carousel, stage, auger. Timer4 mode 14, prescaler 8, `ICR4 = 39999` (50 Hz), `OCR4x = 2 × µs`. No Servo library |
 | A2 | PF2 / ADC2 | Auger feedback, AVcc reference |
@@ -86,8 +86,8 @@ host sends TT, ST or AUG. During the bootloader (before `.init3`) the pins are i
   max(100 ms, 4 × measured interval) while streaming or taring.
 - **Faults.** Latched until `CLR`. `ESTOP`, `WDT` and the motion timeouts switch every output off (servos limp).
   Every fault stops the auger. `AUGER_JAM` and `HX_TIMEOUT` leave a held carousel/stage pulse on. While any fault is
-  latched, TT/ST/AUG answer `err STATE`; with `ESTOP` latched everything except PING, STOP, CLR and HB answers
-  `err ESTOP`. `CLR` clears `ESTOP` only after D2 has read LOW for `estop_release_ms`. `HOPPER_EMPTY` is a host-side
+  latched, TT/ST/AUG answer `err STATE`; with `ESTOP` latched everything except PING, STOP, CLR, HB and the
+  scale commands (STREAM, TARE, CAL, which move nothing) answers `err ESTOP`. `CLR` clears `ESTOP` only after D2 has read LOW for `estop_release_ms`. `HOPPER_EMPTY` is a host-side
   rule and is never raised here.
 - **Comm watchdog.** During TT/ST/AUG, no valid line for 500 ms → `WDT`. While idle the servos keep holding.
 - **PING** adds `adc` (last A2 reading), `estop` (D2 state), `faults` (bit mask in `protocol.FAULTS` order), `hx_ms`,

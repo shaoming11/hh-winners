@@ -300,12 +300,13 @@ class SimMega(Plugin):
         if name == 'CLR':
             if 'ESTOP' in self.faults and self.w.estop: self.emit(dict(seq=seq, err='STATE', detail='e-stop still pressed')); return
             self.faults.clear(); self.set_limp(False); self.emit(dict(seq=seq, ok=True)); return
-        if 'ESTOP' in self.faults: self.emit(dict(seq=seq, err='ESTOP', detail='latched')); return
+        # scale commands move nothing, so they stay available while the e-stop is latched (bring-up, weighing)
         if name == 'STREAM': self.streaming = cmd['on']; self.next_sample = self.w.time; self.emit(dict(seq=seq, ok=True)); return
         if name == 'TARE':                       # mean of the next 8 conversions (0.1 s at 80 SPS), then reply
             if 'HX_TIMEOUT' in self.faults: self.emit(dict(seq=seq, err='STATE', detail='HX711 fault')); return
             self.tare_pending = dict(seq=seq, vals=[], next=self.w.time); return
         if name == 'CAL': self.counts_per_g = float(cmd['counts_per_g']); self.emit(dict(seq=seq, ok=True)); return
+        if 'ESTOP' in self.faults: self.emit(dict(seq=seq, err='ESTOP', detail='latched')); return
         if self.faults: self.emit(dict(seq=seq, err='STATE', detail='faults latched: %s' % sorted(self.faults))); return
         if self.motion is not None:
             self.emit(dict(seq=seq, err='BUSY', detail='%s running' % self.motion['cmd'])); return

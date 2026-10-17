@@ -18,7 +18,7 @@
 // ------------------------------------------------------------------ pins (electrical.md 4)
 #define ESTOP_PIN 2                 // D2 = PE4 / INT4: NC contact to GND, INPUT_PULLUP; HIGH = pressed or wire broken
 #define ESTOP_BIT _BV(PE4)
-#define HX_DT_BIT _BV(PE5)          // D3 = PE5: HX711 DOUT, read on PINE
+#define HX_DT_BIT _BV(PE3)          // D5 = PE3: HX711 DOUT, read on PINE (moved from D3 to fit the bench wiring)
 #define HX_SCK_BIT _BV(PG5)         // D4 = PG5: HX711 SCK, written on PORTG
 #define TT_BIT _BV(PH3)             // D6 = PH3 / OC4A: carousel M45CHW
 #define ST_BIT _BV(PH4)             // D7 = PH4 / OC4B: stage M45CHW

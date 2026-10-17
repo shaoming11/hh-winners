@@ -604,7 +604,7 @@ void Core::handle_line(const char* line, size_t n, uint32_t now) {
         reply_simple(seq, "ok", now);
         return;
     }
-    if (faults_ & F_ESTOP) { reply_err(seq, E_ESTOP, "latched", now); return; }
+    // Scale commands move nothing, so they stay available while the e-stop is latched (bring-up, weighing).
     if (cmd == C_STREAM) {
         streaming_ = obj_.get("on")->b;
         hx_ref_ = now;
@@ -618,6 +618,7 @@ void Core::handle_line(const char* line, size_t n, uint32_t now) {
         return;
     }
     if (cmd == C_CAL) { counts_per_g_ = obj_.get("counts_per_g")->f; reply_simple(seq, "ok", now); return; }
+    if (faults_ & F_ESTOP) { reply_err(seq, E_ESTOP, "latched", now); return; }
     if (faults_) {
         Sb d(detail, sizeof detail);
         d.s("faults latched:");
