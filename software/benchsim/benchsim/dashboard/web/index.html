@@ -14,6 +14,7 @@
   <span id="clock" class="metric">t = –</span>
   <span id="rtf" class="metric muted"></span>
   <span class="grow"></span>
+  <span id="speeds" class="speeds" role="group" aria-label="Playback speed"></span>
   <span id="toast" class="muted"></span>
   <button id="btn-start" data-cmd="start">Start</button>
   <button id="btn-stop" data-cmd="stop" class="danger">Stop</button>
@@ -52,7 +53,9 @@
     </article>
     <article class="card" id="card-chem">
       <h2>Chemistry</h2>
-      <div id="chem" class="secondary small">Vessel contents appear once the full demo runner is attached.</div>
+      <div id="chem-legend" class="legend small"></div>
+      <div id="chem" class="secondary small">Vessel contents appear with the full demo runner.</div>
+      <div id="foam" class="facts-row small"></div>
     </article>
     <article class="card" id="card-twin">
       <h2>Twin: commanded vs measured</h2>

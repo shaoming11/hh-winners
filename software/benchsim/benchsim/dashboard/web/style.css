@@ -80,6 +80,23 @@ button.danger:not(:disabled) { background: var(--critical); border-color: var(--
 .timeline li.failed { border-color: var(--critical); } .timeline li.failed .st { color: var(--critical-ink); }
 .timeline li.skipped { opacity: .6; } .timeline li.skipped .st, .timeline li.pending .st { color: var(--muted); }
 
+.speeds { display: flex; gap: 2px; padding: 2px; border-radius: 7px; border: 1px solid var(--axis); }
+.speeds button { padding: 3px 8px; font-size: 13px; border: 0; background: transparent; }
+.speeds button.on { background: var(--s1); color: #fff; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 8px; color: var(--ink-2); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; background: var(--c); }
+.vessel { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); gap: 2px 10px; align-items: center; padding: 3px 0; }
+.vessel .name { color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vessel .bar { display: flex; gap: 2px; height: 12px; }
+.vessel .bar i { display: block; height: 100%; background: var(--c); }
+.vessel .bar i:first-child { border-radius: 4px 0 0 4px; } .vessel .bar i:last-child { border-radius: 0 4px 4px 0; }
+.vessel .bar i:only-child { border-radius: 4px; }
+.vessel .txt { grid-column: 2; color: var(--muted); font-variant-numeric: tabular-nums; }
+.vessel.empty .bar { background: var(--grid); border-radius: 4px; height: 4px; }
+.facts-row { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.facts-row b { color: var(--ink); font-weight: 650; }
+
 .right { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .card { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 12px 14px; min-width: 0; }
 .card h2 { margin: 0 0 8px; font-size: 13px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); }
@@ -101,7 +118,9 @@ button.danger:not(:disabled) { background: var(--critical); border-color: var(--
 .twin-meter { margin: 6px 0 4px; } .twin-meter .meter-track { height: 8px; } .twin-meter .meter-text { min-width: 70px; }
 .meter-fill.ok { background: var(--good); } .meter-fill.warn { background: var(--warning); } .meter-fill.crit { background: var(--critical); }
 .meter-fill.lag, .meter-fill.idle { background: var(--axis); }
-.joints span { margin-right: 10px; white-space: nowrap; }
+.facts dt { white-space: nowrap; }
+.joints { display: flex; flex-wrap: wrap; gap: 0 10px; }
+.joints span { white-space: nowrap; }
 .caveat { margin: 8px 0 0; }
 
 .wire { font: 12px/1.45 ui-monospace, "SF Mono", Menlo, monospace; height: 220px; overflow: auto; background: var(--page); border-radius: 6px; padding: 6px 8px; }

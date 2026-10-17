@@ -1,7 +1,8 @@
 """python -m benchsim.dashboard: serve the live dashboard and run the protocol in simulation on demand.
 
     python -m benchsim.dashboard                       # http://127.0.0.1:8765, real-time pacing
-    python -m benchsim.dashboard --speed 2             # twice real time (0 = as fast as the sim goes)
+    python -m benchsim.dashboard --speed 2             # twice real time (0 = as fast as the sim goes; also live on the page)
+    python -m benchsim.dashboard --dev                 # quick 3-step protocol instead of the full 12-step demo
     python -m benchsim.dashboard --host 0.0.0.0        # reachable from another screen on the LAN
 """
 import argparse
@@ -17,10 +18,12 @@ def main(argv=None):
     p.add_argument('--speed', type=float, default=1.0, help='sim seconds per wall second (0 = unpaced)')
     p.add_argument('--camera', default='auto', help="auto (follows the step), overview, bench_cam, top or foam_cam")
     p.add_argument('--fps', type=float, default=15.0, help='camera frames per sim second'); p.add_argument('--no-video', action='store_true')
+    p.add_argument('--dev', action='store_true', help='quick 3-step protocol instead of the full demo')
     p.add_argument('--seed', type=int, default=0); p.add_argument('--open', action='store_true', help='open the browser')
     a = p.parse_args(argv)
     hub = server.Hub(); cam = None if a.no_video else video.Video(hub, camera=a.camera, fps=a.fps)
-    run = runner.Runner(hub, speed=a.speed, seed=a.seed, video=cam)
+    make = lambda out_root, seed: runner.make_run(out_root, seed, dev=a.dev)
+    run = runner.Runner(hub, make_run=make, speed=a.speed, seed=a.seed, video=cam)
     try:
         srv = server.serve(hub, run.control, host=a.host, port=a.port)
     except OSError as e:

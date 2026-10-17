@@ -300,3 +300,37 @@ Known disagreements found so far (the JSON coordinates are authoritative):
 | transfer → scale bearing | +4.5° | −5° | sign error in the recorded table |
 | CAD wrist-roll axis | 7.4 mm off the MJCF roll axis laterally | – | the other five axes fit within 1.1 mm (`cadmap`) |
 | CAD park pose `[30, 60, −150, 30, 0]` | maps to a near-vertical arm in MJCF | demo_process calls it "folded" | clear of everything; kept as recorded |
+
+## Live dashboard (phase 11)
+
+```bash
+.venv/bin/python -m benchsim.dashboard --open          # http://127.0.0.1:8765: press Start; Stop runs the safe-stop path
+.venv/bin/python -m benchsim.dashboard --speed 2       # 2x real time (also switchable live: 0.5x to 8x)
+.venv/bin/python -m benchsim.dashboard --dev           # quick 3-step transfer protocol instead of the full demo
+.venv/bin/python -m benchsim.dashboard --host 0.0.0.0  # reachable from a second screen on the LAN
+```
+
+A browser page for the audience. It shows the sim camera with the current step drawn over it (auto camera: close-up
+for transfers and dosing, flask camera for the eruption) and a 12-step timeline. Four cards sit beside them:
+- **Now:** what is happening, the chemical and amount, the timeout, and the tightest verified gap.
+- **Chemistry:** contents of every vessel from the ledger, plus O₂ and the foam column.
+- **Twin:** where the plan puts each gripper vs where the servos say it is, in mm, against the step's clearance.
+- **Wire and Errors:** the exact Mega JSON lines with their CRC, the servo-bus writes, and grasp checks, faults and stop
+  reasons.
+
+The page uses only the standard library and plain HTML/JS: no npm and no build step.
+
+- **Contract.** `benchsim.dashboard.feed.Feed(bench, publish).attach(sequencer)` publishes `benchsim.feed/1`
+  snapshots (schema in `feed.py`). It works through `ctx.on_tick_hooks` and the sim frame hooks, so nothing in a run
+  changes. The arms are wrapped only to record their commanded goals. Pass `probes={'name': fn}` to add live values,
+  and `ledger=` / `twin=` to fill the Chemistry and Twin cards.
+- **Threads.** The sim and the MuJoCo renderer stay on the main thread. HTTP runs in daemon threads (SSE `/events`,
+  MJPEG `/stream.mjpg`, `POST /api/{start,stop,reset,speed/<x>,camera/<name>}`).
+- **Full demo.** `runner.DemoRun` mirrors `demo_run.SimDemo.run`, whose Sequencer is built inside `run()` and so
+  cannot be watched from outside. `tests/test_dashboard.py` runs it to DONE, which catches drift between the two. A
+  2-line `on_sequencer` hook in `SimDemo.run` would remove the mirror.
+- **Twin limit.** Commanded and measured angles both come from the servos' encoders. A tracking error (stall,
+  collision, overload) shows in the Twin card; a wrong servo zero does not. The grasp jaw-angle and scale checks catch
+  that physically.
+- **Real hardware.** Not wired yet. The feed and twin only use the `ArmBackend`/`MegaClient` interfaces, so a runner
+  built on `make_bench('real', ...)` can attach the same `Feed`, with a twin built from `scene.build()`.
