@@ -1,0 +1,575 @@
+{
+ "layout": {
+  "d": 0.0,
+  "a": 0.0,
+  "b": -20.0,
+  "car_c": 43.7,
+  "car_R": 84.0,
+  "pick_deg": 0.0,
+  "auger_deg": 180.0,
+  "pockets": [
+   0,
+   90,
+   180,
+   270
+  ],
+  "scale": [
+   345.0,
+   350.5
+  ],
+  "e6_y": 317.0,
+  "funnel": [
+   450.0,
+   159.0
+  ],
+  "stage_rot": 0.0,
+  "rack": [
+   [
+    779.8133329356934,
+    332.86371709403824
+   ],
+   [
+    821.892336110995,
+    398.91452147779023
+   ],
+   [
+    845.4423259036623,
+    473.6055466999209
+   ]
+  ],
+  "rack_floor": 60.2
+ },
+ "pans": {
+  "A": [
+   330.0,
+   525.7
+  ],
+  "B": [
+   550.0,
+   525.7
+  ]
+ },
+ "park_deg": {
+  "A": [
+   -60.0,
+   60.0,
+   -150.0,
+   30.0,
+   0.0
+  ],
+  "B": [
+   30.0,
+   60.0,
+   -150.0,
+   30.0,
+   0.0
+  ]
+ },
+ "steps": [
+  {
+   "step": "carousel: P1 (empty) to the pick pocket (0 deg); arms parked",
+   "arm": "-",
+   "park_clearance_mm": {
+    "A": 18.9,
+    "B": 19.0
+   },
+   "park_clearance_at": {
+    "A": "arm x FRAME-2020 (bought, 4 x 400 mm)",
+    "B": "arm x FRAME-2020 (bought, 4 x 400 mm)"
+   },
+   "park_margin": {
+    "A": [
+     31.80419656025945,
+     "elbow"
+    ],
+    "B": [
+     31.80419656025945,
+     "elbow"
+    ]
+   }
+  },
+  {
+   "step": "1  A: P1 carousel -> scale (top-down)",
+   "arm": "A",
+   "fail": "no top-down solution (src 1, dst 1 grasps)"
+  },
+  {
+   "step": "2  B: developer rack -> pour onto P1 (scale) -> rack (grip 40, lip 45)",
+   "arm": "B",
+   "fail": "no collision-free pour (1 in-margin manifolds, 1 tried)",
+   "first_manifold_hit": null,
+   "reasons": {},
+   "best_manifold_margin": 25.83934040553787
+  },
+  {
+   "step": "3  B: P1 scale -> pour into funnel -> scale (grip 40, lip 65+)",
+   "arm": "B",
+   "fail": "no collision-free pour (0 in-margin manifolds, 0 tried)",
+   "first_manifold_hit": null,
+   "reasons": {},
+   "best_manifold_margin": null
+  },
+  {
+   "step": "4  A: P1 scale -> carousel (top-down)",
+   "arm": "A",
+   "fail": "no top-down solution (src 1, dst 1 grasps)"
+  },
+  {
+   "step": "carousel: P2 to auger (180), dose yeast (DH-01 underside z160), P2 to pick (0); arms parked",
+   "arm": "-",
+   "park_clearance_mm": {
+    "A": 18.9,
+    "B": 19.0
+   },
+   "park_clearance_at": {
+    "A": "arm x FRAME-2020 (bought, 4 x 400 mm)",
+    "B": "arm x FRAME-2020 (bought, 4 x 400 mm)"
+   },
+   "park_margin": {
+    "A": [
+     31.80419656025945,
+     "elbow"
+    ],
+    "B": [
+     31.80419656025945,
+     "elbow"
+    ]
+   }
+  },
+  {
+   "step": "5  A: P2 carousel -> scale (top-down)",
+   "arm": "A",
+   "fail": "no top-down solution (src 1, dst 1 grasps)"
+  },
+  {
+   "step": "6  B: water rack -> pour onto P2 (scale) -> rack (grip 40, lip 45)",
+   "arm": "B",
+   "sign": 1,
+   "pick": [
+    14.539002924952142,
+    "wr_flex"
+   ],
+   "carry": [
+    -15.706150999992888,
+    "shoulder"
+   ],
+   "pour": [
+    25.83934040553787,
+    "elbow"
+   ],
+   "tilt_in_descend": 25.83934040553787,
+   "approach": 14.539002924952142,
+   "psi_deg": 140,
+   "lip_above_rim": 55.0,
+   "lip_start_off": -26.472920020154106,
+   "lip_drift": 12.3,
+   "lip_offset_range": [
+    -18.3,
+    -14.2
+   ],
+   "landing_offset_mm": 12.3,
+   "grip_h": 40.0,
+   "coll": {},
+   "r_src": 299.99999999999994,
+   "r_rcv": 269.6665348166138,
+   "q_pick": [
+    -76.0,
+    114.1,
+    -37.7,
+    -76.5,
+    89.3
+   ],
+   "q_pour55": [
+    40.3,
+    52.1,
+    -24.0,
+    -27.0,
+    34.9
+   ],
+   "q_pour105": [
+    40.7,
+    49.1,
+    -29.3,
+    -23.9,
+    -15.1
+   ],
+   "clearance_mm": 2.0,
+   "clearance_at": "held beaker x REF-ROD"
+  },
+  {
+   "step": "7  B: P2 scale -> pour into funnel -> scale (grip 40, lip 65+)",
+   "arm": "B",
+   "fail": "no collision-free pour (0 in-margin manifolds, 0 tried)",
+   "first_manifold_hit": null,
+   "reasons": {},
+   "best_manifold_margin": null
+  },
+  {
+   "step": "8  A: P2 scale -> carousel (top-down)",
+   "arm": "A",
+   "fail": "no top-down solution (src 1, dst 1 grasps)"
+  }
+ ],
+ "coordinates_mm": {
+  "arm_A_base_axis": [
+   430.0,
+   599.7
+  ],
+  "arm_B_base_axis": [
+   617.0,
+   599.7
+  ],
+  "X_rail_front_centre_Y": 582.5,
+  "X_rail_rear_centre_Y": 652.3,
+  "Y_left_rail_Y": [
+   242.3,
+   642.3
+  ],
+  "Y_right_rail_Y": [
+   270.0,
+   670.0
+  ],
+  "E6_Y": [
+   430.0,
+   450.0
+  ],
+  "carousel_centre": [
+   175.0,
+   326.3
+  ],
+  "TT04_v4": {
+   "pitch_r": 84.0,
+   "pockets_deg": [
+    0,
+    90,
+    180,
+    270
+   ],
+   "pick_xy": [
+    259.0,
+    326.3
+   ],
+   "auger_xy": [
+    91.0,
+    326.3
+   ],
+   "beaker_bottom_z": 61.7
+  },
+  "PS01_E5": "with carousel -43.7 in Y; PS-01 +4 mm along E5; DH-01 underside z160",
+  "scale_pan_centre": [
+   708.5,
+   330.0,
+   63.7
+  ],
+  "scale_saddle_bolts": [
+   [
+    675.0,
+    271.5
+   ],
+   [
+    675.0,
+    326.5
+   ]
+  ],
+  "RK03_pockets": [
+   [
+    846.8,
+    406.9
+   ],
+   [
+    888.9,
+    472.9
+   ],
+   [
+    912.4,
+    547.6
+   ]
+  ],
+  "RK03_beaker_bottom_z": 60.2,
+  "funnel_axis_rim": [
+   450.0,
+   282.0,
+   233.0
+  ],
+  "table_extent": {
+   "X": [
+    -200,
+    1630
+   ],
+   "Y": [
+    -30,
+    730
+   ]
+  }
+ },
+ "stations_on_extrusions": {
+  "arm_A_base": "X rails, pan axis 165 mm from the X-rail west end (X 265)",
+  "arm_B_base": "X rails, pan axis 352 mm from the X-rail west end",
+  "X_rails": "front centre 340.2 mm, rear centre 410.0 mm from the Y-left south end (Y 242.3); 312.5/382.3 from the Y-right south end (Y 270)",
+  "carousel_TT01": "Y-left, bolts at Y 311.3/341.3 = 69/99 mm from the Y-left south end",
+  "E5_PS01": "E5 via FX-01 on Y-left T-slots, -43.7 mm in Y with the carousel; PS-01 +4 mm along E5",
+  "scale_WS01": "Y-right outside face, saddle bolts 1.5 and 56.5 mm from the Y-right south end (Y 270)",
+  "stage": "unchanged, E6 at Y 430-450 (S1/S2 crossbar)",
+  "RK03": "outside face of Y-right + table pads; pockets as listed"
+ },
+ "grip_h": 40.0,
+ "frame_changes": [
+  "X-front and X-rear rails move +74 mm along Y (rear corner brackets flipped to the south side)",
+  "arm A base slides +100 mm along the X rails; arm B base +47 mm",
+  "Y-left moves -47.7 mm along Y (242.3-642.3)",
+  "carousel TT-01 slides -43.7 mm along Y-left; E5/PS-01 move with it; PS-01 +4 mm along E5",
+  "WS-01 saddle moves from X-front to the outside of Y-right (rotated 90 deg)"
+ ],
+ "status": "Update 11 candidate FAIL (A top-down carry 6.5 deg; B scale pour and funnel pour at grip 40 no manifold). Best state = Update 9 coordinates (coordinates_mm / frame_changes / stations_on_extrusions): B scale pour PASS; A carousel<->scale and funnel steps open. See layout_final.md Updates 9-11.",
+ "status_update10": "Restructure (A top-down transfers, B all pours) not run: no layout satisfies all reach windows; closest candidate fails B side-grasp scale pick by ~3 deg (r 273 vs ~285). See layout_final.md Update 10.",
+ "candidate_update10": {
+  "arm_A_base": [
+   330.0,
+   525.7
+  ],
+  "arm_B_base": [
+   550.0,
+   525.7
+  ],
+  "stage_translation_Y": -123.0,
+  "funnel": [
+   450.0,
+   159.0,
+   233.0
+  ],
+  "E6_Y": [
+   307.0,
+   327.0
+  ],
+  "scale_pan": [
+   345.0,
+   350.5
+  ],
+  "scale_on": "E6 north face",
+  "carousel": "as Update 9"
+ },
+ "update12_candidate1": {
+  "status": "PARTIAL: steps 1,2,4 PASS (5,6,8 same geometry), step 3/7 funnel pour FAIL (scale pick margin at grip 20/30; tilt-in at grip 30/40 high lips). Joint-space carries at Z300.",
+  "transfer_arm_east_base": [
+   604.8,
+   599.7
+  ],
+  "transfer_arm_offset_from_Xrail_west_end_mm": 339.8,
+  "pourer_west_base": [
+   397.4,
+   599.7
+  ],
+  "pourer_offset_from_Xrail_west_end_mm": 132.4,
+  "X_rails": "+74 in Y (front centre 582.5, rear 652.3)",
+  "stage": "as built, funnel (450,282,233)",
+  "scale_pan": [
+   596.0,
+   395.3,
+   63.7
+  ],
+  "scale": "loose, rotated 180 deg",
+  "carousel_centre": [
+   807.9,
+   523.5
+  ],
+  "carousel_rotation_deg": 220.6,
+  "pick_pocket": [
+   744.1,
+   468.8
+  ],
+  "auger_pocket": [
+   871.6,
+   578.2
+  ],
+  "rack_pockets": [
+   [
+    322.3,
+    319.6
+   ],
+   [
+    222.9,
+    368.1
+   ],
+   [
+    148.8,
+    450.3
+   ]
+  ],
+  "rack_beaker_bottom_z": 60.2,
+  "bearing_radius_from_arm": {
+   "carousel pick (transfer)": 191.1,
+   "scale (transfer)": 204.6,
+   "scale (pourer)": 285.0,
+   "funnel (pourer)": 322.0,
+   "rack pockets (pourer)": 290.0
+  },
+  "rack_bearings_from_pourer_deg": [
+   -15,
+   -37,
+   -59
+  ],
+  "rack_r_from_pourer": 290.0,
+  "step_results": {
+   "1": "PASS pick 17.7 place 19.0 carry 9.5 (wr_flex) clr 7.9",
+   "2": "PASS pick 11.2 pour 32.3 clr 5.8 landing 16.4",
+   "3": "FAIL",
+   "4": "PASS pick 19.0 place 17.7 carry 9.5 clr 7.9"
+  }
+ },
+ "update13_final": {
+  "status": "ALL 8 STEPS PASS",
+  "tape_datums": "X from Y-left outer face (X 245); Y from E6 south face (Y 430)",
+  "pourer_base": {
+   "xy": [
+    397.4,
+    599.7
+   ],
+   "tape": [
+    152.4,
+    169.7
+   ],
+   "X_rail_offset_from_west_end": 132.4
+  },
+  "transfer_base": {
+   "xy": [
+    604.8,
+    599.7
+   ],
+   "tape": [
+    359.8,
+    169.7
+   ],
+   "X_rail_offset_from_west_end": 339.8
+  },
+  "X_rails": {
+   "front_centre_Y": 582.5,
+   "rear_centre_Y": 652.3,
+   "change": "+74 mm along Y, rear brackets south side"
+  },
+  "scale": {
+   "pan": [
+    620.0,
+    407.0,
+    63.7
+   ],
+   "tape": [
+    375.0,
+    -23.0
+   ],
+   "mount": "E6 south side; pan 355 mm from E6 west end; saddle X 547-664"
+  },
+  "funnel": {
+   "xy": [
+    450.0,
+    282.0
+   ],
+   "rim_z": 233.0,
+   "tape": [
+    205.0,
+    -148.0
+   ]
+  },
+  "carousel": {
+   "centre": [
+    807.9,
+    523.5
+   ],
+   "rotation_deg": 220.6,
+   "pick": [
+    744.1,
+    468.8
+   ],
+   "auger": [
+    871.6,
+    578.2
+   ],
+   "tape_centre": [
+    562.9,
+    93.5
+   ],
+   "tape_pick": [
+    499.1,
+    38.8
+   ],
+   "tape_auger": [
+    626.6,
+    148.2
+   ],
+   "beaker_bottom_z": 61.7,
+   "mount": "loose"
+  },
+  "rack_stands": [
+   {
+    "xy": [
+     192.3,
+     394.6
+    ],
+    "tape": [
+     -52.7,
+     -35.4
+    ]
+   },
+   {
+    "xy": [
+     134.6,
+     477.1
+    ],
+    "tape": [
+     -110.4,
+     47.1
+    ]
+   },
+   {
+    "xy": [
+     108.5,
+     574.4
+    ],
+    "tape": [
+     -136.5,
+     144.4
+    ]
+   }
+  ],
+  "rack_beaker_bottom_z": 60.2,
+  "r_bearing": {
+   "pourer": {
+    "rack": [
+     290,
+     [
+      -45,
+      -65,
+      -85
+     ]
+    ],
+    "scale": [
+     294.4,
+     47
+    ],
+    "funnel": [
+     322.0,
+     9
+    ]
+   },
+   "transfer": {
+    "carousel_pick": [
+     191.1,
+     48
+    ],
+    "scale": [
+     193.3,
+     -5
+    ]
+   }
+  },
+  "steps": {
+   "1": "PASS 17.7/17.3, carry 9.5 (wr_flex), 7.9 mm",
+   "2": "PASS pick 11.6, pour 35.7, 6.2 mm, landing 15.9",
+   "3": "PASS pick 10.4, pour 74.9, tilt-in 66.0, 5.3 mm, landing 7.2",
+   "4": "PASS 17.3/17.7, carry 9.5, 7.9 mm",
+   "5": "PASS (=1)",
+   "6": "PASS pick 11.2, pour 35.6, 5.8 mm, landing 10.2",
+   "7": "PASS pick 10.4, pour 74.9, tilt-in 66.0, 5.3 mm, landing 7.2",
+   "8": "PASS 17.3/17.7, carry 9.5, 7.9 mm"
+  }
+ }
+}
