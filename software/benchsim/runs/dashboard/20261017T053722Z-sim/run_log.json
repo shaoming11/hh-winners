@@ -1,0 +1,212 @@
+{
+ "schema": "benchsim.runlog/1",
+ "run_id": "20261017T053722Z-sim",
+ "mode": "sim",
+ "started_utc": "2026-10-17T05:37:22Z",
+ "finished_utc": "2026-10-17T05:37:49Z",
+ "config": {
+  "layout_source": "tools/layout/layout_final.json:update13_final",
+  "params_sha256": "62c630552aa8327f6f60432fb84a5fbf45ce353076f6e634765750a02bea095a",
+  "so101_revision": "5f6d2b876a53a4872e405b991dd925556c9e38a4",
+  "seed": 0
+ },
+ "protocol": {
+  "source": "preset",
+  "text": null,
+  "steps": [
+   {
+    "type": "TRANSFER",
+    "params": {
+     "beaker": "P1",
+     "src": "carousel_pick",
+     "dst": "scale_pan"
+    },
+    "label": "1 P1 carousel -> scale"
+   },
+   {
+    "type": "VERIFY_MASS",
+    "params": {
+     "beaker": "P1",
+     "target_g": 0.0,
+     "tol_g": 0.5
+    },
+    "label": "2 P1 is empty"
+   },
+   {
+    "type": "TRANSFER",
+    "params": {
+     "beaker": "P1",
+     "src": "scale_pan",
+     "dst": "carousel_pick"
+    },
+    "label": "3 P1 -> carousel"
+   }
+  ],
+  "validation": {
+   "ok": true,
+   "problems": []
+  },
+  "approved_by": "operator (sim)",
+  "approved_utc": "2026-10-17T05:37:26Z"
+ },
+ "steps": [
+  {
+   "index": 1,
+   "type": "TRANSFER",
+   "label": "1 P1 carousel -> scale",
+   "params": {
+    "beaker": "P1",
+    "src": "carousel_pick",
+    "dst": "scale_pan"
+   },
+   "status": "passed",
+   "reason": "grasp grasped",
+   "t_start": 0.095,
+   "t_end": 11.631,
+   "target": {},
+   "measured": {
+    "grasp_jaw_deg": 23.12,
+    "scale": [
+     {
+      "event": "place",
+      "before_g": -0.01,
+      "after_g": 17.99
+     }
+    ],
+    "scale_after_g": 17.987,
+    "beaker_tare_g": 17.987
+   },
+   "faults": []
+  },
+  {
+   "index": 2,
+   "type": "VERIFY_MASS",
+   "label": "2 P1 is empty",
+   "params": {
+    "beaker": "P1",
+    "target_g": 0.0,
+    "tol_g": 0.5
+   },
+   "status": "passed",
+   "reason": "content -0.00 g (error -0.00 g)",
+   "t_start": 11.631,
+   "t_end": 12.027,
+   "target": {
+    "content_g": 0.0,
+    "tol_g": 0.5
+   },
+   "measured": {
+    "scale_g": 17.982,
+    "tare_g": 17.987,
+    "tare": "measured",
+    "content_g": -0.005,
+    "error_g": -0.005
+   },
+   "faults": []
+  },
+  {
+   "index": 3,
+   "type": "TRANSFER",
+   "label": "3 P1 -> carousel",
+   "params": {
+    "beaker": "P1",
+    "src": "scale_pan",
+    "dst": "carousel_pick"
+   },
+   "status": "passed",
+   "reason": "grasp grasped",
+   "t_start": 12.027,
+   "t_end": 23.231,
+   "target": {},
+   "measured": {
+    "grasp_jaw_deg": 22.24,
+    "scale": [
+     {
+      "event": "lift",
+      "before_g": 17.98,
+      "after_g": 0.04
+     }
+    ]
+   },
+   "faults": []
+  }
+ ],
+ "faults": [],
+ "events": [
+  {
+   "t": 0.095,
+   "kind": "step_start",
+   "index": 1,
+   "type": "TRANSFER",
+   "label": "1 P1 carousel -> scale"
+  },
+  {
+   "t": 4.515,
+   "kind": "grasp",
+   "arm": "transfer",
+   "outcome": "grasped",
+   "jaw_deg": 23.12,
+   "expected_deg": 22.94
+  },
+  {
+   "t": 7.163,
+   "kind": "release",
+   "arm": "transfer",
+   "jaw_deg": 33.75
+  },
+  {
+   "t": 11.631,
+   "kind": "step_done",
+   "index": 1,
+   "status": "passed"
+  },
+  {
+   "t": 11.631,
+   "kind": "step_start",
+   "index": 2,
+   "type": "VERIFY_MASS",
+   "label": "2 P1 is empty"
+  },
+  {
+   "t": 12.027,
+   "kind": "step_done",
+   "index": 2,
+   "status": "passed"
+  },
+  {
+   "t": 12.027,
+   "kind": "step_start",
+   "index": 3,
+   "type": "TRANSFER",
+   "label": "3 P1 -> carousel"
+  },
+  {
+   "t": 16.383,
+   "kind": "grasp",
+   "arm": "transfer",
+   "outcome": "grasped",
+   "jaw_deg": 22.24,
+   "expected_deg": 22.94
+  },
+  {
+   "t": 19.511,
+   "kind": "release",
+   "arm": "transfer",
+   "jaw_deg": 33.75
+  },
+  {
+   "t": 23.231,
+   "kind": "step_done",
+   "index": 3,
+   "status": "passed"
+  }
+ ],
+ "traces": {},
+ "frames": [],
+ "video": null,
+ "summary": {
+  "passed": 3,
+  "failed": 0,
+  "skipped": 0
+ }
+}
