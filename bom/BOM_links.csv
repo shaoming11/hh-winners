@@ -1,0 +1,123 @@
+id,item,spec,qty_needed,pack_qty,packs_to_buy,link,price_each_pack,delivery_estimate_02215,status,note
+F-01,M3 SHCS assortment kit (Fgruh),"M3-0.5 SHCS 12.9 black, M3x6/8/10/12/16/20/25/30 + M3 hex nuts + washers",1 kit,1120 pc kit,1,https://www.amazon.com/dp/B0FGV5FCBN,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,Covers F-02..F-08. Per-length count not stated on the page; 1120 pc over 8 lengths + nuts + washers is far above the 15/length max needed.
+F-02,SHCS M3 x 8,"ISO 4762, 25T horn -> DH-02 v3 flange and horn stacks (CAD 8)",8 +20% = 10,in F-01,0,https://www.amazon.com/dp/B0FGV5FCBN,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,From F-01 kit.
+F-03,SHCS M3 x 12,"ISO 4762, deck->horn x4 + crank->horn x4 (CAD 8) + FB5311M ear screws x4 (FAS-20) if not supplied",12 +20% = 15,in F-01,0,https://www.amazon.com/dp/B0FGV5FCBN,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,From F-01 kit.
+F-04,SHCS M3 x 16,"ISO 4762, GR-03 finger clamps (CAD 9)",9 +20% = 11,in F-01,0,https://www.amazon.com/dp/B0FGV5FCBN,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,From F-01 kit.
+F-05,SHCS M3 x 20,"ISO 4762, DH-01 -> AG-01/PS-01 (CAD 4; BOM said 2)",4 +20% = 5,in F-01,0,https://www.amazon.com/dp/B0FGV5FCBN,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,From F-01 kit. CAD count used.
+F-06,SHCS M3 x 25,ISO 4762 (CAD 2; not in BOM.csv yet),2 +20% = 3,in F-01,0,https://www.amazon.com/dp/B0FGV5FCBN,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,From F-01 kit. New in CAD; add a BOM row.
+F-07,Hex nut M3,ISO 4032 (CAD 8),8 +20% = 10,in F-01 / F-09,0,https://www.amazon.com/dp/B0FGV5FCBN,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,In F-01 kit; F-09 also has 30 M3 hex.
+F-08,Washer M3,"Flat washer, horn-gap shims (FAS-17)",4 +20% = 5,in F-01,0,https://www.amazon.com/dp/B0FGV5FCBN,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,From F-01 kit.
+F-09,Nylon-insert lock nut + hex nut kit,"DIN 985 304 SS: M3 lock x30, M4 x25, M5 x20, M6/M8/M10; hex nuts M3 x30, M5 x20 ...",1 kit,206 pc kit,1,https://www.amazon.com/dp/B0F62DG4DV,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,Covers F-10..F-12.
+F-10,Nyloc nut M3,"DIN 985, GR-03 finger clamps (CAD 8)",8 +20% = 10,in F-09 (30),0,https://www.amazon.com/dp/B0F62DG4DV,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,Separate 120-pk B0FJ8QP76C no longer needed.
+F-11,Nyloc nut M5,DIN 985 (CAD 1),1 +1 = 2,in F-09 (20),0,https://www.amazon.com/dp/B0F62DG4DV,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+F-12,Hex nut M5,ISO 4032 (CAD 1),1 +1 = 2,in F-09 (20),0,https://www.amazon.com/dp/B0F62DG4DV,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,F-18 kit also has 40 M5 nuts.
+F-13,2020 M5 T-nut + M5 SHCS kit (JCSPBYL),"120 M5 drop-in T-nuts + 40 M5x8, 30 M5x10, 30 M5x12, 20 M5x14 SHCS",1 kit,240 pc kit,1,https://www.amazon.com/dp/B0DMCS8KW4,12.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,Covers F-14..F-17.
+F-14,T-nut 2020 drop-in M5,CAD 42 + jig plates 12 = 54,54 +20% = 65,in F-13 (120) + FR-02 (40),0,https://www.amazon.com/dp/B0DMCS8KW4,12.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,160 on hand after F-13 + FR-02. PS-01 taller post adds none (same bolts).
+F-15,SHCS M5 x 8,"ISO 4762, corner brackets 11 x 2 (CAD 22)",22 +20% = 27,in F-13 (40),0,https://www.amazon.com/dp/B0DMCS8KW4,12.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,FR-02 kit adds 40 more M5 screws (length not stated).
+F-16,SHCS M5 x 10,"ISO 4762, CAD 8 + alignment-jig plates 12 = 20",20 +20% = 24,in F-13 (30),0,https://www.amazon.com/dp/B0DMCS8KW4,12.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,"If you want more margin: 100-pk B0GHNN6HQ4 ($8.09, Thu)."
+F-17,SHCS M5 x 12,"ISO 4762, saddles/AG-01/PS-01/WS-01/RK-02 (CAD 11)",11 +20% = 14,in F-13 (30),0,https://www.amazon.com/dp/B0DMCS8KW4,12.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+F-18,M5 SHCS assortment kit (Fasteners Pro),72 SHCS M5x8/10/12/16/20/25/30/35 (~9 per length) + 40 hex nuts + 160 washers,1 kit,272 pc kit,1,https://www.amazon.com/dp/B0FGV561HZ,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,"Covers F-19, F-20."
+F-19,SHCS M5 x 20,"ISO 4762, four-bar pivots (BOM 3; CAD shows 1)",3 +1 = 4,in F-18 (~9),0,https://www.amazon.com/dp/B0FGV561HZ,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,BOM count used (CAD has 1). Snug + blue threadlock.
+F-20,SHCS M5 x 25,ISO 4762 (CAD 2),2 +1 = 3,in F-18 (~9),0,https://www.amazon.com/dp/B0FGV561HZ,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,Dedicated 60-pk B0GHNNR8YZ not needed.
+F-21,Set screw M3 x 12,"Cup point grub screw, WS-01 overload stop (FAS-09)",1,pack (count not stated),1,https://www.amazon.com/dp/B0DDHL6P99,6.89,"Thu Oct 15 (Prime), order by ~8:44 PM ET; only 2 left",buy,Only 2 left in stock: order early. Backup: Ace / Home Depot.
+F-22,ruthex M5 heat-set insert,RX-M5x9.5 brass (FAS-16),3,50,1,https://www.amazon.com/dp/B07YSVXWS8,9.99,"Thu Oct 15 (Prime), order by ~9:34 PM ET",buy,Install with TOO-01.
+F-23,M3 brass standoff kit,M3 male/female standoffs + screws + nuts (FAS-18),4 x M3x8,120 pc kit,1,https://www.amazon.com/dp/B06XQ33Y9X,8.99,"Thu Oct 15 (Prime), order by ~9:34 PM ET; only 13 left",buy,Only 13 left.
+F-24,SHCS M4 x 12,"ISO 4762, load cell + pan (CAD 4)",4,-,0,,,,have,M4 screws on hand.
+F-25,SHCS M4 x 20,"ISO 4762 12.9, arm back row (CAD 4)",4,-,0,,,,have,M4 screws on hand.
+F-26,BHCS M4 x 20,"ISO 7380 button head, arm front row (CAD 4, CDR-11)",4,-,0,https://www.amazon.com/dp/B07H17FG9R,8.89,"(fallback) Thu Oct 15 (Prime), order by ~11:39 PM ET",have,"M4 on hand: confirm they are BUTTON head. If not, link is Fullerkreg 50-pk ($8.89, Thu)."
+F-27,T-nut 2020 drop-in M4,CAD 8,8,-,0,,,,have,M4 T-nuts on hand.
+F-28,M45CHW servo ear screws,Supplied with servos (FAS-06),8,-,0,,,,have,Come with the servos.
+FR-01,"2020 aluminium extrusion, 400 mm","CAD: frame 4 + E5, E6, S1, S2",8,-,0,,,,have,Owner has 8 x 400 mm.
+FR-02,2020 inside corner bracket kit (TOCLUX),20 black alu brackets + 40 M5 T-nuts + 40 M5 SHCS,11 (CAD),20 sets,1,https://www.amazon.com/dp/B0F1B85397,14.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,CAD has 11 brackets; BOM only listed 4 owned. Skip if you already have 11.
+FR-03,SO-101 follower arm,"Stock, TheRobotStudio",2,-,0,,,,have,Borrowed from SIGRobotics.
+FR-04,BESSEY CM34DR deep-reach C-clamp,3 in x 4-1/2 in,2,2,1,https://www.amazon.com/dp/B0CBZ9J74Y,19.06,"Thu Oct 15 (Prime), order by ~8:39 PM ET",buy,Measure overall length (>7 in must be checked).
+FR-05,"BESSEY CM40 C-clamp, 4 in (fallback)",Only if CM34DR cannot fly,2,1,2,https://www.amazon.com/dp/B0006694IC,6.76,"Thu Oct 15 (Prime), order by ~11:39 PM ET",verify,HDW-05 fallback; otherwise buy in Cambridge.
+FR-06,F625ZZ flanged bearing,5 x 16 x 5 mm (uxcell),6,10,1,https://www.amazon.com/dp/B0G1B256ZS,8.49,"Thu Oct 15 (Prime), order by ~11:39 PM ET; only 5 left",buy,Only 5 left: order first.
+FR-07,"Lazy Susan bearing, 4 in",9.4 mm thick (CON-15),1,8,1,https://www.amazon.com/dp/B08CY2P8KZ,15.99,"Thu Oct 15 (Prime), order by ~9:19 PM ET",buy,
+FR-08,PTFE stick-on glides 20 mm,"CON-14, under ST-04",4,20,1,https://www.amazon.com/dp/B08HWC3CSP,8.99,"Thu Oct 15 (Prime), order by ~9:19 PM ET",buy,
+FR-09,2020 slot cover strip,6 m (CON-20),1,6 m,1,https://www.amazon.com/dp/B09KPZBTB9,11.98,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-01,2S LiPo 7.4 V >=2200 mAh XT60,,1,-,0,,,,have,Owner bringing it.
+ELE-02,OVONIC Mate1 2S balance charger,"100 W, XT60",1,1,1,https://www.amazon.com/dp/B0G6CV6BNR,50.99,"Thu Oct 15 (Prime), order by ~9:34 PM ET",buy,Skip if a charger comes with the pack.
+ELE-03,Zeee LiPo safe bag,,1,1,1,https://www.amazon.com/dp/B07KZQZBN2,13.49,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-04,LiPo cell checker 1-8S,,1,1,1,https://www.amazon.com/dp/B013U1CP08,5.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-05,Sabrent 4-port powered USB 3.0 hub,HB-UM43,1,1,1,https://www.amazon.com/dp/B00TPMEOYM,19.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-06,Arduino Mega 2560 Pro,,1,-,0,,,,have,
+ELE-07,USB-A to micro-USB cable,Amazon Basics,1,2,1,https://www.amazon.com/dp/B0719H12WD,7.25,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,Confirm the board connector is micro-USB.
+ELE-08,ShangHJ 1 kg load cell + HX711,,1,2 sets,1,https://www.amazon.com/dp/B09K7G51KJ,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-12,20 AWG JR servo extension 100 cm,"BackBayRC, safety clip",2,5,1,https://www.amazon.com/dp/B0CXR2YBS4,24.49,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-13,20 AWG JR servo extension 30 cm,BackBayRC twisted,2,5,1,https://www.amazon.com/dp/B0CXQ8RZH8,14.49,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-14,16 AWG silicone wire red+black,10 ft each,1,1,1,https://www.amazon.com/dp/B0D93K21TN,7.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-15,20 AWG silicone wire red+black,10 ft each,1,1,1,https://www.amazon.com/dp/B01AAX64EC,8.48,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-16,22 AWG stranded hook-up wire,6 colours x 10 ft,1,1,1,https://www.amazon.com/dp/B089CQHRDT,12.79,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-17,"WAGO 221 lever-nut kit, 28 pc",incl. exactly 4 x 221-415 (5-way),4 x 221-415,28 pc,1,https://www.amazon.com/dp/B0CJ5QF3VX,20.95,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,Replaces the 12-pc kit (only 3 x 221-415) + local 4th. Genuine 25-pk B0107SYYGU is Sat.
+ELE-18,Inline ATO fuse holder 16 AWG,Anyongora,3,4,1,https://www.amazon.com/dp/B0F6NPV287,7.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-19,ATO blade fuse 3 A,Covers ELE-42 too,5,20,1,https://www.amazon.com/dp/B0DHS1GTC7,3.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-21,ATO blade fuse 10 A,,2,25,1,https://www.amazon.com/dp/B0DSCGW488,4.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-22,XT60 lead with inline blade-fuse holder,,1,2,1,https://www.amazon.com/dp/B0BZ7Y1DQY,12.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-23,"Taiss 22 mm e-stop, 2 NC, in station box",Red latching mushroom,1,1,1,https://www.amazon.com/dp/B07GPF76R1,16.99,"Fri Oct 16 (Prime), order by ~11:59 PM ET",buy,FRIDAY only. Order with ELE-23b as backup.
+ELE-23b,TWTADE 22 mm 2 NC e-stop (bare),"Panel mount, Thursday backup",1,1,1,https://www.amazon.com/dp/B07NP44T74,13.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,Mount in a 22 mm hole in HDW-07 if the boxed one is late.
+ELE-24,"HiLetgo 5 V 1-ch relay, H/L jumper",,1,2,1,https://www.amazon.com/dp/B00LW15A4W,7.39,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-25,Metal film resistor kit 1/4 W,50 values,3,kit,1,https://www.amazon.com/dp/B0CDWVLTM1,8.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-26,HiLetgo INA226 module,,1,2,1,https://www.amazon.com/dp/B0CDWXB8PG,10.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-27,2512 2 W R010 shunt,10 mOhm,1,50,1,https://www.amazon.com/dp/B0FVM8PRL5,5.99,"Fri Oct 16 (Prime), order by ~11:59 PM ET; only 15 left",buy,FRIDAY only; fallback = INA226 onboard R100.
+ELE-28,Rubycon 2200 uF 16 V low-ESR,,1,1,1,https://www.amazon.com/dp/B0FVGBGMW2,6.99,"Thu Oct 15 (Prime), order by ~9:34 PM ET",buy,
+ELE-29,FlashHobby M45CHW servo,Carousel + stage,2,-,0,,,,have,Owned (per user).
+ELE-30,"FlashHobby M45CHW servo, spare",45 kg 25T,1,1,1,https://www.amazon.com/dp/B09VBFZ9KW,44.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET; only 17 left",buy,CDR-42 spare. Only 17 left.
+ELE-31,Treedix 25T aluminium disc horn,"20 dia, 14 mm BC, M3; also covers ELE-41",3,10,1,https://www.amazon.com/dp/B0875ZS9KF,8.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET; only 11 left",buy,Only 11 left.
+ELE-32,470 uF 16 V electrolytic,8 x 12 mm,1,pack,1,https://www.amazon.com/dp/B0CMQCQMH5,5.99,"Thu Oct 15 (Prime), order by ~9:19 PM ET",buy,Not marked low-ESR (low-ESR B0D78PQ4C1 was Fri only).
+ELE-33,Ceramic capacitor kit (100 nF),24 values,1,kit,1,https://www.amazon.com/dp/B0C1V8Q93P,9.99,"Thu Oct 15 (Prime), order by ~7:39 PM ET",buy,Earliest cutoff.
+ELE-34,A3144 Hall sensor,,3,20,1,https://www.amazon.com/dp/B0CZ6QXMZ2,6.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-35,N52 6 x 2 mm magnet,,4,50,1,https://www.amazon.com/dp/B0H55FXL9W,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+ELE-36a,Perfboard kit (DIY screw-terminal breakout),"Double-sided, 5 sizes",1,54,1,https://www.amazon.com/dp/B0G4QTPVZ8,8.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,No Mega 2560 PRO screw-terminal shield on Amazon (only full-size R3 shields). Build one on perfboard.
+ELE-36b,Screw terminal block 2-pin 3.5 mm,PCB mount,~20,50,1,https://www.amazon.com/dp/B01C3DGIBQ,8.79,"Thu Oct 15 (Prime), order by ~10:04 PM ET; only 16 left",buy,For ELE-36a.
+ELE-37a,"Arm power adapter 5 V 8 A, Class 2","BTF-LIGHTING, 5.5 x 2.1 plug, ETL",2,1,2,https://www.amazon.com/dp/B0G4KLQKR9,25.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",verify,"Buy ONE family only, after SIGRobotics confirms motor voltage."
+ELE-37b,Arm power adapter 12 V 8 A,"JOYLIT 96 W, 5.5 x 2.1 centre-positive",2,1,2,https://www.amazon.com/dp/B015G8E7JU,17.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",verify,Alternative if arms are 12 V. Class II (2-prong) not confirmed on the page.
+ELE-38,Switched power strip,6 individually switched outlets,1,1,1,https://www.amazon.com/dp/B0GF26Y1TF,19.99,"Thu Oct 15 (Prime), order by ~11:54 PM ET",buy,Label ARMS OFF.
+ELE-39,4-core shielded cable 22 AWG,25 ft,1,25 ft,1,https://www.amazon.com/dp/B0D9JY3MC4,16.99,"Thu Oct 15 (Prime), order by ~11:54 PM ET",verify,Only if the HX711 moves into EL-02.
+ELE-40,Feetech FB5311M-360 servo,,1,-,0,,,,have,Owned.
+ELE-41,25T horn for FB5311M-360,From ELE-31 10-pack,1,in ELE-31,0,https://www.amazon.com/dp/B0875ZS9KF,8.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET; only 11 left",buy,No extra purchase.
+HDW-07,ABS project box (EL-02),200 x 120 x 75,1,1,1,https://www.amazon.com/dp/B06XSQZ5M6,9.99,"Thu Oct 15 (Prime), order by ~9:19 PM ET",buy,
+GLS-01,Karter 250 mL narrow-mouth Erlenmeyer,Borosilicate 3.3,2,1,2,https://www.amazon.com/dp/B006VYY10Y,8.20,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,1 + 1 spare.
+GLS-02,Glass stir rods 6 mm x 6 in,Borosilicate (Gardena),4,15,1,https://www.amazon.com/dp/B0D1NCM4R4,8.98,"Thu Oct 15 (Prime), order by ~9:34 PM ET",buy,Substitute for B099QK8PX8 (Fri).
+GLS-03,Karter 100 mL graduated cylinder,Borosilicate 3.3,1,1,1,https://www.amazon.com/dp/B006UKIASI,10.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+LAB-02,EISCO 100 mL PP beaker,"CH0137B-12, 56 x 74; 3 rack + 4 carousel + 2 spare",9,12,1,https://www.amazon.com/dp/B00BHLE5RU,16.29,"Fri Oct 16 (Prime), order by ~11:59 PM ET",buy,"Pack verified: Unit Count 12, model CH0137B-12. FRIDAY only."
+LAB-01,EISCO 50 mL PP beaker,Single per listing,0 (superseded),1,0,https://www.amazon.com/dp/B00BHLE5AW,9.19,"Fri Oct 16 (Prime), order by ~8:14 PM ET; only 11 left",verify,"Replaced by 100 mL. Buy only if the scale/mix positions still need 50 mL (now Fri, 11 left)."
+LAB-03,EISCO 4 in PP funnel,"102 mouth, 20 OD stem",1,1,1,https://www.amazon.com/dp/B017UYYKSQ,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+LAB-04,"Clear PP storage bin with lid, 3.5 qt",Waste/rinse bin (REF-BIN ~110 x 80 x 100),1,1,1,https://www.amazon.com/dp/B094KXYV3Q,12.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET; only 20 left",verify,Purpose of REF-BIN unconfirmed; larger than the CAD body.
+CHM-01,"12 % hydrogen peroxide, 32 fl oz (MAXTITE)","Clear liquid 12 % H2O2 (= 40 vol), food grade",2,1,2,https://www.amazon.com/dp/B09HW9VJGQ,13.95,"Fri Oct 16 (Prime), order by ~11:14 PM ET",buy,Salon Care 40 Vol CLEAR (B004OKA0EI) has no Amazon buy box. FRIDAY only. Backup: Sally Beauty Cambridge (in store).
+CHM-02,Dawn Ultra dish soap 7.5 oz,,1,3,1,https://www.amazon.com/dp/B084P9759D,12.60,"Thu Oct 15 (Prime), order by ~10:59 PM ET",buy,
+CHM-03,"Liquid food colouring, 4 colours",Amazon Grocery,1,4,1,https://www.amazon.com/dp/B08CYBKJX4,3.14,"Thu Oct 15 (Prime), order by ~10:59 PM ET",buy,
+CHM-04,Instant dry yeast packets,One in a Mill,12,12,1,https://www.amazon.com/dp/B09HVZ79JL,14.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,Also needed Thu for the CDR-05 auger test.
+CON-01,3M 4950 VHB tape 1 in x 5 yd,,1,1,1,https://www.amazon.com/dp/B007Y7GIKI,22.29,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-02,"Cork sheet 3 mm, 12 x 12 in",BENECREAT,1,8,1,https://www.amazon.com/dp/B0CKL6KLQS,16.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-03,1 mm adhesive silicone rubber sheet,9 x 12 in,1,1,1,https://www.amazon.com/dp/B0CZNYD9PP,8.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET; only 18 left",buy,
+CON-04,Reynolds plastic wrap,225 sq ft,1,1,1,https://www.amazon.com/dp/B07WD9PF7T,5.19,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-05,Trimaco 4 mil drop cloth 9 x 12 ft,,1,1,1,https://www.amazon.com/dp/B00004YOTS,11.69,"Thu Oct 15 (Prime), order by ~11:54 PM ET",buy,
+CON-06,Oil Eater absorbent spill pads,,1,pack,1,https://www.amazon.com/dp/B09X24M4B8,8.40,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-07,ELEGOO Kapton tape,,1,4,1,https://www.amazon.com/dp/B072Z92QZ2,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-08,ASI 388 neutral-cure silicone 2.8 oz,,1,1,1,https://www.amazon.com/dp/B0063U2RT8,9.95,"Fri Oct 16 (Prime), order by ~11:59 PM ET",buy,Buy-box offer FRIDAY; a second offer on the page shows Thu. Or Home Depot/Ace.
+CON-09,Loctite 242 blue threadlocker,,1,1,1,https://www.amazon.com/dp/B000I1RSNS,7.02,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-10,Ginsco heat-shrink kit,,1,580,1,https://www.amazon.com/dp/B01MFA3OFA,7.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-11,Zip ties 4 in,,1,200,1,https://www.amazon.com/dp/B0BC1VH4XB,3.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-12,Adhesive cable-tie mounts 3/4 in,,10,100,1,https://www.amazon.com/dp/B07M69LK65,6.99,"Thu Oct 15 (Prime), order by ~11:54 PM ET",buy,
+CON-13,"Sharpie ultra-fine marker, black",80 mL fill line,1,2,1,https://www.amazon.com/dp/B00144862U,1.97,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-16,"PLA filament, white",,1 kg,-,0,,,,have,
+CON-17,SUNLU TPU 95A 1.75 mm,~70 g needed,1,1 kg,1,https://www.amazon.com/dp/B0BXNWK6NS,21.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,Skip if a TPU spool is on hand.
+CON-18a,Bounty paper towels,2 triple rolls,1,2,1,https://www.amazon.com/dp/B0DQYR6X8R,7.32,"Thu Oct 15 (Prime), order by ~11:14 PM ET",buy,
+CON-18b,Hefty 13 gal trash bags,,1,40,1,https://www.amazon.com/dp/B01BZ0N8SO,11.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-19,VELCRO heavy-duty strips 4 x 2 in,,1,8,1,https://www.amazon.com/dp/B09BNPX3XJ,8.65,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-21,"Electrical tape, 4 colours",incl. red + blue,1,4,1,https://www.amazon.com/dp/B0C62DM4H8,7.89,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-22,63/37 rosin-core solder 0.8 mm,50 g,1,1,1,https://www.amazon.com/dp/B075WB98FJ,8.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CON-23,120-grit sandpaper,9 x 11 in,1,12,1,https://www.amazon.com/dp/B0BWN8J1FZ,8.99,"Thu Oct 15 (Prime), order by ~10:04 PM ET",buy,
+TOO-01,Pinecil soldering iron,,1,1,1,https://www.amazon.com/dp/B096X6SG13,39.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,Skip if owned.
+TOO-02,AMTOVL long metric hex keys,"1.5-10 mm, 9 pc",1,9,1,https://www.amazon.com/dp/B0CJBRYQF3,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,TSA: carry only keys <=7 in.
+TOO-03,HARFINGTON 14 mm HSS drill,"10 mm shank, 158 mm OAL",1,1,1,https://www.amazon.com/dp/B0F679NDD6,8.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+TOO-04,GMTOOLS countersink set,,1,5,1,https://www.amazon.com/dp/B0CWLCZ51W,13.99,"Thu Oct 15 (Prime), order by ~10:59 PM ET",buy,
+TOO-05,AstroAI digital multimeter,,1,1,1,https://www.amazon.com/dp/B08DHHJPS1,18.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,Skip if owned.
+TOO-06,Digital luggage scale,,1,1,1,https://www.amazon.com/dp/B07QFTGGYF,9.99,"Thu Oct 15 (Prime), order by ~10:59 PM ET",buy,
+TOO-07,TempPro instant-read thermometer,reads 40 C,1,1,1,https://www.amazon.com/dp/B01LET2BFC,9.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+SAF-01,Quest safety glasses ANSI Z87.1,,2,2,1,https://www.amazon.com/dp/B0CZ7K4Q9S,7.99,"Thu Oct 15 (Prime), order by ~7:39 PM ET",buy,Earliest cutoff.
+SAF-02,Indirect-vent splash goggles,Anti-fog,2,1,2,https://www.amazon.com/dp/B0CJVDBZW3,7.99,"Thu Oct 15 (Prime), order by ~9:34 PM ET",buy,Pack size not stated on page; assumed 1.
+SAF-03,Supmedic nitrile gloves,Pick size,1,100,1,https://www.amazon.com/dp/B0C9S5PMSD,8.97,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CLB-01,MAGIKON 100 g M2 calibration weight,,1,1,1,https://www.amazon.com/dp/B078N1TRDC,4.99,"Thu Oct 15 (Prime), order by ~11:39 PM ET",buy,
+CLB-02,US nickels (backup),,20,-,0,,,,have,
