@@ -155,12 +155,15 @@ def _play_to(world: BenchWorld, bus: SimArmBus, arm: str,
 def transfer_beaker(world: BenchWorld, arm: str, beaker: str,
                     destination_site_xyz_m: tuple[float, float, float], *,
                     clearance_mm: float = 60.0,
-                    speed_deg_s: float = 55.0) -> dict:
-    """Transfer one empty beaker and verify that it lands upright on the receiver.
+                    speed_deg_s: float = 55.0,
+                    release_after: bool = True) -> dict:
+    """Transfer one beaker along a joint-limited path while keeping it upright.
 
     The planner samples a Cartesian path and constrains the held beaker's vertical
     axis to remain upright. It keeps at least 5 degrees of joint-limit margin. An
-    outward escape waypoint clears the carousel before the higher carry path.
+    outward escape waypoint clears the carousel before the higher carry path. By
+    default the beaker is released at the destination; ``release_after=False``
+    leaves it attached so a later motion such as pouring can continue from there.
     Grasping remains the proximity plus weld abstraction documented in the README.
     """
     if arm not in ("pourer", "transfer"):
@@ -225,12 +228,13 @@ def transfer_beaker(world: BenchWorld, arm: str, beaker: str,
         for contact in motion["arm_contacts"]
     ]
 
-    # Give the soft grasp constraint time to correct small contact deflections at the pan.
-    world.step(2.0)
+    # Give the soft grasp constraint time to correct small contact deflections at the receiver.
+    world.step(2.0 if release_after else 0.2)
     pre_release_error_mm = float(np.linalg.norm(
         world.site_pose(object_site)[0] - destination) * 1000)
-    world.release(arm)
-    world.step(2.0)
+    if release_after:
+        world.release(arm)
+        world.step(2.0)
     final_site, _ = world.site_pose(object_site)
     final_error_mm = float(np.linalg.norm(final_site - destination) * 1000)
     final_body_pos, final_body_rot = world.body_pose(beaker)
@@ -245,7 +249,7 @@ def transfer_beaker(world: BenchWorld, arm: str, beaker: str,
         "arm": arm,
         "beaker": beaker,
         "grasp": grasp,
-        "released": beaker,
+        "released": beaker if release_after else None,
         "source_site_xyz_m": pick_xyz.tolist(),
         "destination_site_xyz_m": destination.tolist(),
         "reach_error_mm": reach_error_mm,

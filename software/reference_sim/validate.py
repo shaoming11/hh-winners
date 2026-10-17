@@ -9,6 +9,7 @@ from verify_motion import run as verify_motion
 from verify_transfer import run as verify_transfer
 from verify_carousel import run as verify_carousel
 from verify_rack_transfer import run as verify_rack_transfer
+from verify_pour import run as verify_pour
 from verify_foam import run as verify_foam
 
 
@@ -19,6 +20,7 @@ def main() -> None:
     transfer = verify_transfer()
     carousel = verify_carousel()
     rack_transfer = verify_rack_transfer()
+    physical_pour = verify_pour()
     foam = verify_foam()
 
     result = run()
@@ -72,6 +74,9 @@ def main() -> None:
     print(f"PASS: four carousel beakers follow a {carousel['reached_deg']:.2f}° index and stay in their pockets")
     print(f"PASS: rack-to-scale transfer lands {rack_transfer['final_site_error_mm']:.2f} mm off target, "
           f"tilt {rack_transfer['upright_error_deg']:.2f}°")
+    print(f"PASS: arm-driven pour lands {physical_pour['landed_g']:.2f} g, "
+          f"spill {physical_pour['spilled_g']:.2f} g, peak tilt "
+          f"{physical_pour['peak_tilt_deg']:.1f}°")
     print(f"PASS: analytical foam reaches {foam['peak_height_mm']:.1f} mm; "
           f"oxygen estimate {foam['oxygen_estimate_l']:.2f} L")
     print("PASS: SO-101 joint command, JSON-line codec, and simulated mechanism commands respond")

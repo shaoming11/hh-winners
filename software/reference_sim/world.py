@@ -124,7 +124,23 @@ class BenchWorld:
         local_rot = object_rot.T @ tool_rot
         self.model.site_pos[sid] = local_pos
         self.model.site_quat[sid] = self._matrix_quaternion(local_rot)
+        # Refresh equality data without losing the live poses of other free bodies.
+        live_state = {
+            "qpos": self.data.qpos.copy(),
+            "qvel": self.data.qvel.copy(),
+            "act": self.data.act.copy(),
+            "ctrl": self.data.ctrl.copy(),
+            "eq_active": self.data.eq_active.copy(),
+            "time": float(self.data.time),
+        }
         mujoco.mj_setConst(self.model, self.data)
+        self.data.qpos[:] = live_state["qpos"]
+        self.data.qvel[:] = live_state["qvel"]
+        self.data.act[:] = live_state["act"]
+        self.data.ctrl[:] = live_state["ctrl"]
+        self.data.eq_active[:] = live_state["eq_active"]
+        self.data.qacc_warmstart[:] = 0.0
+        self.data.time = live_state["time"]
         eqid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_EQUALITY,
                                  f"weld_{arm}_{beaker}")
         if eqid < 0:
