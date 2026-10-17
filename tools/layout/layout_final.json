@@ -472,17 +472,17 @@
   },
   "carousel": {
    "centre": [
-    807.9,
-    523.5
+    755.7,
+    325.0
    ],
-   "rotation_deg": 220.6,
+   "rotation_deg": 180.0,
    "pick": [
-    744.1,
-    468.8
+    715.3,
+    398.6
    ],
    "auger": [
-    871.6,
-    578.2
+    796.1,
+    251.4
    ],
    "tape_centre": [
     562.9,
@@ -497,7 +497,7 @@
     148.2
    ],
    "beaker_bottom_z": 61.7,
-   "mount": "loose"
+   "mount": "TRIAL: TT-01 rail saddle on Y-right, base flush with the rail front end (branch try-saddle-carousel)"
   },
   "rack_stands": [
    {
@@ -553,8 +553,8 @@
    },
    "transfer": {
     "carousel_pick": [
-     191.1,
-     48
+     229.4,
+     28.8
     ],
     "scale": [
      193.3,
