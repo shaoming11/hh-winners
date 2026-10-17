@@ -194,7 +194,7 @@ def plan_lines(steps):
 def review_lines(rv):
     """what the operator sees: source, numbered plan, validation result"""
     o = ['PROTOCOL SOURCE: %s' % rv['source'] + (' (%s)' % rv['model'] if rv.get('model') and rv['source'] == 'llm' else '')]
-    if rv.get('fallback_reason'): o.append('  preset used because: %s' % rv['fallback_reason'])
+    if rv.get('fallback_reason'): o.append('  %s because: %s' % ('preset used' if rv['source'] == 'preset' else 'no plan', rv['fallback_reason']))
     if rv.get('notes'): o.append('  notes: %s' % rv['notes'])
     o.append('PLAN (%d steps, sha256 %s):' % (len(rv['steps']), rv['plan_sha256'][:12]))
     o += plan_lines(rv['steps'])
