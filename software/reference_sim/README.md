@@ -17,6 +17,7 @@ software/reference_sim/.venv/bin/python software/reference_sim/build_scene.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_layout.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_motion.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_transfer.py
+software/reference_sim/.venv/bin/python software/reference_sim/verify_carousel.py
 software/reference_sim/.venv/bin/python software/reference_sim/run_demo.py --physical-p1-transfer
 software/reference_sim/.venv/bin/python software/reference_sim/viewer.py
 ```
@@ -58,6 +59,8 @@ degrees and actuated by the official MuJoCo position servos.
   a 40 mm lift, and a small wrist move while holding the beaker.
 - `verify_transfer.py` executes the empty P1 carousel-to-scale transfer, including an outward
   escape, a lifted carry, release, and upright-placement measurement.
+- `verify_carousel.py` checks that all four dynamic beakers follow a 45 degree carousel index while
+  staying on the 84 mm pocket radius and upright.
 - `run_demo.py --physical-p1-transfer` runs that same arm transfer as step 1 of the analytical
   10-step scenario and records the motion metrics in `build/reference_run.json`.
 
