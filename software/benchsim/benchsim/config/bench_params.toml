@@ -255,3 +255,35 @@ fill_offset_ml = 9.2                        # 5.2 V_first = V_table(theta_first)
 low_fill_ml = 36.0                          # 5.2 PAUSE("refill water") below 1.2 x 30 mL
 fill_offset_ml = 9.2                        # assumed equal to the developer value (same beaker; the liquid model has no
                                             # viscosity term); 5.2 says measure it from 3 weighed-fill water pours
+
+[auger_model]
+# benchsim.chem.auger (analytic dosing model, not a granular-flow simulation) and the host dosing procedure in
+# benchsim.mechanisms. g/rev mean and CV are [auger] g_per_rev_nominal and g_per_rev_cv.
+true_over_nominal = 1.0                     # simulated screw's true g/rev over g_per_rev_nominal: assumed (no calibration yet)
+recover_dispenses = false                   # assumed: forward travel that re-covers a reversed angle dispenses nothing
+hopper_window_rev = 10                      # electrical.md 6: "if 10 revolutions add less than 1 g, fault"
+hopper_load_g = 40.0                        # assumed: one hopper fill (architecture 5: refill every 4 runs of 7 g)
+rev_resolution = 0.1                        # architecture 6 / 7.4: round((target - m) / g_per_rev, 0.1) rev; AUG <revs x 10>
+cal_revs = 10.0                             # architecture 6: calibrate_auger.py, 3 x 10 rev into a tared cup
+cal_runs = 3                                # architecture 6
+host_reply_margin_s = 2.0                   # assumed: host waits this long past the Mega's AUG timeout before giving up
+
+[foam]
+# benchsim.chem.foam: analytic elephant-toothpaste model (not CFD). First-order H2O2 decomposition after an induction
+# delay; soap traps part of the O2 as foam, which fills the flask headspace, then a column above the neck, then
+# overflows into the catch well. Approximations are listed in the module docstring.
+h2o2_mass_frac = 0.12                       # demo_process 1: 12 % H2O2 (40-volume clear developer)
+h2o2_molar_mass = 34.015                    # g/mol; 2 H2O2 -> 2 H2O + O2
+o2_molar_volume_l = 24.47                   # L/mol, ideal gas at 25 C, 101.325 kPa: 39 g developer -> 1.68 L O2 (demo_process 1: ~1.7 L)
+induction_s = 2.0                           # assumed: catalyst mixing/wetting delay after yeast meets peroxide
+k_ml_per_g_s = 1.2                          # assumed: k = k_ml_per_g_s * yeast g / liquid mL (7 g in ~94 mL -> 0.09 /s, half-life ~8 s)
+soap_min_g = 1.0                            # assumed: less soap than this traps no foam
+trap_frac_soap = 0.7                        # assumed: fraction of the released O2 held in foam when soap is present
+trap_frac_no_soap = 0.0                     # assumed: without soap the bubbles burst at the surface
+liquid_frac = 0.05                          # assumed: foam liquid volume fraction (expansion ratio 20); foam liquid <= flask liquid
+collapse_tau_s = 30.0                       # assumed: drainage/collapse time constant of standing foam
+column_max_mm = 200.0                       # assumed: tallest standing column above the neck before it topples into the catch well
+dye_g = 0.2                                 # assumed: "a few drops" of food colouring with the soap (demo_process 1)
+rgba_dyed = [1.0, 0.45, 0.6, 0.95]          # scene.py foam colour (food colouring)
+rgba_plain = [0.96, 0.95, 0.90, 0.95]       # assumed: undyed foam
+update_dt_s = 0.01                          # model integration step (s)
