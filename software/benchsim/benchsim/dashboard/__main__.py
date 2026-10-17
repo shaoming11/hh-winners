@@ -2,7 +2,7 @@
 
     python -m benchsim.dashboard                       # http://127.0.0.1:8765, real-time pacing
     python -m benchsim.dashboard --speed 2             # twice real time (0 = as fast as the sim goes; also live on the page)
-    python -m benchsim.dashboard --dev                 # quick 3-step protocol instead of the full 12-step demo
+    python -m benchsim.dashboard --dev                 # quick 3-step protocol instead of the full 11-step demo
     python -m benchsim.dashboard --host 0.0.0.0        # reachable from another screen on the LAN
     python -m benchsim.dashboard --plain               # the bare MuJoCo scene, without the camera look (benchsim.fx)
     python -m benchsim.dashboard --replay runs/dashboard/<run_id>   # play back a recorded run (no simulation)
