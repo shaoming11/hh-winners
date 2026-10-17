@@ -50,10 +50,12 @@ def test_slider_crank_formula():
 def test_carousel_station_angles(fresh):
     model, b = fresh; bench = b.bench; C = bench['params']['carousel']; st = bench['stations']
     tab = {(r['pocket'], r['station']): r['deck_deg'] for r in station_table(bench)}
-    want = {(0, 'pick'): 0, (0, 'auger'): 180, (1, 'pick'): 270, (1, 'auger'): 90, (2, 'pick'): 180, (2, 'auger'): 0, (3, 'pick'): 90, (3, 'auger'): 270}
+    # deck range measured on the bench 2026-10-17 is [-110, 250]: the 270-deg stops are reached as -90
+    want = {(0, 'pick'): 0, (0, 'auger'): 180, (1, 'pick'): -90, (1, 'auger'): 90, (2, 'pick'): 180, (2, 'auger'): 0, (3, 'pick'): 90, (3, 'auger'): -90}
     for k, v in want.items(): assert tab[k] == pytest.approx(v, abs=0.1), k
     assert all(C['deck_range_deg'][0] <= v <= C['deck_range_deg'][1] for v in tab.values())
-    assert deck_angle(0.0, 300.0, C['deck_range_deg']) is None          # outside the 270 deg servo travel + trim
+    assert deck_angle(0.0, 300.0, C['deck_range_deg']) == pytest.approx(-60.0)   # 300 deg is reached the short way round
+    assert deck_angle(0.0, 300.0, (-10.0, 280.0)) is None                      # outside a 290-deg window
     d = mujoco.MjData(model); qa = model.joint('carousel').qposadr[0]
     for (k, s), a in tab.items():                     # the compiled model puts that pocket on the update13_final station
         d.qpos[qa] = math.radians(a); mujoco.mj_kinematics(model, d)

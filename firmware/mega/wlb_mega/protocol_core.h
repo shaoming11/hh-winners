@@ -128,6 +128,10 @@ struct Config {
     uint16_t aug_us_stop, aug_us_offset;
     int8_t aug_dir_sign;       // pulse offset sign for dir = +1
     int8_t aug_fb_sign;        // feedback angle change sign when the pulse is above the stop centre
+    uint8_t aug_timed;         // 1 = no feedback wire: progress from time at aug_rev_per_s, no stall rule
+    float aug_rev_per_s;       // measured auger speed at aug_us_offset (timed mode)
+    uint32_t aug_start_ms;     // timed mode: spin-up time not counted as progress at the start of each dose
+    float aug_coast_rev;       // timed mode: turns the screw coasts after the stop pulse; credited at the start of a dose
     uint16_t aug_adc_min, aug_adc_max;
     uint32_t stall_window_ms;
     float stall_min_deg;
@@ -189,7 +193,7 @@ private:
     };
     struct Auger {
         int32_t seq;
-        uint32_t t0, win_t0, next_prog;
+        uint32_t t0, win_t0, next_prog, last_t;
         float target, net, hw, win_net, rev_until, last_fb;
         int8_t dir;
         uint8_t phase, after, stalls, glitches;

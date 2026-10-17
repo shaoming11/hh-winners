@@ -18,7 +18,17 @@
 // ------------------------------------------------------------------ pins (electrical.md 4)
 #define ESTOP_PIN 2                 // D2 = PE4 / INT4: NC contact to GND, INPUT_PULLUP; HIGH = pressed or wire broken
 #define ESTOP_BIT _BV(PE4)
-#define HX_DT_BIT _BV(PE3)          // D5 = PE3: HX711 DOUT, read on PINE (moved from D3 to fit the bench wiring)
+// LOCAL BRING-UP ONLY (never flash for a run): build with -DWLB_NO_ESTOP to treat D2 as released when no
+// e-stop is wired. Unplugging the pack is then the only stop.
+#ifdef WLB_NO_ESTOP
+#define ESTOP_OPEN() false
+#else
+#define ESTOP_OPEN() ((PINE & ESTOP_BIT) != 0)
+#endif
+#define HX_DT_BIT _BV(PB5)          // D11 = PB5: HX711 DOUT (moved from D3 to fit the bench wiring)
+#define HX_DT_PIN PINB
+#define HX_DT_DDR DDRB
+#define HX_DT_PORT PORTB
 #define HX_SCK_BIT _BV(PG5)         // D4 = PG5: HX711 SCK, written on PORTG
 #define TT_BIT _BV(PH3)             // D6 = PH3 / OC4A: carousel M45CHW
 #define ST_BIT _BV(PH4)             // D7 = PH4 / OC4B: stage M45CHW
@@ -69,7 +79,7 @@ static void pwm_init() {
 // Connecting a compare output mid-frame could emit one truncated pulse; outputs are connected here, at the
 // frame start, so the first pulse is always whole. OCR4x is double-buffered and also loads at BOTTOM.
 ISR(TIMER4_OVF_vect) {
-    if (com_pending && !(PINE & ESTOP_BIT)) TCCR4A |= com_pending;
+    if (com_pending && !ESTOP_OPEN()) TCCR4A |= com_pending;
     com_pending = 0;
 }
 
@@ -113,13 +123,13 @@ static void apply_outputs(bool estop_open) {
 
 // ------------------------------------------------------------------ HX711, bit-banged (gain 128, channel A)
 static void hx_init() {
-    DDRE &= ~HX_DT_BIT;
-    PORTE &= ~HX_DT_BIT;
+    HX_DT_DDR &= ~HX_DT_BIT;
+    HX_DT_PORT &= ~HX_DT_BIT;
     PORTG &= ~HX_SCK_BIT;                       // SCK LOW: SCK held HIGH > 60 us powers the HX711 down
     DDRG |= HX_SCK_BIT;
 }
 
-static bool hx_ready() { return !(PINE & HX_DT_BIT); }
+static bool hx_ready() { return !(HX_DT_PIN & HX_DT_BIT); }
 
 static int32_t hx_read() {
     uint32_t v = 0;
@@ -128,7 +138,7 @@ static int32_t hx_read() {
     for (uint8_t i = 0; i < 24; i++) {
         PORTG |= HX_SCK_BIT;
         __builtin_avr_delay_cycles(4);          // SCK high >= 0.2 us, data valid 0.1 us after the edge
-        v = (v << 1) | ((PINE & HX_DT_BIT) ? 1u : 0u);
+        v = (v << 1) | ((HX_DT_PIN & HX_DT_BIT) ? 1u : 0u);
         PORTG &= ~HX_SCK_BIT;
         __builtin_avr_delay_cycles(4);
     }
@@ -173,7 +183,9 @@ void setup() {
     pwm_init();
     hx_init();
     pinMode(ESTOP_PIN, INPUT_PULLUP);
+#ifndef WLB_NO_ESTOP
     attachInterrupt(digitalPinToInterrupt(ESTOP_PIN), on_estop, RISING);
+#endif
     analogReference(DEFAULT);                   // AVcc
     Serial.begin(250000);
     wlb::Config cfg;
@@ -186,7 +198,7 @@ void setup() {
 void loop() {
     while (Serial.available() > 0) core.feed((char)Serial.read(), millis());
     if (hx_ready()) core.hx_sample(hx_read(), millis());
-    bool estop = (PINE & ESTOP_BIT) != 0;
+    bool estop = ESTOP_OPEN();
     if (estop_isr) {
         estop_isr = false;
         estop = true;

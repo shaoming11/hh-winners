@@ -73,7 +73,7 @@ deck_z = [51.6, 58.6]                       # 7 mm deck under the ring
 base_size = [151.3, 110.0, 43.0]            # TT-01 v2 STL extent
 # motion: docs/software_architecture.md 7.4 (historical) gives >= 2 s per 45 deg; same limit kept
 min_s_per_45deg = 2.0
-deck_range_deg = [-10.0, 280.0]             # M45CHW 270-deg servo travel plus trim: assumed
+deck_range_deg = [-110.0, 250.0]            # measured 2026-10-17: what 500-2500 us reaches around the new zero (P2 pick uses -90)
 timeout_extra_s = 2.0                       # architecture 4: commanded duration + 2 s
 
 [auger]
@@ -87,7 +87,7 @@ g_per_rev_cv = 0.06                         # rev-to-rev coefficient of variatio
 rev_s = 1.2                                 # one revolution at the dosing pulse: assumed
 first_pass_frac = 0.85                      # electrical.md 6
 max_topups = 2                              # electrical.md 6
-reverse_rev = 0.25                          # electrical.md 6
+reverse_rev = 0.0                           # electrical.md 6 had 0.25 against dribble; turned off on the bench 2026-10-17 (confused dose counting)
 stall_window_s = 0.150                      # electrical.md 6: < 5 deg in 150 ms
 stall_min_deg = 5.0
 max_stalls = 3
@@ -302,18 +302,22 @@ hx_timeout_intervals = 4                    # electrical.md 7
 tare_samples = 8                            # SimMega TARE: mean of 8 conversions
 home_tt_deg = 0.0                           # deck home = its 0 deg mark; stage home = [stage] work_deg
 # M45CHW pulses: us = us_at_zero + us_per_deg * deg. All assumed until commissioning (electrical.md E10 and the
-# software_architecture.md 7.4 gauge). Carousel: deck_range_deg [-10, 280] spread over 500-2500 us (2000/290 us/deg);
-# if the servo covers only 270 deg over that pulse range, [carousel] deck_range_deg must shrink.
+# software_architecture.md 7.4 gauge). Carousel: measured on the bench 2026-10-17 (zero = pick cup over the TT-01 tab;
+# 90 deg real = 489.7 us), so 500-2500 us reaches about -116..+251 deg and deck_range_deg is [-110, 250].
 # Stage: 2000 us per 270 deg with crank 75 deg (mid-stroke) at 1500 us.
 servo_us_min = 500                          # assumed M45CHW pulse range
 servo_us_max = 2500                         # assumed
-tt_us_at_zero = 568.9655                    # assumed: 500 + 10 * 2000/290
-tt_us_per_deg = 6.896552                    # assumed: 2000/290
-st_us_at_zero = 944.4445                    # assumed: 1500 - 75 * 2000/270
+tt_us_at_zero = 1134.4828                   # measured 2026-10-17: pick cup over the TT-01 tab
+tt_us_per_deg = 5.440613                    # measured 2026-10-17: 90 deg real = 489.7 us (servo turns ~368 deg over 2000 us)
+st_us_at_zero = 914.8149                    # measured 2026-10-17: assumed 944.4445 (1500 - 75 * 2000/270) minus 4 deg, crank and rod in line at WORK
 st_us_per_deg = 7.407407                    # assumed: 2000/270
 # FB5311M-360 auger (electrical.md 4 and 6, software_architecture.md 6)
 aug_us_stop = 1500                          # architecture 6: about 1500 us = stop; measure the exact centre (E8)
 aug_us_offset = 200                         # architecture 6: dosing pulse 1500 +- 200 us
+aug_timed = true                            # 2026-10-17: A2 feedback wire not fitted; firmware doses by time, no stall rule
+aug_rev_per_s = 0.37                        # fit 2026-10-17 to 4 empty doses seen by eye: turns = 0.37 * s + 0.19 (2.21 s -> 1.0, 4.17 -> 1.75, 4.76 -> 1.825, 5.09 -> 2.125)
+aug_start_ms = 0
+aug_coast_rev = 0.19                        # same fit: turns it keeps going after the stop pulse
 aug_dir_sign = 1                            # assumed: pulse above the stop centre for dir = +1 (feeds yeast)
 aug_fb_sign = 1                             # assumed: A2 angle rises when the pulse is above the stop centre
 aug_fb_adc_min = 0                          # assumed: A2 reading at 0 deg; record min/max/wrap at E8

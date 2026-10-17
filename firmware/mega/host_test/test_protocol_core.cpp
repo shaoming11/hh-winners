@@ -277,7 +277,7 @@ static const Field FIELDS[] = {
     F('f', counts_per_g), F('f', tt.us_at_zero), F('f', tt.us_per_deg), F('f', st.us_at_zero), F('f', st.us_per_deg),
     F('h', us_min), F('h', us_max), F('f', home_tt_deg), F('f', home_st_deg), F('h', aug_us_stop), F('h', aug_us_offset),
     F('c', aug_dir_sign), F('c', aug_fb_sign), F('h', aug_adc_min), F('h', aug_adc_max), F('u', stall_window_ms),
-    F('f', stall_min_deg), F('b', max_stalls), F('f', reverse_deg), F('f', fb_max_step_deg), F('b', fb_glitch_resync),
+    F('f', stall_min_deg), F('b', max_stalls), F('f', reverse_deg), F('f', fb_max_step_deg), F('b', fb_glitch_resync), F('b', aug_timed), F('f', aug_rev_per_s), F('u', aug_start_ms), F('f', aug_coast_rev),
 };
 #undef F
 
@@ -374,6 +374,7 @@ static void run_script(std::istream& in) {
     Rig rig;
     Config base;
     default_config(base);
+    base.aug_timed = 0;                             // the shared script exercises the feedback mode; timed mode has fw-only checks
     Config cfg = base;
     double plant_rev_s = 1.2;
     rig.reset(true, 0, 0, cfg);
@@ -512,6 +513,7 @@ static void live_emit(void*, const char* line, size_t n) {
 static int live(double grams) {
     Config cfg;
     default_config(cfg);
+    cfg.aug_timed = 0;                              // the live plant simulates the feedback wire
     Plant plant;
     plant.grams = grams;
     plant.aug_rate = 360.0 / 1.2;

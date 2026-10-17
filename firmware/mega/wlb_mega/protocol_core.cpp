@@ -385,7 +385,7 @@ size_t Writer::finish() {
 void default_config(Config& c) {
     memset(&c, 0, sizeof c);
     // protocol.Limits (bench_params.toml) and protocol.validate constants
-    c.tt_lo_deg = -10.0f; c.tt_hi_deg = 280.0f;       // [carousel] deck_range_deg
+    c.tt_lo_deg = -110.0f; c.tt_hi_deg = 250.0f;       // [carousel] deck_range_deg
     c.tt_ms_per_45 = 2000.0f;                         // [carousel] min_s_per_45deg = 2.0
     c.tt_slack_ms = 50.0f;                            // protocol.validate: ms < need - 50
     c.st_lo_deg = -2.0f; c.st_hi_deg = 152.0f;        // [stage] work_deg 0 / erupt_deg 150, -+2 (protocol.Limits)
@@ -406,19 +406,23 @@ void default_config(Config& c) {
     c.hx_nominal_ms = 12.5f;                          // [scale] rate_hz = 80
     c.counts_per_g = 420.0f;                          // [scale] counts_per_g
     // M45CHW pulses ([mega] tt_/st_us_at_zero, tt_/st_us_per_deg; assumed until commissioning)
-    c.tt.us_at_zero = 568.9655f; c.tt.us_per_deg = 6.896552f;
-    c.st.us_at_zero = 944.4445f; c.st.us_per_deg = 7.407407f;
+    c.tt.us_at_zero = 1134.4828f; c.tt.us_per_deg = 5.440613f;
+    c.st.us_at_zero = 914.8149f; c.st.us_per_deg = 7.407407f;
     c.us_min = 500; c.us_max = 2500;                  // [mega] servo_us_min / servo_us_max
     c.home_tt_deg = 0.0f;                             // deck at its 0 deg mark
     c.home_st_deg = 0.0f;                             // [stage] work_deg
     // FB5311M-360 auger ([mega] aug_*; [auger] stall rule)
     c.aug_us_stop = 1500; c.aug_us_offset = 200;
+    c.aug_timed = 1;                                  // [mega] aug_timed: the A2 feedback wire is not fitted yet
+    c.aug_rev_per_s = 0.37f;                          // [mega] aug_rev_per_s: fit 2026-10-17, turns = 0.37 * s + 0.19 (4 doses)
+    c.aug_start_ms = 0;                               // [mega] aug_start_ms
+    c.aug_coast_rev = 0.19f;                          // [mega] aug_coast_rev: same fit
     c.aug_dir_sign = 1; c.aug_fb_sign = 1;
     c.aug_adc_min = 0; c.aug_adc_max = 1023;
     c.stall_window_ms = 150;                          // [auger] stall_window_s
     c.stall_min_deg = 5.0f;                           // [auger] stall_min_deg
     c.max_stalls = 3;                                 // [auger] max_stalls
-    c.reverse_deg = 90.0f;                            // [auger] reverse_rev = 0.25
+    c.reverse_deg = 0.0f;                             // [auger] reverse_rev = 0 (2026-10-17: anti-dribble reverse turned off on the bench)
     c.fb_max_step_deg = 45.0f;                        // [mega] aug_fb_max_step_deg
     c.fb_glitch_resync = 20;                          // [mega] aug_fb_glitch_resync
 }
@@ -688,7 +692,8 @@ void Core::axis_tick(uint32_t now) {
 void Core::start_auger(int32_t seq, float rev, int8_t dir, uint32_t now) {
     memset(&aug_, 0, sizeof aug_);
     aug_.seq = seq;
-    aug_.t0 = aug_.win_t0 = aug_.next_prog = now;
+    aug_.t0 = aug_.win_t0 = aug_.next_prog = aug_.last_t = now;
+    if (cfg_.aug_timed) aug_.net = aug_.hw = cfg_.aug_coast_rev * 360.0f;   // it coasts this far after the stop
     aug_.target = rev * 360.0f;
     aug_.dir = dir;
     aug_.phase = A_DOSE;
@@ -717,18 +722,29 @@ void Core::auger_tick(uint32_t now, uint16_t adc) {
     // The rule is applied in both directions (the simulator checks the forward direction only).
     Auger& a = aug_;
     if ((uint32_t)(now - a.t0) > cfg_.aug_timeout_ms) { fault(F_AUG_TIMEOUT, now); return; }
-    float ang = fb_angle(adc);
-    if (!a.fb_init) { a.last_fb = ang; a.fb_init = true; }
-    float d = ang - a.last_fb;
-    if (d > 180.0f) d -= 360.0f;
-    else if (d < -180.0f) d += 360.0f;
-    if (fabsf(d) <= cfg_.fb_max_step_deg) {
-        a.net += d * (float)(cfg_.aug_fb_sign * cfg_.aug_dir_sign * a.dir);   // progress in the commanded sense
-        a.last_fb = ang;
-        a.glitches = 0;
-    } else if (++a.glitches >= cfg_.fb_glitch_resync) {
-        a.last_fb = ang;                                // persistent jump: resynchronise, motion not counted
-        a.glitches = 0;
+    if (cfg_.aug_timed) {
+        // No feedback wire: progress is the measured speed times the time the output has been driving, forward while
+        // dosing and backward while reversing. Everything below (dose target, 1/4-turn reverse, done) is unchanged;
+        // the stall rule is off because there is nothing to detect a jam with.
+        uint32_t from = a.last_t;
+        if (a.phase == A_DOSE && (uint32_t)(from - a.t0) < cfg_.aug_start_ms) from = a.t0 + cfg_.aug_start_ms;   // spin-up
+        float dt = (int32_t)(now - from) > 0 ? (float)(uint32_t)(now - from) / 1000.0f : 0.0f;
+        a.last_t = now;
+        a.net += cfg_.aug_rev_per_s * 360.0f * dt * (a.phase == A_DOSE ? 1.0f : -1.0f);
+    } else {
+        float ang = fb_angle(adc);
+        if (!a.fb_init) { a.last_fb = ang; a.fb_init = true; }
+        float d = ang - a.last_fb;
+        if (d > 180.0f) d -= 360.0f;
+        else if (d < -180.0f) d += 360.0f;
+        if (fabsf(d) <= cfg_.fb_max_step_deg) {
+            a.net += d * (float)(cfg_.aug_fb_sign * cfg_.aug_dir_sign * a.dir);   // progress in the commanded sense
+            a.last_fb = ang;
+            a.glitches = 0;
+        } else if (++a.glitches >= cfg_.fb_glitch_resync) {
+            a.last_fb = ang;                                // persistent jump: resynchronise, motion not counted
+            a.glitches = 0;
+        }
     }
     if (a.phase == A_DOSE) {
         if (a.net > a.hw) a.hw = a.net;                 // dosed revolutions = high-water mark of net progress
@@ -745,7 +761,7 @@ void Core::auger_tick(uint32_t now, uint16_t adc) {
         a.win_t0 = now;
         a.win_net = a.net;
     }
-    if (a.phase != A_FINISH && (uint32_t)(now - a.win_t0) >= cfg_.stall_window_ms) {
+    if (!cfg_.aug_timed && a.phase != A_FINISH && (uint32_t)(now - a.win_t0) >= cfg_.stall_window_ms) {
         if (fabsf(a.net - a.win_net) < cfg_.stall_min_deg) {
             a.stalls++;
             if (a.stalls >= cfg_.max_stalls) { fault(F_AUGER_JAM, now); return; }

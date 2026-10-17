@@ -81,7 +81,7 @@ at boot, so the servos get no pulse. Operating rule:
 | Pin | AVR | Function | Configuration |
 |---|---|---|---|
 | D2 | PE4 / INT4 | E-stop pole 2 sense | INPUT_PULLUP, interrupt. NC contact to GND. HIGH (pressed or wire broken) latches the e-stop fault and stops all PWM |
-| D5 | PE3 | HX711 DT | Direct port read (moved from D3 on 2026-10-17 to fit the existing wiring) |
+| D11 | PB5 | HX711 DT | Direct port read (moved from D3 on 2026-10-17 to fit the existing wiring) |
 | D4 | PG5 | HX711 SCK | Direct port write; interrupts off only for the 25–27 clock pulses |
 | D6 | PH3 / OC4A | Carousel servo PWM | Timer4, 50 Hz (ICR4 = 39999, prescaler 8), OCR4A = 2 × µs. No Servo library. LOW at boot |
 | D7 | PH4 / OC4B | Stage servo PWM | Timer4, same frame. LOW at boot |
@@ -173,7 +173,7 @@ With no current sensor, timeouts are the protection for the M45CHW servos.
 | W7 | Servo signals | D6 (carousel), D7 (stage), D8 (auger) | Servo lead | Twisted with its own − |
 | W8 | Auger feedback | A2 | Servo lead | Twisted with the auger − |
 | W9 | E-stop pole 2 | D2 and Mega GND | Twisted pair | |
-| W10 | HX711 DT / SCK / VCC / GND | D5 / D4 / 5 V / GND | 4 wires, twisted | ≥ 50 mm from servo leads |
+| W10 | HX711 DT / SCK / VCC / GND | D11 / D4 / 5 V / GND | 4 wires, twisted | ≥ 50 mm from servo leads |
 | W11 | Mega USB | Laptop | USB cable (owned) | Confirm the board's connector type |
 
 The e-stop and the electronics sit in the ABS project box, which keeps foam and liquid off them.

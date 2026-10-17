@@ -37,6 +37,15 @@ arduino-cli compile --fqbn arduino:avr:mega:cpu=atmega2560 firmware/mega/wlb_meg
 arduino-cli upload  --fqbn arduino:avr:mega:cpu=atmega2560 -p /dev/ttyUSB0 firmware/mega/wlb_mega
 ```
 
+**Bring-up build without an e-stop (local testing only).** Before the e-stop is wired, D2 reads as pressed and
+every move answers `err ESTOP`. For bench tests only, build with the flag below: D2 is then ignored, so pulling the
+pack is the only stop. The default build never sets it; never flash it for a run.
+
+```bash
+arduino-cli compile --fqbn arduino:avr:mega:cpu=atmega2560 --build-property "build.extra_flags=-DWLB_NO_ESTOP" \
+    --build-path /tmp/wlb_noestop firmware/mega/wlb_mega
+```
+
 **Press the e-stop before flashing or resetting the board** (electrical.md 2): without the relay, servo power is
 live whenever the pack is plugged in and the e-stop is released.
 
@@ -45,7 +54,7 @@ live whenever the pack is plugged in and the e-stop is released.
 | Pin | AVR | Use |
 |---|---|---|
 | D2 | PE4 / INT4 | E-stop pole 2, `INPUT_PULLUP`, NC to GND. Rising edge: the interrupt disconnects all three compare outputs and drives D6/D7/D8 LOW at once; the core then latches `ESTOP` |
-| D5 | PE3 | HX711 DOUT, read on `PINE` (moved from D3 to fit the bench wiring) |
+| D11 | PB5 | HX711 DOUT, read on `PINB` (moved from D3 to fit the bench wiring) |
 | D4 | PG5 | HX711 SCK on `PORTG`; 25 pulses (channel A, gain 128) with interrupts off for about 25 µs |
 | D6 / D7 / D8 | PH3/OC4A, PH4/OC4B, PH5/OC4C | Carousel, stage, auger. Timer4 mode 14, prescaler 8, `ICR4 = 39999` (50 Hz), `OCR4x = 2 × µs`. No Servo library |
 | A2 | PF2 / ADC2 | Auger feedback, AVcc reference |
@@ -73,6 +82,11 @@ host sends TT, ST or AUG. During the bootloader (before `.init3`) the pins are i
   *unknown* and TT/ST answer `err STATE`. Recovery: put the deck at its 0° mark and the stage at WORK by hand, then
   send `{"cmd":"CLR","seq":n,"home":true}` (needs the e-stop released). Plain `CLR` does not home. `home` is an
   extra key that `protocol.validate` and `SimMega` ignore.
+- **Auger timed mode (bench default since 2026-10-17).** The A2 feedback wire is not fitted, so `aug_timed = 1`: the
+  firmware counts progress as `aug_rev_per_s` x driving time, credits `aug_coast_rev` (the coast after the stop pulse)
+  at the start, and has no stall rule. Fitted on the bench by eye: turns = 0.37 x s + 0.19. The anti-dribble reverse
+  is off (`reverse_rev = 0`). Set `aug_timed = false` in bench_params.toml and the firmware default to go back to the
+  feedback mode below once the wire is fitted.
 - **Auger (AUG).** Pulse `aug_us_stop ± aug_us_offset` (sign from `dir` and `aug_dir_sign`); D8 is off at all other
   times. Revolutions are counted by unwrapping the A2 angle. The dosed count is the high-water mark of net progress
   in the commanded direction. A reading that jumps more than `aug_fb_max_step_deg` between two loop passes is

@@ -573,6 +573,7 @@ def firmware_config_expected(P=None):
         'aug_adc_min': M['aug_fb_adc_min'], 'aug_adc_max': M['aug_fb_adc_max'], 'stall_window_ms': A['stall_window_s'] * 1000,
         'stall_min_deg': A['stall_min_deg'], 'max_stalls': A['max_stalls'], 'reverse_deg': A['reverse_rev'] * 360.0,
         'fb_max_step_deg': M['aug_fb_max_step_deg'], 'fb_glitch_resync': M['aug_fb_glitch_resync'],
+        'aug_timed': 1.0 if M['aug_timed'] else 0.0, 'aug_rev_per_s': M['aug_rev_per_s'], 'aug_start_ms': M['aug_start_ms'], 'aug_coast_rev': M['aug_coast_rev'],
     }
 
 
@@ -713,7 +714,7 @@ def firmware_test_script(P=None):
     s = S.cmd('AUG', 'ack', rev=2.0, dir=1); S.run(3500)
     S.add('expect_done %d 1' % s); S.add('expect_num %d rev 1.99 2.02' % s); S.add('expect_num %d stalls 0 0' % s)
     S.add('expect_progress %d 5' % s); S.add('fw expect_out aug off')
-    S.add('fw expect_plant_deg 625 635')                                  # 2 rev forward, then the 1/4 turn back
+    S.add('fw expect_plant_deg 715 725')                                  # 2 rev forward (reverse_rev 0: no turn back)
 
     S.add('# --- jammed auger: 3 stalls -> AUGER_JAM'); S.add('reset'); S.add('jam 1')
     s = S.cmd('AUG', 'ack', rev=3.0, dir=1); S.run(3000); S.add('expect_fault AUGER_JAM 1'); S.add('expect_done %d 0' % s)
@@ -770,7 +771,7 @@ def firmware_test_script(P=None):
     S.add('fw expect_fault AUGER_JAM 1'); S.add('fw expect_done %d 0' % a)
     # A2 glitch: 2.0 s into a 2.4 s dose the reading jumps 170 deg the way the dose turns, for 8 ms. A jump that
     # early in a dose is absorbed by the high-water count anyway; near the end it would stop the dose early.
-    for gate, rev, plant in (('', '1.99 2.02', '-635 -625'), ('fw cfg fb_max_step_deg 400', '2.05 2.5', '-615 -500')):
+    for gate, rev, plant in (('', '1.99 2.02', '-725 -715'), ('fw cfg fb_max_step_deg 400', '2.05 2.5', '-705 -500')):
         if gate: S.add('# negative control: without the glitch gate the same glitch stops the dose early'); S.add(gate)
         S.add('fw reset')
         S.seq += 1; a = S.seq; S.add('fw send ' + protocol.encode(dict(cmd='AUG', seq=a, rev=2.0, dir=-1)).rstrip('\n'))
@@ -779,6 +780,15 @@ def firmware_test_script(P=None):
             S.seq += 1; S.add('fw run 100'); S.add('fw send ' + protocol.encode(dict(cmd='HB', seq=S.seq)).rstrip('\n'))
         S.add('fw expect_done %d 1' % a); S.add('fw expect_num %d rev %s' % (a, rev)); S.add('fw expect_plant_deg %s' % plant)
     S.add('fw cfgclear')
+    # timed auger (no A2 wire, the bench default since 2026-10-17): 1 rev at 2 rev/s = 500 ms after aug_start_ms of spin-up.
+    # A jammed screw is invisible in this mode: the dose still completes and no AUGER_JAM is raised.
+    S.add('# firmware only: timed auger, no feedback wire'); S.add('fw cfg aug_timed 1'); S.add('fw cfg aug_rev_per_s 2'); S.add('fw cfg aug_start_ms 300'); S.add('fw cfg aug_coast_rev 0'); S.add('fw reset'); S.add('fw jam 1')
+    S.seq += 1; a = S.seq; S.add('fw send ' + protocol.encode(dict(cmd='AUG', seq=a, rev=1.0, dir=1)).rstrip('\n'))
+    for i in range(12):
+        if i == 7: S.add('fw expect_done %d 0' % a)     # 700 ms: still in the 300 + 500 ms dose
+        S.seq += 1; S.add('fw run 100'); S.add('fw send ' + protocol.encode(dict(cmd='HB', seq=S.seq)).rstrip('\n'))
+    S.add('fw expect_done %d 1' % a); S.add('fw expect_num %d rev 0.99 1.02' % a); S.add('fw expect_num %d stalls 0 0' % a)
+    S.add('fw expect_fault AUGER_JAM 0'); S.add('fw expect_out aug off'); S.add('fw jam 0'); S.add('fw cfgclear')
     return '\n'.join(S.lines) + '\n'
 
 

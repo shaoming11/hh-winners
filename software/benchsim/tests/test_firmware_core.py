@@ -150,9 +150,9 @@ STUB_ARDUINO = r'''
 #include <deque>
 #include <string>
 #define _BV(b) (1 << (b))
-extern volatile uint8_t PORTE, DDRE, PINE, PORTG, DDRG, PORTH, DDRH, TCCR4A, TCCR4B, TCCR4C, TIMSK4, TIFR4, SREG;
+extern volatile uint8_t PORTB, DDRB, PINB, PORTE, DDRE, PINE, PORTG, DDRG, PORTH, DDRH, TCCR4A, TCCR4B, TCCR4C, TIMSK4, TIFR4, SREG;
 extern volatile uint16_t TCNT4, ICR4, OCR4A, OCR4B, OCR4C;
-enum { PE3 = 3, PE4 = 4, PE5 = 5, PG5 = 5, PH3 = 3, PH4 = 4, PH5 = 5, COM4A1 = 7, COM4A0 = 6, COM4B1 = 5, COM4B0 = 4, COM4C1 = 3,
+enum { PB5 = 5, PE3 = 3, PE4 = 4, PE5 = 5, PG5 = 5, PH3 = 3, PH4 = 4, PH5 = 5, COM4A1 = 7, COM4A0 = 6, COM4B1 = 5, COM4B0 = 4, COM4C1 = 3,
        COM4C0 = 2, WGM41 = 1, WGM43 = 4, WGM42 = 3, CS41 = 1, TOV4 = 0, TOIE4 = 0 };
 #define A2 56
 #define INPUT_PULLUP 2
@@ -194,7 +194,7 @@ SMOKE = r'''
 #include <stdio.h>
 #include "Arduino.h"
 #include "EEPROM.h"
-volatile uint8_t PORTE, DDRE, PINE, PORTG, DDRG, PORTH, DDRH, TCCR4A, TCCR4B, TCCR4C, TIMSK4, TIFR4, SREG;
+volatile uint8_t PORTB, DDRB, PINB, PORTE, DDRE, PINE, PORTG, DDRG, PORTH, DDRH, TCCR4A, TCCR4B, TCCR4C, TIMSK4, TIFR4, SREG;
 volatile uint16_t TCNT4, ICR4, OCR4A, OCR4B, OCR4C;
 StubSerial Serial;
 StubEEPROM EEPROM;
@@ -213,7 +213,7 @@ static void step(int ms) { for (int i = 0; i < ms; i++) { g_ms++; loop(); if (g_
 static bool sent(const char* s) { return Serial.tx.find(s) != std::string::npos; }
 int main(int argc, char** argv) {
     if (argc < 4) return 2;
-    PORTH = 0xFF; DDRH = 0; TCCR4A = 0xFF; PINE = HX_DT_BIT;          /* pins high before boot; HX711 not ready */
+    PORTH = 0xFF; DDRH = 0; TCCR4A = 0xFF; HX_DT_PIN = HX_DT_BIT;          /* pins high before boot; HX711 not ready */
     setup();
     CHECK((PORTH & SERVO_BITS) == 0 && (DDRH & SERVO_BITS) == SERVO_BITS, "D6/D7/D8 are LOW outputs after setup");
     CHECK(TCCR4A == _BV(WGM41) && TCCR4B == (_BV(WGM43) | _BV(WGM42) | _BV(CS41)) && ICR4 == 39999, "Timer4 mode 14, prescaler 8, 20 ms frame");
@@ -227,9 +227,9 @@ int main(int argc, char** argv) {
     CHECK((TCCR4A & COM_TT) == 0 && (com_pending & COM_TT), "TT output waits for the frame start");
     TIMER4_OVF_vect();
     CHECK((TCCR4A & COM_TT) && !(TCCR4A & (COM_ST | COM_AUG)), "only the carousel output is connected");
-    CHECK(OCR4A == 2 * 569, "first pulse = rest position (569 us at 0 deg), OCR4A = 2 x us");
+    CHECK(OCR4A == 2 * 1134, "first pulse = rest position (1134 us at 0 deg, measured zero), OCR4A = 2 x us");
     for (int i = 0; i < 10; i++) { feed(argv[3]); step(100); }
-    CHECK(OCR4A > 2 * 580 && OCR4A < 2 * 638, "pulse ramps toward 10 deg (638 us); about 603 us halfway");
+    CHECK(OCR4A > 2 * 1140 && OCR4A < 2 * 1189, "pulse ramps toward 10 deg (1189 us); about 1161 us halfway");
     PINE |= ESTOP_BIT; g_isr();
     CHECK((TCCR4A & COM_ALL) == 0 && (PORTH & SERVO_BITS) == 0, "D2 interrupt cuts all PWM at once");
     TIMER4_OVF_vect(); step(5);
