@@ -222,7 +222,8 @@ class Mechanisms:
 
         Host hopper-empty rule: once >= hopper_window_rev revolutions have run in this dose, a gain under
         hopper_empty_g_per_10rev per window ends the dose with fault HOPPER_EMPTY. This is the scale-side form of the rule.
-        Mega faults (AUGER_JAM, HOPPER_EMPTY, *_TIMEOUT) and errors end the dose with status 'fault'.
+        Mega faults (AUGER_JAM, HOPPER_EMPTY, *_TIMEOUT) and errors end the dose with status 'fault'; a host-side
+        TimeoutError (the Mega went silent) propagates.
         """
         tol = self.bench['params']['recipe']['yeast_tol_g'] if tol_g is None else tol_g
         topups = self.A['max_topups'] if max_topups is None else max_topups
@@ -238,7 +239,8 @@ class Mechanisms:
                 back(beaker); self.insert(beaker); self.carousel_to(beaker, 'auger')
                 R.topups += 1; R.passes.append(self.auger(rev, 'topup')); m = self._verify(R, beaker, weigh, initial_g)
         except MegaError as e:
-            R.status = 'fault'; R.fault = e.code; R.detail = str(e); return R
+            R.status = 'fault'; R.fault = e.code
+            R.detail = 'Mega %s %s' % ('error' if 'err' in e.reply else 'fault', {k: v for k, v in e.reply.items() if k not in ('crc', 'fault', 'err')}); return R
         if R.status == 'running':
             R.status = 'ok' if abs(m - target_g) <= tol else ('short' if m < target_g else 'over')
         return R

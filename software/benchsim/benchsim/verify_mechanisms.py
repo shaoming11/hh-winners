@@ -48,10 +48,11 @@ POCKET_TOL_MM = 1.0                       # pocket centre vs station, beaker vs 
 STAGE_TOL_MM = 0.5                        # same gate as benchsim.exercise
 STAGE_START_S = 1.5                       # architecture 4.5: STAGE_OUT starts <= 1.5 s after the catalyst untilt
 FOAM_RUN_S = 60.0
-FRAME_TIMES = [4.0 + 0.25 * i for i in range(17)] + [10.0, 15.0, 20.0, 30.0, 45.0, 60.0]   # s after the slurry goes in; plus the ERUPT arrival
+FRAME_TIMES = [4.0 + 0.25 * i for i in range(9)] + [7.0, 8.0, 10.0, 15.0, 20.0, 30.0, 45.0, 60.0]   # s after the slurry goes in; plus the ERUPT arrival
 SAVE_FRAMES = (4.5, 4.75, 5.0, 5.5, 30.0, 60.0)                                            # saved as PNG, plus the ERUPT arrival frame
 CAM, CAM_W, CAM_H = 'foam_cam', 640, 480
 REGION_HALF_W = 2.0                       # region half-width above the neck, in projected column radii
+OUTSIDE_FRAC = 0.02                       # foam-coloured pixels outside the region, as a fraction of those inside (classifier sanity)
 HUE_TOL_DEG, MIN_SAT, MIN_VAL = 30.0, 0.15, 0.25   # foam-colour classifier (HSV) around the foam rgba hue
 
 
@@ -232,7 +233,8 @@ def check_stage(model, builder, log=print):
     gates = dict(linkage_matches_analytic=lerr <= STAGE_TOL_MM, travel_vs_commanded_angle=cerr <= STAGE_TOL_MM,
                  analytic_150deg_is_97_3=abs(slider_crank_travel(S['erupt_deg'], r, L) - S['expected_travel_mm']) <= 0.05,
                  erupt_travel_97_3=abs(erupt['sled_travel_mm'] - S['expected_travel_mm']) <= STAGE_TOL_MM,
-                 work_return=all(abs(x['sled_travel_mm']) <= STAGE_TOL_MM for x in work))
+                 work_return=all(abs(x['sled_travel_mm']) <= STAGE_TOL_MM for x in work),
+                 travel_time_within_cmd_plus_timeout=all(0.0 <= x['travel_s'] - x['cmd_s'] <= S['timeout_extra_s'] for x in ret))
     return dict(rows=rows, moves=ret, max_linkage_error_mm=round(lerr, 4), max_error_vs_cmd_mm=round(cerr, 4),
                 analytic_150_mm=round(slider_crank_travel(S['erupt_deg'], r, L), 4), tol_mm=STAGE_TOL_MM, gates=gates)
 
@@ -288,7 +290,7 @@ def check_foam(model, builder, log=print):
         if t0 + tf > w.time: w.idle(t0 + tf - w.time)
         neck = mm(w.d.site('flask_neck_top').xpos); u, v, z, f = project(model, w.d, CAM, neck, CAM_W, CAM_H)
         r_px = f * foam.r_col / z; hw = REGION_HALF_W * r_px
-        u0, u1 = int(max(0, math.floor(u - hw))), int(min(CAM_W, math.ceil(u + hw))); v1 = int(min(CAM_H, max(0, math.ceil(v))))
+        u0, u1 = int(max(0, math.floor(u - hw))), int(min(CAM_W, math.ceil(u + hw))); v1 = int(min(CAM_H, max(0, math.ceil(v + r_px))))   # + base ellipse
         rnd.update_scene(w.d, camera=CAM, scene_option=opt); img = rnd.render().copy()
         rnd.enable_segmentation_rendering(); rnd.update_scene(w.d, camera=CAM, scene_option=opt); seg = rnd.render().copy(); rnd.disable_segmentation_rendering()
         segm = (seg[..., 0] == gid) & (seg[..., 1] == int(mujoco.mjtObj.mjOBJ_GEOM)); colm = foam_mask(img, rgba)
@@ -300,8 +302,9 @@ def check_foam(model, builder, log=print):
             rows_seg = np.nonzero(segm[:, u0:u1].any(axis=1))[0]
             if 0 <= tv < CAM_H and len(rows_seg):
                 # below the funnel rim the semi-transparent cone is in front and segmentation records the funnel, not the foam
-                top = dict(predicted_v=round(tv, 1), segmented_v=int(rows_seg.min()), diff_px=round(rows_seg.min() - tv, 1), above_rim=bool(neck[2] + h > rim_z))
-        fr = dict(t=round(tf, 3), column_mm=round(h, 2), neck_px=[round(u, 1), round(v, 1)], region=[u0, 0, u1, v1],
+                top = dict(predicted_v=round(float(tv), 1), segmented_v=int(rows_seg.min()), diff_px=round(float(rows_seg.min() - tv), 1),
+                           above_rim=bool(neck[2] + h > rim_z))
+        fr = dict(t=round(tf, 3), column_mm=round(h, 2), neck_px=[round(float(u), 1), round(float(v), 1)], region=[u0, 0, u1, v1],
                   colour_px=int(colm[:v1, u0:u1].sum()), segmented_px=int(segm[:v1, u0:u1].sum()), colour_px_outside=int(colm.sum() - colm[:v1, u0:u1].sum()),
                   top_check=top)
         if tf == t_erupt or any(abs(tf - s) < 1e-9 for s in SAVE_FRAMES):
@@ -342,9 +345,11 @@ def check_foam(model, builder, log=print):
         camera_frames_cover_growth=len(grow) >= 3,
         camera_colour_px_grow=len(cnt) >= 3 and all(b >= a for a, b in zip(cnt, cnt[1:])) and cnt[-1] > cnt[0],
         camera_segmented_px_grow=len(sg) >= 3 and all(b >= a for a, b in zip(sg, sg[1:])) and sg[-1] > sg[0],
-        camera_projection_matches_top=len(tops) >= 2 and max(abs(x) for x in tops) <= 3.0)
+        camera_projection_matches_top=len(tops) >= 2 and max(abs(x) for x in tops) <= 3.0,
+        camera_foam_pixels_in_region=max(fr['colour_px_outside'] for fr in frames) <= OUTSIDE_FRAC * max(fr['colour_px'] for fr in frames))
     out['stats'] = dict(peak_mm=s['peak_mm'], growth_frames=len(grow), colour_px_first=cnt[0] if cnt else None, colour_px_last=cnt[-1] if cnt else None,
-                        segmented_px_last=sg[-1] if sg else None, top_checks=len(tops), max_top_projection_diff_px=max((abs(x) for x in tops), default=None))
+                        segmented_px_last=sg[-1] if sg else None, top_checks=len(tops), max_top_projection_diff_px=max((abs(x) for x in tops), default=None),
+                        max_colour_px_outside=max(fr['colour_px_outside'] for fr in frames))
     log('foam: O2 %.0f mL (yield %.0f), at neck %.2f s, peak %.1f mm at %.2f s, stage at ERUPT %.2f s' % (
         s['o2_ml'], yield_ml, out['t_foam_at_neck'] or -1, s['peak_mm'], out['t_peak'] or -1, t_erupt))
     return out
@@ -385,6 +390,11 @@ def write_report(rep):
           'max |error| %.3f g. Top-up counts %s. Yeast spilled: %.4f g.' % (
               P['recipe']['yeast_g'], s['tol_g'], s['n'], s['mean_error_g'], s['std_error_g'], s['max_abs_error_g'], s['truth_mean_error_g'],
               s['truth_std_error_g'], s['truth_max_abs_error_g'], s['topups'], s['spilled_g']), '',
+          'Where the negative bias comes from: every AUG starts by re-covering the previous %.2f-turn anti-dribble reverse, and in this model that '
+          'travel dispenses nothing ([auger_model] recover_dispenses = false, assumed). Calibration spreads the loss over 10 rev, so the calibrated '
+          'value sits below the true one, but a 1-1.5 rev top-up still loses about %.2f rev x %.2f g/rev = %.2f g. The documented top-up formula is '
+          'used unchanged. If the real screw behaves this way, adding reverse_rev to each commanded pass would remove most of the bias.' % (
+              P['auger']['reverse_rev'], P['auger']['reverse_rev'], a['g_per_rev_true'], P['auger']['reverse_rev'] * a['g_per_rev_true']), '',
           '| Fault case | Result |', '|---|---|',
           '| Transient jam (screw blocked 0.25 s, 1 s into the first pass) | %s, first-pass stalls %s, scale %s g |' % (
               a['transient_jam']['status'], a['transient_jam']['first_pass_stalls'], fmt(a['transient_jam']['measured_g'])),
@@ -408,6 +418,7 @@ def write_report(rep):
             x['cmd_deg'], x['span_deg'], x['cmd_ms'] / 1000.0, x['travel_s'], x['deck_error_deg'], x['stations']['pick']['pocket'], x['stations']['pick']['beaker'],
             x['stations']['pick']['position_error_mm'], x['stations']['auger']['pocket'], x['stations']['auger']['beaker'], x['stations']['auger']['position_error_mm'],
             x['beakers']['P1']['offset_mm'], x['beakers']['P2']['offset_mm']))
+    L[-len(b['stops']):] = [x.replace('(None)', '(-)') for x in L[-len(b['stops']):]]
     L += ['', '## (c) Stage slider-crank', '', 'Analytic s(theta) = (r + L) - r cos(theta) - sqrt(L^2 - r^2 sin^2(theta)), r %.0f, L %.0f; s(%.0f deg) = %.4f mm.' % (
               P['stage']['crank_r'], P['stage']['rod_l'], P['stage']['erupt_deg'], c['analytic_150_mm']), '',
           '| Cmd (deg) | Crank measured (deg) | Sled travel MuJoCo (mm) | Analytic at measured (mm) | Linkage error (mm) | Analytic at cmd (mm) | Error vs cmd (mm) |',
@@ -446,12 +457,13 @@ def write_report(rep):
                                                                for k, v in d['zero_cases'].items())), '',
           '### Foam camera check (%s, %dx%d, fovy %.0f deg)' % (d['camera']['name'], d['camera']['width'], d['camera']['height'], d['camera']['fovy_deg']), '',
           'The flask_neck_top site is projected with f = (H/2)/tan(fovy/2) and the camera pose (data.cam_xpos/cam_xmat). The region is %.0f projected '
-          'column radii either side of that pixel, from the image top down to it. Foam-coloured pixels: hue within %.0f deg of the foam rgba hue, saturation '
+          'column radii either side of that pixel, from the image top down to it plus one projected radius (the near half of the column base, seen '
+          'from above). Foam-coloured pixels outside the region must stay under %.0f %% of those inside. Foam-coloured pixels: hue within %.0f deg of the foam rgba hue, saturation '
           '>= %.2f, value >= %.2f. Cross-checks: MuJoCo segmentation of the foam geom in the same region, and the predicted vs segmented top row of the '
           'column. The funnel (alpha 0.55) stands in front of the lower column: the colour test sees the foam through it, but segmentation records the '
           'funnel. The top-row check is therefore gated only while the column top is above the funnel rim (marked *). '
           'Saved frames are annotated: cyan = region, green = projected neck top.' % (
-              d['camera']['region_half_width_radii'], d['camera']['hue_tol_deg'], d['camera']['min_sat'], d['camera']['min_val']), '',
+              d['camera']['region_half_width_radii'], 100 * OUTSIDE_FRAC, d['camera']['hue_tol_deg'], d['camera']['min_sat'], d['camera']['min_val']), '',
           '| t (s) | Column (mm) | Neck pixel (u, v) | Colour px in region | Segmented px in region | Colour px outside | Top row predicted / segmented | Frame |',
           '|---|---|---|---|---|---|---|---|']
     for fr in d['frames']:
