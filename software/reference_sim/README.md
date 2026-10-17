@@ -17,6 +17,7 @@ software/reference_sim/.venv/bin/python software/reference_sim/build_scene.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_layout.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_motion.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_transfer.py
+software/reference_sim/.venv/bin/python software/reference_sim/run_demo.py --physical-p1-transfer
 software/reference_sim/.venv/bin/python software/reference_sim/viewer.py
 ```
 
@@ -57,12 +58,14 @@ degrees and actuated by the official MuJoCo position servos.
   a 40 mm lift, and a small wrist move while holding the beaker.
 - `verify_transfer.py` executes the empty P1 carousel-to-scale transfer, including an outward
   escape, a lifted carry, release, and upright-placement measurement.
+- `run_demo.py --physical-p1-transfer` runs that same arm transfer as step 1 of the analytical
+  10-step scenario and records the motion metrics in `build/reference_run.json`.
 
 ## Limits
 
-The 10-step demo keeps process transfers as logical events. The standalone transfer check validates
-one empty P1 move from the carousel to the scale; other station pairs and filled-beaker handling are
-not yet validated. Grasping uses a proximity check and weld constraint; the stock SO-101 fingers
+The 10-step demo defaults to logical process transfers. With `--physical-p1-transfer`, step 1 moves
+empty P1 from the carousel to the scale; the remaining transfers and filled-beaker handling are not
+yet validated. Grasping uses a proximity check and weld constraint; the stock SO-101 fingers
 are excluded from beaker contacts because they do not reproduce the custom fin-ray geometry. Yeast
 dosing is a calibrated grams-per-revolution equation, and the flow and auger constants are
 placeholders until measured on the assembled bench. The liquid model is not CFD. The checks

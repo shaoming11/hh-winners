@@ -8,9 +8,10 @@ from pathlib import Path
 from chemistry import PourPlant
 from hal.protocol import decode_line, encode_line
 from hal.sim import make_sim_bench
+from motion.pick_place import transfer_beaker
 
 
-def run() -> dict:
+def run(*, physical_p1_transfer: bool = False) -> dict:
     world, pourer, transfer, mega = make_sim_bench()
     world.step(2.0)
     plant = PourPlant(seed=2026)
@@ -48,7 +49,14 @@ def run() -> dict:
 
     events = []
     # Empty P1 is carried to the scale by the documented transfer arm sequence.
-    events.append({"step": 1, "action": "P1 carousel to scale", "virtual_arm_motion": False})
+    if physical_p1_transfer:
+        transfer_result = transfer_beaker(
+            world, "transfer", "carousel_beaker_1", (0.620, 0.407, 0.0957))
+        events.append({"step": 1, "action": "P1 carousel to scale",
+                       "physical_arm_motion": True, "transfer": transfer_result})
+    else:
+        events.append({"step": 1, "action": "P1 carousel to scale",
+                       "physical_arm_motion": False})
     dev = plant.pour(80.0, 39.0, receiver_radius_mm=20.0, receiver_drop_mm=20.0)
     world.set_scale_payload_g(dev.landed_g)
     world.step(1.0)
@@ -106,7 +114,7 @@ def run() -> dict:
         "simulator": "independent-reference-analytical-chemistry",
         "model_scope": "MuJoCo geometry and mechanisms; analytical liquid and yeast models",
         "hardware_used": False,
-        "process_arm_trajectory_playback": False,
+        "process_arm_trajectory_playback": physical_p1_transfer,
         "arm_bus_initial_positions_deg": arm_snapshot,
         "arm_control_smoke": {
             "joint": "pourer.wrist_roll", "start_deg": arm_start_deg,
@@ -118,7 +126,9 @@ def run() -> dict:
         "events": events,
         "final_mujoco": world.status(),
         "notes": [
-            "The scenario exercises the process targets, not a calibrated arm trajectory replay.",
+            ("P1 carousel-to-scale uses joint-limited MuJoCo arm motion. Other process transfers "
+             "remain logical events." if physical_p1_transfer else
+             "The scenario exercises the process targets, not a calibrated arm trajectory replay."),
             "Liquid flow and landing are equations, not CFD or particle physics.",
             "Weir coefficient and auger grams per revolution are uncalibrated defaults.",
         ],
@@ -127,10 +137,12 @@ def run() -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--physical-p1-transfer", action="store_true",
+                        help="move empty P1 from the carousel to the scale with the transfer arm")
     parser.add_argument("--output", type=Path,
                         default=Path(__file__).resolve().parent / "build" / "reference_run.json")
     args = parser.parse_args()
-    result = run()
+    result = run(physical_p1_transfer=args.physical_p1_transfer)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n")
     for event in result["events"]:
@@ -139,6 +151,11 @@ def main() -> None:
         if pour:
             print(f"{event['step']:02d}. {desc}: landed {pour['landed_g']:.2f} g, "
                   f"spill {pour['spilled_g']:.2f} g, peak flow {pour['peak_flow_g_s']:.2f} g/s")
+        elif "transfer" in event:
+            transfer = event["transfer"]
+            print(f"{event['step']:02d}. {desc}: arm transfer, "
+                  f"{transfer['final_site_error_mm']:.2f} mm placement error, "
+                  f"{transfer['upright_error_deg']:.2f}° tilt")
         elif "stage_travel_mm" in event:
             print(f"{event['step']:02d}. {desc}: {event['stage_travel_mm']:.2f} mm")
         else:
