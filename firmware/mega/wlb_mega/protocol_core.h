@@ -26,7 +26,7 @@
 namespace wlb {
 
 enum {
-    LINE_MAX = 160,       // longest accepted input line (protocol lines are < 80 characters)
+    IN_MAX = 160,       // longest accepted input line (protocol lines are < 80 characters)
     OUT_MAX = 200,        // longest output line
     MAX_KEYS = 10,        // flat object: at most this many keys
     KEY_MAX = 15,         // longest key
@@ -221,7 +221,7 @@ private:
     EmitFn emit_;
     PersistFn persist_;
     void* ctx_;
-    char line_[LINE_MAX + 1];
+    char line_[IN_MAX + 1];
     size_t line_n_;
     bool overflow_;
     FlatObject obj_;             // the command being handled (static, not on the AVR stack)

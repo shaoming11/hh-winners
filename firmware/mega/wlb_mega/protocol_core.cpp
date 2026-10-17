@@ -290,8 +290,8 @@ int decode_line(const char* line, size_t n, FlatObject& out, char* detail, size_
     while (b > a && space_(line[b - 1])) b--;
     const char* L = line + a;
     size_t m = b - a;
-    if (m > LINE_MAX) { d.s("line too long"); return E_BADCMD; }
-    char body[LINE_MAX + 2];
+    if (m > IN_MAX) { d.s("line too long"); return E_BADCMD; }
+    char body[IN_MAX + 2];
     size_t bl;
     // protocol.decode: line.endswith('"}') and line[-12:].startswith(',"crc":"')
     size_t ts = m >= CRC_TAIL ? m - CRC_TAIL : 0;
@@ -476,7 +476,7 @@ void Core::feed(char c, uint32_t now) {
         overflow_ = false;
         return;
     }
-    if (line_n_ < LINE_MAX) line_[line_n_++] = c;
+    if (line_n_ < IN_MAX) line_[line_n_++] = c;
     else overflow_ = true;
 }
 
