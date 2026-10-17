@@ -155,3 +155,87 @@ yeast_tol_g = 0.7
 water_g = 30.0
 water_tol_g = 2.0
 activate_wait_s = 60.0
+
+[liquid]
+# Analytic pour model (benchsim/chem/liquid.py), NOT CFD: flat horizontal free surface in a tilted cylinder
+# (beaker inside: od/2 - wall, height - floor), rectangular-weir flow over the lip, ballistic stream, parcels.
+cd = 0.62                                   # sharp-crested weir discharge coefficient (textbook 0.60-0.62); assumed for a PP lip
+lip_width_mm = 14.0                         # effective width of the EISCO spout incl. rim curvature: assumed, measure the spout
+hold_head_mm = 0.5                          # capillary hold-up: no flow until the surface is this far above the lip: assumed
+exit_velocity_coeff = 1.0                   # x critical-depth velocity sqrt(g 2h/3) at the lip (free-overfall brink): assumed
+transport_delay_s = 0.03                    # liquid running down the lip before free fall: assumed
+jet_radius_mm = 3.0                         # stream footprint radius for the receiver-opening overlap: assumed
+impact_force = true                         # stream momentum flux (m_dot * v) pushes on the receiver beaker (scale overshoot)
+funnel_delay_s = 0.8                        # funnel cone + stem transit into the flask: assumed
+residual_film_ml = 0.4                      # wetted-wall film that never drains from a beaker: assumed
+drip_ml = 0.1                               # lip film built up while pouring, dripped off after the stream stops: assumed
+drip_tau_s = 0.5                            # after-drip time constant: assumed
+
+[pour]
+# Closed-loop pour controller (benchsim/process/pour.py). Section numbers: docs/software_architecture.md 5.
+control_dt_s = 0.025                        # host control period (40 Hz goal writes): assumed
+fit_window_s = 0.5                          # 5.1 rolling least-squares line fit (mass and flow)
+outlier_sigma = 5.0                         # 5.1 outlier gate
+outlier_sigma_floor_g = 0.07                # gate sigma never below the HX711 noise ([scale] noise_g)
+outlier_reset_n = 4                         # this many gated samples in a row is a real step: restart the window: assumed
+theta_start_deg = 40.0                      # 5.2 manifold start
+theta_max_deg = 105.0                       # 5.2 manifold end
+fast_rate_deg_s = 120.0                     # 5.2 "fast move to 40": assumed command rate (arm max 180 deg/s)
+ramp_rate_deg_s = 3.0                       # 5.2
+first_drop_q_g_s = 0.5                      # 5.1 first drop: q_hat above this for first_drop_n samples
+first_drop_n = 3
+first_drop_dm_g = 0.3                       # 5.1 and dm_f above this
+kp_deg_per_gs = 0.15                        # 5.3
+ki_deg_per_s_per_gs = 1.5                   # 5.3 gives 0.3 as the initial value. With 0.3 the simulated loop misses the 5.3/9.1
+                                            # acceptance (q* within +-1 g/s after 1.5 s): worst 4.5 g/s over the plant sweep in
+                                            # reports/pour_report.md; 1.5 meets it (worst 0.76 g/s). Retune on hardware.
+max_rate_deg_s = 10.0                       # 5.3 tilt-rate clamp
+q_gain_per_s = 0.6                          # 5.3 q* = clamp(0.6 (target - m), 1, ceiling)
+q_min_g_s = 1.0
+q_ceiling_g_s = 8.0
+cut_a_g = 0.3                               # 5.4 cut when m >= target - (a + b q_hat); initial values, refit from pours
+cut_b_s = 0.15
+untilt_fast_deg = 5.0                       # 5.4 fast untilt delta
+untilt_fast_big_deg = 8.0                   # 5.4 delta when q_hat at the cut > untilt_big_q_g_s
+untilt_big_q_g_s = 5.0
+untilt_rate_deg_s = 60.0                    # 5.4 then <= 60 deg/s
+untilt_total_deg = 15.0                     # 5.4 down to theta_cut - 15
+drip_hold_s = 1.5                           # 5.4
+settle_window_s = 0.5                       # 5.5
+settle_timeout_s = 5.0                      # 5.5
+settle_sigma_g = 0.15                       # 5.5 says 0.05 g, which is below the HX711 per-sample noise (electrical.md 5:
+                                            # 0.05-0.1 g); read here as ~2x the per-sample noise of the window
+settle_flow_g_s = 0.25                      # settled also needs |q_hat| below this (~3x the slope noise of a 0.5 s fit): assumed
+topup_back_deg = 3.0                        # 5.5 top-up: ramp to theta_cut - 3 at 10 deg/s, then +0.5 deg every 0.6 s
+topup_ramp_deg_s = 10.0
+topup_step_deg = 0.5
+topup_period_s = 0.6
+topup_flow_g_s = 0.3                        # 5.5 until q_hat > 0.3 g/s or the cut law fires
+max_topup_pulses = 6                        # 5.5 PAUSE after 6 pulses
+max_pour_s = 45.0                           # whole-pour timeout -> PAUSE_TIMEOUT: assumed
+# mass-deficit (spill) check: an addition to section 5, not in the architecture doc. While flowing, expected =
+# rho (V_first - V_table(theta)) - (spill_allow_g + spill_allow_s q_hat); the allowance covers the liquid standing
+# above the lip (~6-18 g at 1-8 g/s in the [liquid] model) and estimator lag. PAUSE_SPILL if the scale shows less
+# than spill_ratio * expected for spill_hold_s. Values assumed; see reports/pour_report.md for the margins seen.
+spill_check = true
+spill_allow_g = 8.0
+spill_allow_s = 1.5
+spill_ratio = 0.6
+spill_hold_s = 1.0
+spill_arm_s = 2.0                           # check only after the flow has run this long (the start-up transient stands
+                                            # liquid above the lip faster than the scale sees it)
+# funnel pour (5.6): fixed profile, open loop
+funnel_theta_deg = 105.0
+funnel_rate_deg_s = 10.0                    # ramp 40 -> 105 deg: assumed (same as the closed-loop rate clamp)
+funnel_hold_s = 3.0                         # hold at 105 deg so the beaker drains: assumed
+
+[pour.developer]
+low_fill_ml = 46.0                          # 5.2 PAUSE("refill developer") below 1.2 x 38.5 mL
+fill_offset_ml = 9.2                        # 5.2 V_first = V_table(theta_first) + offset. Simulated value from 3 weighed-fill
+                                            # pours (python -m benchsim.pour_trials --calibrate: 8.99 / 9.21 / 9.51 mL at
+                                            # 60 / 70 / 80 mL), mostly first-drop detection lag. Re-measure on the bench
+
+[pour.water]
+low_fill_ml = 36.0                          # 5.2 PAUSE("refill water") below 1.2 x 30 mL
+fill_offset_ml = 9.2                        # assumed equal to the developer value (same beaker; the liquid model has no
+                                            # viscosity term); 5.2 says measure it from 3 weighed-fill water pours
