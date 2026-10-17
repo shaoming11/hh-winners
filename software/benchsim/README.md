@@ -118,6 +118,65 @@ mjpython -m benchsim view                    # (macOS) interactive viewer; the d
   and the scale rises 18.0 g on place. Rack→scale (pourer, GRIP_H 48) grasps at 8.09° (expected 7.72°) and the
   scale rises 19.3 g. With P1 removed, the jaw closes to 16.96°: a miss, so the step fails and the arm backs out.
 
+## Liquid, pouring, auger, stage and foam (phases 6–7)
+
+```bash
+.venv/bin/python -m benchsim.pour_trials          # 10 closed-loop pours, spill cases, funnel pour -> reports/pour_report.md
+.venv/bin/python -m benchsim.verify_mechanisms    # auger doses, carousel, stage, foam + camera -> reports/mechanisms_report.md
+```
+
+These are analytic models, not CFD. All coefficients are in `bench_params.toml` under `[liquid] [pour] [auger_model] [foam]`,
+and the ones marked *assumed* have no measurement behind them.
+- **Liquid** (`chem/liquid.py`): a tilted-cylinder volume and lip head for the held beaker, weir flow over the lip,
+  stream delay plus ballistic landing, and material that misses the receiver opening goes to the spill tally. The
+  liquid weight is applied to the beaker bodies, so the MuJoCo scale flexure and the HX711 model read it.
+- **Pour controller** (`process/pour.py`, no MuJoCo): architecture §5. A line-fit flow estimate, feed-forward plus PI
+  on flow, the cut law `a + b·q̂`, two-stage untilt, drip hold and bounded top-ups. Ki is 1.5 rather than the doc's
+  0.3, because 0.3 failed the doc's own ±1 g/s tracking criterion on the synthetic plant. In simulation: **10/10
+  pours within ±2 g (mean −0.28 g, SD 0.06 g, worst 0.38 g)**. Offsetting the receiver by 31–35 mm gives measured
+  spills of 16.5 g and 40.5 g and a pause. The funnel pour delivers 38.58 of 39 g, landing at most 34 mm off-axis
+  against the 40 mm limit.
+- **Auger** (`chem/auger.py`, `mechanisms.py`): g/rev with a per-revolution spread; yeast lands in the beaker under the
+  outlet; first pass at 85 %, scale check, at most 2 top-ups; stall rule, jam and hopper-empty faults. 10 doses of
+  7 g: all within ±0.7 g, with a −0.18 g mean bias that comes from the assumed `recover_dispenses = false`.
+- **Stage**: the MuJoCo slider-crank matches the analytic `s(θ)` within 0.0001 mm and gives **97.306 mm at 150°**.
+- **Foam** (`chem/foam.py`): induction delay plus first-order H2O2 decomposition, with soap trapping O2 as foam.
+  39 g of 12 % developer gives 1.68 L of O2 (demo_process: about 1.7 L). The foam column geom grows on the sled,
+  and the `foam_cam` pixel count of foam colour rises 2362 → 30869.
+
+## Full demo, run log and notebook (phases 8–9)
+
+```bash
+.venv/bin/python -m benchsim.demo_run                                   # 10-step demo -> runs/<id>/ (video, run_log.json, notebook)
+.venv/bin/python -m benchsim.demo_run --stop-during-pour --no-video     # safe stop in the middle of the developer pour
+.venv/bin/python -m benchsim.demo_run --protocol-text benchsim/ai/examples/elephant_toothpaste.txt --approve --no-video
+.venv/bin/python -m benchsim.ai --text benchsim/ai/examples/elephant_toothpaste.txt   # proposal + validation + approval only
+.venv/bin/python -m benchsim.collect_evidence runs/<id> demo_run        # copy a run into reports/
+```
+
+- **Sequencer** (`process/sequencer.py`, `process/skills.py`). Explicit states, per-step timeouts, and stop requests
+  honoured at safe points. On safe stop the Mega gets STOP, a pouring arm untilts, both arms hold with torque on,
+  and a gripper holding a beaker is never opened.
+- **Evidence run** (`reports/demo_run/`: `demo.mp4`, `run_log.json`, `notebook.md/.html`, scale, joint and pour traces,
+  camera frames). All 12 step rows passed:
+  - developer 38.71 g (−0.29)
+  - yeast 6.85 g (−0.15) after 1 top-up
+  - water +29.77 g (−0.23)
+  - funnel pours left 0.46 g and 0.39 g in the beakers
+  - spill 0.002 g, ERUPT reached
+  - 344 s of sim time in 107 s wall with video; the run is deterministic
+- **Safe stop during the pour** (`reports/demo_safe_stop/`). The beaker is upright 1.2 s after the stop, the pourer
+  still holds it with torque on, and 0.03 g spills. Every later step is skipped with the reason.
+- **Language layer** (`benchsim/ai/`). Protocol text is turned into steps from the fixed vocabulary only, then the
+  deterministic validator (`process/steps.validate`) checks them and the operator must approve (type `approve`, or
+  pass `--approve` on the command line). It never produces actuator commands. Without an API key it falls back to
+  the preset; `reports/demo_ai_protocol/` is that path run through simulation and the notebook.
+- **Process finding** (it depends on assumed foam parameters). In the documented order, step 9 (P2 back to the
+  carousel) comes before ERUPT. With the assumed kinetics (2 s induction, about 8 s half-life) the foam reaches the
+  flask neck 4.3 s after the slurry hits the peroxide, while the stage reaches ERUPT 35 s later, so the eruption
+  happens at WORK. `--erupt-before-return` swaps steps 9 and 10, but the pourer's own return still takes about
+  20 s. The real induction time needs measuring before relying on an eruption at the audience position.
+
 ## Conventions
 
 - World: +X east, +Y north, table top at Z 0 (`docs/demo_process.md` §2.1).
