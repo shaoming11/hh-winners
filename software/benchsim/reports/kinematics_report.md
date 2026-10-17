@@ -11,12 +11,12 @@ Status: **approximate**. The recorded paths are replayed with this mapping for a
 
 | signs | mean endpoint error (mm) | max (mm) | all frames in limits |
 |---|---|---|---|
-| [1, 1, 1, 1, 1] | 25.4 | 72.7 | True |
-| [1, 1, 1, 1, -1] | 35.8 | 72.6 | True |
-| [1, -1, -1, -1, 1] | 156.9 | 220.7 | False |
-| [1, -1, -1, -1, -1] | 157.9 | 221.0 | False |
-| [-1, 1, -1, -1, -1] | 230.8 | 374.1 | False |
-| [-1, 1, -1, -1, 1] | 233.1 | 368.4 | False |
+| [1, 1, 1, 1, 1] | 33.9 | 102.4 | True |
+| [1, 1, 1, 1, -1] | 44.3 | 102.2 | True |
+| [1, -1, -1, -1, 1] | 161.5 | 236.8 | False |
+| [1, -1, -1, -1, -1] | 162.6 | 237.1 | False |
+| [-1, 1, -1, -1, -1] | 236.4 | 374.1 | False |
+| [-1, 1, -1, -1, 1] | 238.7 | 368.4 | False |
 
 ### Station endpoints of the recorded paths (MJCF FK vs update13_final)
 
@@ -25,10 +25,10 @@ Status: **approximate**. The recorded paths are replayed with this mapping for a
 | P_dev pick | [188.6, 399.0, 105.2] | [192.3, 394.6, 100.2] | 7.59 | 9.96 wrist_flex | 11.65 wr_flex | -1.69 |
 | P_wat pick | [109.8, 578.2, 90.6] | [108.5, 574.4, 100.2] | 10.43 | 9.56 wrist_flex | 11.18 wr_flex | -1.63 |
 | P_fun pick | [616.0, 403.0, 98.6] | [620.0, 407.0, 93.7] | 7.51 | 8.76 wrist_flex | 10.42 wr_flex | -1.66 |
-| T1 first frame (pick) | [742.1, 466.2, 60.7] | [715.3, 398.6, 61.7] | 72.74 | 19.40 wrist_flex | 17.72 wr_flex | +1.67 |
+| T1 first frame (pick) | [742.1, 466.2, 60.7] | [718.8, 366.5, 61.7] | 102.41 | 19.40 wrist_flex | 17.72 wr_flex | +1.67 |
 | T1 last frame (place) | [616.7, 406.4, 62.6] | [620.0, 407.0, 63.7] | 3.48 | 18.96 wrist_flex | 17.29 wr_flex | +1.67 |
 | T2 first frame (pick) | [616.7, 406.4, 62.6] | [620.0, 407.0, 63.7] | 3.48 | 18.96 wrist_flex | 17.29 wr_flex | +1.67 |
-| T2 last frame (place) | [742.1, 466.2, 60.7] | [715.3, 398.6, 61.7] | 72.74 | 19.40 wrist_flex | 17.72 wr_flex | +1.67 |
+| T2 last frame (place) | [742.1, 466.2, 60.7] | [718.8, 366.5, 61.7] | 102.41 | 19.40 wrist_flex | 17.72 wr_flex | +1.67 |
 
 The binding joint matches the planner in every case; the constant 1.67 deg margin difference is the wrist-flex zero of the axis fit vs the planner's link-angle calibration (urdf_limits.py), i.e. the wrist-flex zero is uncertain by about 1.7 deg.
 
@@ -37,7 +37,7 @@ The binding joint matches the planner in every case; the constant 1.67 deg margi
 | step | segment | frames | in limits | min margin | contacts (worst) | min clearance | held tilt | lip above rim |
 |---|---|---|---|---|---|---|---|---|
 | T1 | approach park->pick | 6 | True | 11.2 wrist_flex | 0  | 18.6 |  |  |
-| T1 | carry pick->place (held) | 8 | True | 11.2 wrist_flex | 6 (2.4 mm carousel/beaker_P1) | -2.3 | [0.6, 0.6] |  |
+| T1 | carry pick->place (held) | 8 | True | 11.2 wrist_flex | 3 (1.4 mm beaker_P1/scale_pan) | -1.4 | [0.6, 0.6] |  |
 | T1 | retreat place->park | 5 | True | 11.5 wrist_flex | 11 (13.2 mm beaker_P1/transfer/gripper) | -13.2 |  |  |
 | P_dev | approach park->pick | 13 | True | 10.0 wrist_flex | 19 (4.7 mm beaker_dev/pourer/gripper) | -4.7 |  |  |
 | P_dev | carry pick->pre-pour (held) | 34 | True | 10.0 wrist_flex | 7 (4.6 mm beaker_dev/world) | -4.6 | [0.3, 0.8] |  |
@@ -48,7 +48,7 @@ The binding joint matches the planner in every case; the constant 1.67 deg margi
 | P_fun | tilt-in (held) | 35 | True | 66.1 wrist_roll | 0  | 10.7 | [1.1, 55.0] | [np.float64(68.3), np.float64(83.8)] |
 | P_fun | pour 55->105 deg (held) | 26 | True | 76.3 shoulder_lift | 0  | 18.6 | [55.0, 105.0] | [np.float64(62.3), np.float64(68.3)] |
 | T2 | approach park->pick | 6 | True | 11.5 wrist_flex | 13 (13.8 mm beaker_P1/transfer/gripper) | -13.7 |  |  |
-| T2 | carry pick->place (held) | 8 | True | 11.2 wrist_flex | 6 (2.4 mm scale_pan/beaker_P1) | -2.4 | [0.6, 0.6] |  |
+| T2 | carry pick->place (held) | 8 | True | 11.2 wrist_flex | 3 (1.4 mm scale_pan/beaker_P1) | -1.4 | [0.6, 0.6] |  |
 | T2 | retreat place->park | 5 | True | 11.2 wrist_flex | 11 (13.2 mm beaker_P1/transfer/gripper) | -13.2 |  |  |
 | P_wat | approach park->pick | 13 | True | 9.5 wrist_flex | 3 (0.8 mm world/pourer/moving_jaw_so101_v1) | -0.8 |  |  |
 | P_wat | carry pick->pre-pour (held) | 34 | True | 9.5 wrist_flex | 12 (9.7 mm world/beaker_water) | -9.7 | [0.3, 0.8] |  |
@@ -63,7 +63,7 @@ Solved by IK on the MJCF arms, seeded from the mapped recorded poses. Top-down p
 
 | step | pose | endpoint error (mm) | axis tilt (deg) | min margin | binding | rule |
 |---|---|---|---|---|---|---|
-| 1 P1 carousel->scale | pick (close on P1) | 0.000 | 0.0 | 22.29 | wrist_flex | ok |
+| 1 P1 carousel->scale | pick (close on P1) | 0.000 | 0.0 | 23.11 | wrist_flex | ok |
 | 1 P1 carousel->scale | place (release) | 0.000 | 0.0 | 15.27 | wrist_flex | ok |
 | 2 developer pour | pick (close on dev) | 0.000 | 0.0 | 9.01 | wrist_flex | **below 10** |
 | 2 developer pour | place (release) | 0.000 | 0.0 | 9.67 | wrist_flex | **below 10** |
@@ -74,8 +74,8 @@ Solved by IK on the MJCF arms, seeded from the mapped recorded poses. Top-down p
 | 3 P1 funnel pour | pour theta 40 | - | - | 74.51 | shoulder_lift | ok |
 | 3 P1 funnel pour | pour theta 105 | - | - | 79.80 | shoulder_lift | ok |
 | 4 P1 scale->carousel | pick (close on P1) | 0.000 | 0.0 | 15.87 | wrist_flex | ok |
-| 4 P1 scale->carousel | place (release) | 0.000 | 0.0 | 21.66 | wrist_flex | ok |
-| 6 P2 carousel->scale | pick (close on P2) | 0.000 | 0.0 | 22.29 | wrist_flex | ok |
+| 4 P1 scale->carousel | place (release) | 0.000 | 0.0 | 22.48 | wrist_flex | ok |
+| 6 P2 carousel->scale | pick (close on P2) | 0.000 | 0.0 | 23.11 | wrist_flex | ok |
 | 6 P2 carousel->scale | place (release) | 0.000 | 0.0 | 15.27 | wrist_flex | ok |
 | 7 water pour | pick (close on water) | 0.000 | 0.0 | 13.83 | wrist_flex | ok |
 | 7 water pour | place (release) | 0.000 | 0.0 | 14.56 | wrist_flex | ok |
@@ -86,7 +86,7 @@ Solved by IK on the MJCF arms, seeded from the mapped recorded poses. Top-down p
 | 8 P2 funnel pour | pour theta 40 | - | - | 74.51 | shoulder_lift | ok |
 | 8 P2 funnel pour | pour theta 105 | - | - | 79.80 | shoulder_lift | ok |
 | 9 P2 scale->carousel | pick (close on P2) | 0.000 | 0.0 | 15.87 | wrist_flex | ok |
-| 9 P2 scale->carousel | place (release) | 0.000 | 0.0 | 21.66 | wrist_flex | ok |
+| 9 P2 scale->carousel | place (release) | 0.000 | 0.0 | 22.48 | wrist_flex | ok |
 
 ### Grip height selection for the side-grasp pours
 
@@ -101,20 +101,20 @@ Solved by IK on the MJCF arms, seeded from the mapped recorded poses. Top-down p
 
 | step | segment | phase | configs | min margin | rule | contacts | min clearance (mm) | at |
 |---|---|---|---|---|---|---|---|---|
-| 1 P1 carousel->scale | approach park->above channel entry | approach | 51 | 14.19 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
-| 1 P1 carousel->scale | lower to channel entry | approach | 10 | 14.19 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
-| 1 P1 carousel->scale | slide in along finger channel | approach | 17 | 13.53 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
-| 1 P1 carousel->scale | descend to carousel_pick | approach | 12 | 13.53 wrist_flex | ok | 0 | 15.54 | transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w8) |
-| 1 P1 carousel->scale | touch fixed finger to P1 | approach | 4 | 22.02 wrist_flex | ok | 0 | 13.19 | transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w9) |
-| 1 P1 carousel->scale | close on P1 | pick | 19 | 22.29 wrist_flex | ok | 0 | 13.19 | transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w9) |
-| 1 P1 carousel->scale | lift from carousel_pick | carry | 12 | 13.78 wrist_flex | ok | 0 | 0.05 | beaker_P1(beaker_P1_floor) x carousel(tt04_floor) |
-| 1 P1 carousel->scale | carry carousel_pick->scale_pan | carry | 18 | 7.95 wrist_flex | ok | 0 | 11.74 | beaker_P1(beaker_P1_floor) x carousel(pocket0_w9) |
-| 1 P1 carousel->scale | lower onto scale_pan | carry | 11 | 7.95 wrist_flex | ok | 0 | 7.72 | transfer/gripper(transfer/finger_fixed) x scale_pan(scale_ring_w6) |
+| 1 P1 carousel->scale | approach park->above channel entry | approach | 46 | 14.16 wrist_flex | ok | 0 | 14.40 | transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w3) |
+| 1 P1 carousel->scale | lower to channel entry | approach | 9 | 14.16 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
+| 1 P1 carousel->scale | slide in along finger channel | approach | 16 | 14.16 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
+| 1 P1 carousel->scale | descend to carousel_pick | approach | 12 | 14.50 wrist_flex | ok | 0 | 5.55 | transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w7) |
+| 1 P1 carousel->scale | touch fixed finger to P1 | approach | 5 | 23.11 wrist_flex | ok | 0 | -0.33 | transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w7) |
+| 1 P1 carousel->scale | close on P1 | pick | 19 | 23.11 wrist_flex | ok | 0 | 5.30 | transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w5) |
+| 1 P1 carousel->scale | lift from carousel_pick | carry | 12 | 14.41 wrist_flex | ok | 0 | 0.05 | beaker_P1(beaker_P1_floor) x carousel(tt04_floor) |
+| 1 P1 carousel->scale | carry carousel_pick->scale_pan | carry | 23 | 7.95 wrist_flex | ok | 0 | 11.74 | beaker_P1(beaker_P1_floor) x carousel(pocket0_w15) |
+| 1 P1 carousel->scale | lower onto scale_pan | carry | 11 | 7.95 wrist_flex | ok | 0 | 1.57 | beaker_P1(beaker_P1_floor) x scale_pan(scale_pan_floor) |
 | 1 P1 carousel->scale | release | place | 19 | 15.27 wrist_flex | ok | 0 | 7.72 | transfer/gripper(transfer/finger_fixed) x scale_pan(scale_ring_w6) |
-| 1 P1 carousel->scale | move fixed finger off P1 | retreat | 4 | 14.58 wrist_flex | ok | 0 | 7.72 | transfer/gripper(transfer/finger_fixed) x scale_pan(scale_ring_w6) |
+| 1 P1 carousel->scale | move fixed finger off P1 | retreat | 4 | 14.58 wrist_flex | ok | 0 | -0.33 | transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w7) |
 | 1 P1 carousel->scale | lift 20 mm | retreat | 13 | 6.75 wrist_flex | ok | 0 | 8.04 | transfer/gripper(transfer/finger_fixed) x scale_pan(scale_ring_w6) |
 | 1 P1 carousel->scale | slide out along finger channel | retreat | 17 | 6.73 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
-| 1 P1 carousel->scale | return to park | park | 67 | 8.14 wrist_flex | ok | 0 | 14.65 | transfer/moving_jaw_so101_v1(transfer/finger_moving) x beaker_P1(beaker_P1_w11) |
+| 1 P1 carousel->scale | return to park | park | 67 | 8.14 wrist_flex | ok | 0 | 12.91 | transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w9) |
 | 2 developer pour | approach park->above rack_1 | approach | 99 | 31.41 elbow_flex | ok | 0 | 3.62 | pourer/gripper(pourer/finger_fixed) x beaker_dev(beaker_dev_w17) |
 | 2 developer pour | descend to rack_1 | approach | 30 | 9.01 wrist_flex | ok | 0 | 5.00 | pourer/gripper(pourer/finger_fixed) x world(rk03_cup1_w18) |
 | 2 developer pour | close on dev | pick | 11 | 9.01 wrist_flex | **below 10** | 0 | 4.88 | pourer/moving_jaw_so101_v1(pourer/finger_moving) x world(rk03_cup1_w10) |
@@ -152,27 +152,27 @@ Solved by IK on the MJCF arms, seeded from the mapped recorded poses. Top-down p
 | 4 P1 scale->carousel | touch fixed finger to P1 | approach | 5 | 15.17 wrist_flex | ok | 0 | -0.22 | transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w6) |
 | 4 P1 scale->carousel | close on P1 | pick | 19 | 15.87 wrist_flex | ok | 0 | 6.22 | transfer/gripper(transfer/finger_fixed) x scale_pan(scale_ring_w4) |
 | 4 P1 scale->carousel | lift from scale_pan | carry | 13 | 7.95 wrist_flex | ok | 0 | 0.02 | beaker_P1(beaker_P1_floor) x scale_pan(scale_pan_floor) |
-| 4 P1 scale->carousel | carry scale_pan->carousel_pick | carry | 18 | 7.95 wrist_flex | ok | 0 | 11.40 | beaker_P1(beaker_P1_floor) x carousel(pocket3_w8) |
-| 4 P1 scale->carousel | lower onto carousel_pick | carry | 11 | 13.78 wrist_flex | ok | 4 | -3.64 | beaker_P1(beaker_P1_floor) x carousel(pocket3_w13) |
-| 4 P1 scale->carousel | release | place | 19 | 21.66 wrist_flex | ok | 0 | 14.04 | transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w9) |
-| 4 P1 scale->carousel | move fixed finger off P1 | retreat | 4 | 21.39 wrist_flex | ok | 0 | -0.22 | transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w6) |
-| 4 P1 scale->carousel | lift 20 mm | retreat | 12 | 12.91 wrist_flex | ok | 0 | 16.27 | transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w8) |
-| 4 P1 scale->carousel | slide out along finger channel | retreat | 16 | 12.91 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
-| 4 P1 scale->carousel | return to park | park | 59 | 13.56 wrist_flex | ok | 0 | 9.86 | transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w2) |
-| 6 P2 carousel->scale | approach park->above channel entry | approach | 51 | 14.19 wrist_flex | ok | 0 | 11.96 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w3) |
-| 6 P2 carousel->scale | lower to channel entry | approach | 10 | 14.19 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
-| 6 P2 carousel->scale | slide in along finger channel | approach | 17 | 13.53 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
-| 6 P2 carousel->scale | descend to carousel_pick | approach | 12 | 13.53 wrist_flex | ok | 0 | 15.54 | transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w8) |
-| 6 P2 carousel->scale | touch fixed finger to P2 | approach | 4 | 22.02 wrist_flex | ok | 0 | -0.38 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w6) |
-| 6 P2 carousel->scale | close on P2 | pick | 19 | 22.29 wrist_flex | ok | 0 | 13.19 | transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w9) |
-| 6 P2 carousel->scale | lift from carousel_pick | carry | 12 | 13.78 wrist_flex | ok | 12 | -5.08 | beaker_P2(beaker_P2_w18) x carousel(pocket3_w13) |
-| 6 P2 carousel->scale | carry carousel_pick->scale_pan | carry | 18 | 7.95 wrist_flex | ok | 12 | -22.06 | beaker_P2(beaker_P2_floor) x beaker_P1(beaker_P1_w9) |
+| 4 P1 scale->carousel | carry scale_pan->carousel_pick | carry | 23 | 7.95 wrist_flex | ok | 0 | 11.67 | beaker_P1(beaker_P1_floor) x carousel(pocket0_w3) |
+| 4 P1 scale->carousel | lower onto carousel_pick | carry | 11 | 14.41 wrist_flex | ok | 0 | -0.08 | beaker_P1(beaker_P1_w1) x carousel(pocket0rib_w3) |
+| 4 P1 scale->carousel | release | place | 19 | 22.48 wrist_flex | ok | 0 | 6.80 | transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w5) |
+| 4 P1 scale->carousel | move fixed finger off P1 | retreat | 5 | 22.48 wrist_flex | ok | 0 | -0.22 | transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w6) |
+| 4 P1 scale->carousel | lift 20 mm | retreat | 12 | 13.85 wrist_flex | ok | 0 | 7.00 | transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w7) |
+| 4 P1 scale->carousel | slide out along finger channel | retreat | 17 | 13.51 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
+| 4 P1 scale->carousel | return to park | park | 55 | 13.51 wrist_flex | ok | 0 | 14.39 | transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w2) |
+| 6 P2 carousel->scale | approach park->above channel entry | approach | 46 | 14.16 wrist_flex | ok | 0 | 14.39 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w3) |
+| 6 P2 carousel->scale | lower to channel entry | approach | 9 | 14.16 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
+| 6 P2 carousel->scale | slide in along finger channel | approach | 16 | 14.16 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
+| 6 P2 carousel->scale | descend to carousel_pick | approach | 12 | 14.50 wrist_flex | ok | 0 | 5.55 | transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w7) |
+| 6 P2 carousel->scale | touch fixed finger to P2 | approach | 5 | 23.11 wrist_flex | ok | 0 | -0.36 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w7) |
+| 6 P2 carousel->scale | close on P2 | pick | 19 | 23.11 wrist_flex | ok | 0 | 5.30 | transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w5) |
+| 6 P2 carousel->scale | lift from carousel_pick | carry | 12 | 14.41 wrist_flex | ok | 0 | 0.00 | beaker_P2(beaker_P2_floor) x carousel(tt04_floor) |
+| 6 P2 carousel->scale | carry carousel_pick->scale_pan | carry | 23 | 7.95 wrist_flex | ok | 0 | 11.67 | beaker_P2(beaker_P2_floor) x carousel(pocket0_w3) |
 | 6 P2 carousel->scale | lower onto scale_pan | carry | 11 | 7.95 wrist_flex | ok | 0 | 1.52 | beaker_P2(beaker_P2_floor) x scale_pan(scale_pan_floor) |
 | 6 P2 carousel->scale | release | place | 19 | 15.27 wrist_flex | ok | 0 | 7.72 | transfer/gripper(transfer/finger_fixed) x scale_pan(scale_ring_w6) |
-| 6 P2 carousel->scale | move fixed finger off P2 | retreat | 4 | 14.58 wrist_flex | ok | 0 | -0.38 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w6) |
+| 6 P2 carousel->scale | move fixed finger off P2 | retreat | 4 | 14.58 wrist_flex | ok | 0 | -0.36 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w7) |
 | 6 P2 carousel->scale | lift 20 mm | retreat | 13 | 6.75 wrist_flex | ok | 0 | 8.04 | transfer/gripper(transfer/finger_fixed) x scale_pan(scale_ring_w6) |
 | 6 P2 carousel->scale | slide out along finger channel | retreat | 17 | 6.73 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
-| 6 P2 carousel->scale | return to park | park | 67 | 8.14 wrist_flex | ok | 0 | 13.10 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w10) |
+| 6 P2 carousel->scale | return to park | park | 67 | 8.14 wrist_flex | ok | 0 | 12.97 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w9) |
 | 7 water pour | approach park->above rack_3 | approach | 95 | 15.88 shoulder_pan | ok | 0 | 3.68 | pourer/gripper(pourer/finger_fixed) x beaker_water(beaker_water_w6) |
 | 7 water pour | descend to rack_3 | approach | 30 | 13.83 wrist_flex | ok | 0 | 1.00 | pourer/gripper(pourer/finger_fixed) x world(rk03_cup3_w4) |
 | 7 water pour | close on water | pick | 11 | 13.83 wrist_flex | ok | 0 | 1.00 | pourer/gripper(pourer/finger_fixed) x world(rk03_cup3_w4) |
@@ -210,30 +210,30 @@ Solved by IK on the MJCF arms, seeded from the mapped recorded poses. Top-down p
 | 9 P2 scale->carousel | touch fixed finger to P2 | approach | 5 | 15.17 wrist_flex | ok | 0 | -0.22 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w6) |
 | 9 P2 scale->carousel | close on P2 | pick | 19 | 15.87 wrist_flex | ok | 0 | 6.22 | transfer/gripper(transfer/finger_fixed) x scale_pan(scale_ring_w4) |
 | 9 P2 scale->carousel | lift from scale_pan | carry | 13 | 7.95 wrist_flex | ok | 0 | 0.02 | beaker_P2(beaker_P2_floor) x scale_pan(scale_pan_floor) |
-| 9 P2 scale->carousel | carry scale_pan->carousel_pick | carry | 18 | 7.95 wrist_flex | ok | 12 | -22.09 | beaker_P2(beaker_P2_floor) x beaker_P1(beaker_P1_w9) |
-| 9 P2 scale->carousel | lower onto carousel_pick | carry | 11 | 13.78 wrist_flex | ok | 11 | -3.64 | beaker_P2(beaker_P2_floor) x carousel(pocket3_w13) |
-| 9 P2 scale->carousel | release | place | 19 | 21.66 wrist_flex | ok | 0 | 14.04 | transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w9) |
-| 9 P2 scale->carousel | move fixed finger off P2 | retreat | 4 | 21.39 wrist_flex | ok | 0 | -0.22 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w6) |
-| 9 P2 scale->carousel | lift 20 mm | retreat | 12 | 12.91 wrist_flex | ok | 0 | 16.27 | transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w8) |
-| 9 P2 scale->carousel | slide out along finger channel | retreat | 16 | 12.91 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
-| 9 P2 scale->carousel | return to park | park | 59 | 13.56 wrist_flex | ok | 0 | 9.86 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w2) |
+| 9 P2 scale->carousel | carry scale_pan->carousel_pick | carry | 23 | 7.95 wrist_flex | ok | 0 | 11.67 | beaker_P2(beaker_P2_floor) x carousel(pocket0_w3) |
+| 9 P2 scale->carousel | lower onto carousel_pick | carry | 11 | 14.41 wrist_flex | ok | 0 | -0.08 | beaker_P2(beaker_P2_w1) x carousel(pocket0rib_w3) |
+| 9 P2 scale->carousel | release | place | 19 | 22.48 wrist_flex | ok | 0 | 6.80 | transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w5) |
+| 9 P2 scale->carousel | move fixed finger off P2 | retreat | 5 | 22.48 wrist_flex | ok | 0 | -0.22 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w6) |
+| 9 P2 scale->carousel | lift 20 mm | retreat | 12 | 13.85 wrist_flex | ok | 0 | 7.00 | transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w7) |
+| 9 P2 scale->carousel | slide out along finger channel | retreat | 17 | 13.51 wrist_flex | ok | 0 | 18.60 | transfer/shoulder x world(rail_X_front) |
+| 9 P2 scale->carousel | return to park | park | 55 | 13.51 wrist_flex | ok | 0 | 14.39 | transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w2) |
 
 | step | free-motion clearance (mm) | segment | between |
 |---|---|---|---|
-| 1 P1 carousel->scale | 11.74 | carry carousel_pick->scale_pan | beaker_P1(beaker_P1_floor) x carousel(pocket0_w9) |
+| 1 P1 carousel->scale | 11.74 | carry carousel_pick->scale_pan | beaker_P1(beaker_P1_floor) x carousel(pocket0_w15) |
 | 2 developer pour | 3.62 | approach park->above rack_1 | pourer/gripper(pourer/finger_fixed) x beaker_dev(beaker_dev_w17) |
 | 3 P1 funnel pour | 3.68 | approach park->above scale_pan | pourer/gripper(pourer/finger_fixed) x beaker_P1(beaker_P1_w2) |
-| 4 P1 scale->carousel | 9.86 | return to park | transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w2) |
-| 6 P2 carousel->scale | -22.06 | carry carousel_pick->scale_pan | beaker_P2(beaker_P2_floor) x beaker_P1(beaker_P1_w9) |
+| 4 P1 scale->carousel | 11.67 | carry scale_pan->carousel_pick | beaker_P1(beaker_P1_floor) x carousel(pocket0_w3) |
+| 6 P2 carousel->scale | 11.67 | carry carousel_pick->scale_pan | beaker_P2(beaker_P2_floor) x carousel(pocket0_w3) |
 | 7 water pour | 3.68 | approach park->above rack_3 | pourer/gripper(pourer/finger_fixed) x beaker_water(beaker_water_w6) |
 | 8 P2 funnel pour | 3.68 | approach park->above scale_pan | pourer/gripper(pourer/finger_fixed) x beaker_P2(beaker_P2_w2) |
-| 9 P2 scale->carousel | -22.09 | carry scale_pan->carousel_pick | beaker_P2(beaker_P2_floor) x beaker_P1(beaker_P1_w9) |
+| 9 P2 scale->carousel | 11.67 | carry scale_pan->carousel_pick | beaker_P2(beaker_P2_floor) x carousel(pocket0_w3) |
 
 Clearances near 0 at picks and places are the beaker seated in its pocket or cup (beakers are ignored by the clearance query while the gripper is at a station).
 
 ## 5. Reach limits found
 
-- Top-down at carousel_pick: +0 mm 22.0 deg, +10 mm 17.8 deg, +20 mm 13.7 deg, +30 mm 9.5 deg, +40 mm 5.3 deg, +50 mm 1.0 deg, +60 mm -3.4 deg, +80 mm unreachable
+- Top-down at carousel_pick: +0 mm 23.2 deg, +10 mm 18.9 deg, +20 mm 14.6 deg, +30 mm 10.3 deg, +40 mm 5.8 deg, +50 mm 1.1 deg, +60 mm -4.0 deg, +80 mm unreachable
 - Top-down at scale_pan: +0 mm 15.2 deg, +10 mm 11.3 deg, +20 mm 7.4 deg, +30 mm 3.6 deg, +40 mm -0.2 deg, +50 mm -4.0 deg, +60 mm unreachable, +80 mm unreachable
 
 ## 6. Open rule issues
@@ -242,12 +242,7 @@ Clearances near 0 at picks and places are the beaker seated in its pocket or cup
 - 2 developer pour / release: margin 9.67 deg < rule 10 (wrist_flex)
 - 3 P1 funnel pour / close on P1: margin 7.54 deg < rule 10 (wrist_flex)
 - 3 P1 funnel pour / release: margin 8.12 deg < rule 10 (wrist_flex)
-- 4 P1 scale->carousel / lower onto carousel_pick: contact {'pair': ('beaker_P1', 'carousel'), 'depth_mm': 4.58}
-- 6 P2 carousel->scale / lift from carousel_pick: contact {'pair': ('beaker_P2', 'beaker_P1'), 'depth_mm': 18.51}
-- 6 P2 carousel->scale / carry carousel_pick->scale_pan: contact {'pair': ('beaker_P2', 'beaker_P1'), 'depth_mm': 22.09}
 - 8 P2 funnel pour / close on P2: margin 7.54 deg < rule 10 (wrist_flex)
 - 8 P2 funnel pour / release: margin 8.12 deg < rule 10 (wrist_flex)
-- 9 P2 scale->carousel / carry scale_pan->carousel_pick: contact {'pair': ('beaker_P2', 'beaker_P1'), 'depth_mm': 22.09}
-- 9 P2 scale->carousel / lower onto carousel_pick: contact {'pair': ('beaker_P2', 'beaker_P1'), 'depth_mm': 18.51}
 
-Collision-free: **False**
+Collision-free: **True**

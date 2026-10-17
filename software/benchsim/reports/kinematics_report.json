@@ -9,8 +9,8 @@
     1,
     1
    ],
-   "mean_err_mm": 25.427171186189387,
-   "max_err_mm": 72.7418883228596,
+   "mean_err_mm": 33.903613531452436,
+   "max_err_mm": 102.40943653128026,
    "all_in_limits": true
   },
   {
@@ -21,8 +21,8 @@
     1,
     -1
    ],
-   "mean_err_mm": 35.7899252304073,
-   "max_err_mm": 72.61979192036931,
+   "mean_err_mm": 44.2504071800603,
+   "max_err_mm": 102.23147874415481,
    "all_in_limits": true
   },
   {
@@ -33,8 +33,8 @@
     -1,
     1
    ],
-   "mean_err_mm": 156.8762796182337,
-   "max_err_mm": 220.67070413528654,
+   "mean_err_mm": 161.47957220155863,
+   "max_err_mm": 236.7822281769238,
    "all_in_limits": false
   },
   {
@@ -45,8 +45,8 @@
     -1,
     -1
    ],
-   "mean_err_mm": 157.9440196136825,
-   "max_err_mm": 220.9622200258912,
+   "mean_err_mm": 162.55535823379145,
+   "max_err_mm": 237.1019051962725,
    "all_in_limits": false
   },
   {
@@ -57,7 +57,7 @@
     -1,
     -1
    ],
-   "mean_err_mm": 230.8478896157538,
+   "mean_err_mm": 236.44394578103373,
    "max_err_mm": 374.079111601503,
    "all_in_limits": false
   },
@@ -69,7 +69,7 @@
     -1,
     1
    ],
-   "mean_err_mm": 233.14452784259987,
+   "mean_err_mm": 238.74580538731706,
    "max_err_mm": 368.44806591010195,
    "all_in_limits": false
   }
@@ -144,11 +144,11 @@
     60.7
    ],
    "station_mm": [
-    715.3,
-    398.6,
+    718.8,
+    366.5,
     61.7
    ],
-   "residual_mm": 72.74,
+   "residual_mm": 102.41,
    "min_margin_deg": 19.4,
    "binding": "wrist_flex",
    "recorded_margin_deg": 17.72,
@@ -204,11 +204,11 @@
     60.7
    ],
    "station_mm": [
-    715.3,
-    398.6,
+    718.8,
+    366.5,
     61.7
    ],
-   "residual_mm": 72.74,
+   "residual_mm": 102.41,
    "min_margin_deg": 19.4,
    "binding": "wrist_flex",
    "recorded_margin_deg": 17.72,
@@ -260,17 +260,17 @@
      "all_in_limits": true,
      "min_margin_deg": 11.17,
      "binding": "wrist_flex",
-     "penetrations": 6,
+     "penetrations": 3,
      "worst_penetration": {
-      "frame": 0,
+      "frame": 32,
       "pair": [
-       "carousel",
-       "beaker_P1"
+       "beaker_P1",
+       "scale_pan"
       ],
-      "depth_mm": 2.37
+      "depth_mm": 1.4
      },
-     "min_clearance_mm": -2.31,
-     "clearance_at": "beaker_P1(beaker_P1_w4) x carousel(pocket3_w5)",
+     "min_clearance_mm": -1.4,
+     "clearance_at": "beaker_P1(beaker_P1_w0) x scale_pan(scale_ring_w11)",
      "tilt_deg_range": [
       0.6,
       0.6
@@ -593,17 +593,17 @@
      "all_in_limits": true,
      "min_margin_deg": 11.17,
      "binding": "wrist_flex",
-     "penetrations": 6,
+     "penetrations": 3,
      "worst_penetration": {
       "frame": 0,
       "pair": [
        "scale_pan",
        "beaker_P1"
       ],
-      "depth_mm": 2.37
+      "depth_mm": 1.4
      },
-     "min_clearance_mm": -2.37,
-     "clearance_at": "beaker_P1(beaker_P1_w4) x carousel(pocket3_w5)",
+     "min_clearance_mm": -1.37,
+     "clearance_at": "beaker_P1(beaker_P1_w0) x scale_pan(scale_ring_w11)",
      "tilt_deg_range": [
       0.6,
       0.6
@@ -762,7 +762,7 @@
    "arm": "transfer",
    "endpoint_error_mm": 0.0,
    "axis_tilt_deg": 0.0,
-   "min_margin_deg": 22.29,
+   "min_margin_deg": 23.11,
    "binding": "wrist_flex",
    "rule_deg": 10.0,
    "rule_met": true
@@ -887,7 +887,7 @@
    "arm": "transfer",
    "endpoint_error_mm": 0.0,
    "axis_tilt_deg": 0.0,
-   "min_margin_deg": 21.66,
+   "min_margin_deg": 22.48,
    "binding": "wrist_flex",
    "rule_deg": 10.0,
    "rule_met": true
@@ -898,7 +898,7 @@
    "arm": "transfer",
    "endpoint_error_mm": 0.0,
    "axis_tilt_deg": 0.0,
-   "min_margin_deg": 22.29,
+   "min_margin_deg": 23.11,
    "binding": "wrist_flex",
    "rule_deg": 10.0,
    "rule_met": true
@@ -1023,7 +1023,7 @@
    "arm": "transfer",
    "endpoint_error_mm": 0.0,
    "axis_tilt_deg": 0.0,
-   "min_margin_deg": 21.66,
+   "min_margin_deg": 22.48,
    "binding": "wrist_flex",
    "rule_deg": 10.0,
    "rule_met": true
@@ -1035,22 +1035,22 @@
     "segment": "approach park->above channel entry",
     "phase": "approach",
     "kind": "joint",
-    "configs": 51,
-    "min_margin_deg": 14.19,
+    "configs": 46,
+    "min_margin_deg": 14.16,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 18.6,
-    "clearance_at": "transfer/shoulder x world(rail_X_front)"
+    "min_clearance_mm": 14.4,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w3)"
    },
    {
     "segment": "lower to channel entry",
     "phase": "approach",
     "kind": "joint",
-    "configs": 10,
-    "min_margin_deg": 14.19,
+    "configs": 9,
+    "min_margin_deg": 14.16,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -1063,8 +1063,8 @@
     "segment": "slide in along finger channel",
     "phase": "approach",
     "kind": "cartesian",
-    "configs": 17,
-    "min_margin_deg": 13.53,
+    "configs": 16,
+    "min_margin_deg": 14.16,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -1078,49 +1078,49 @@
     "phase": "approach",
     "kind": "cartesian",
     "configs": 12,
-    "min_margin_deg": 13.53,
+    "min_margin_deg": 14.5,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 15.54,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w8)"
+    "min_clearance_mm": 5.55,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w7)"
    },
    {
     "segment": "touch fixed finger to P1",
     "phase": "approach",
     "kind": "cartesian",
-    "configs": 4,
-    "min_margin_deg": 22.02,
+    "configs": 5,
+    "min_margin_deg": 23.11,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 13.19,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w9)"
+    "min_clearance_mm": -0.33,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w7)"
    },
    {
     "segment": "close on P1",
     "phase": "pick",
     "kind": "grip",
     "configs": 19,
-    "min_margin_deg": 22.29,
+    "min_margin_deg": 23.11,
     "binding": "wrist_flex",
     "rule_deg": 10.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 13.19,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w9)"
+    "min_clearance_mm": 5.3,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w5)"
    },
    {
     "segment": "lift from carousel_pick",
     "phase": "carry",
     "kind": "cartesian",
     "configs": 12,
-    "min_margin_deg": 13.78,
+    "min_margin_deg": 14.41,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -1133,7 +1133,7 @@
     "segment": "carry carousel_pick->scale_pan",
     "phase": "carry",
     "kind": "joint",
-    "configs": 18,
+    "configs": 23,
     "min_margin_deg": 7.95,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
@@ -1141,7 +1141,7 @@
     "contacts": 0,
     "worst_contact": null,
     "min_clearance_mm": 11.74,
-    "clearance_at": "beaker_P1(beaker_P1_floor) x carousel(pocket0_w9)"
+    "clearance_at": "beaker_P1(beaker_P1_floor) x carousel(pocket0_w15)"
    },
    {
     "segment": "lower onto scale_pan",
@@ -1154,8 +1154,8 @@
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 7.72,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x scale_pan(scale_ring_w6)"
+    "min_clearance_mm": 1.57,
+    "clearance_at": "beaker_P1(beaker_P1_floor) x scale_pan(scale_pan_floor)"
    },
    {
     "segment": "release",
@@ -1182,8 +1182,8 @@
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 7.72,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x scale_pan(scale_ring_w6)"
+    "min_clearance_mm": -0.33,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w7)"
    },
    {
     "segment": "lift 20 mm",
@@ -1224,8 +1224,8 @@
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 14.65,
-    "clearance_at": "transfer/moving_jaw_so101_v1(transfer/finger_moving) x beaker_P1(beaker_P1_w11)"
+    "min_clearance_mm": 12.91,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w9)"
    }
   ],
   "2 developer pour": [
@@ -1755,56 +1755,50 @@
     "segment": "carry scale_pan->carousel_pick",
     "phase": "carry",
     "kind": "joint",
-    "configs": 18,
+    "configs": 23,
     "min_margin_deg": 7.95,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 11.4,
-    "clearance_at": "beaker_P1(beaker_P1_floor) x carousel(pocket3_w8)"
+    "min_clearance_mm": 11.67,
+    "clearance_at": "beaker_P1(beaker_P1_floor) x carousel(pocket0_w3)"
    },
    {
     "segment": "lower onto carousel_pick",
     "phase": "carry",
     "kind": "cartesian",
     "configs": 11,
-    "min_margin_deg": 13.78,
+    "min_margin_deg": 14.41,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
-    "contacts": 4,
-    "worst_contact": {
-     "pair": [
-      "beaker_P1",
-      "carousel"
-     ],
-     "depth_mm": 4.58
-    },
-    "min_clearance_mm": -3.64,
-    "clearance_at": "beaker_P1(beaker_P1_floor) x carousel(pocket3_w13)"
+    "contacts": 0,
+    "worst_contact": null,
+    "min_clearance_mm": -0.08,
+    "clearance_at": "beaker_P1(beaker_P1_w1) x carousel(pocket0rib_w3)"
    },
    {
     "segment": "release",
     "phase": "place",
     "kind": "grip",
     "configs": 19,
-    "min_margin_deg": 21.66,
+    "min_margin_deg": 22.48,
     "binding": "wrist_flex",
     "rule_deg": 10.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 14.04,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w9)"
+    "min_clearance_mm": 6.8,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w5)"
    },
    {
     "segment": "move fixed finger off P1",
     "phase": "retreat",
     "kind": "cartesian",
-    "configs": 4,
-    "min_margin_deg": 21.39,
+    "configs": 5,
+    "min_margin_deg": 22.48,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -1818,21 +1812,21 @@
     "phase": "retreat",
     "kind": "cartesian",
     "configs": 12,
-    "min_margin_deg": 12.91,
+    "min_margin_deg": 13.85,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 16.27,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w8)"
+    "min_clearance_mm": 7.0,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w7)"
    },
    {
     "segment": "slide out along finger channel",
     "phase": "retreat",
     "kind": "cartesian",
-    "configs": 16,
-    "min_margin_deg": 12.91,
+    "configs": 17,
+    "min_margin_deg": 13.51,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -1845,14 +1839,14 @@
     "segment": "return to park",
     "phase": "park",
     "kind": "joint",
-    "configs": 59,
-    "min_margin_deg": 13.56,
+    "configs": 55,
+    "min_margin_deg": 13.51,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 9.86,
+    "min_clearance_mm": 14.39,
     "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w2)"
    }
   ],
@@ -1861,22 +1855,22 @@
     "segment": "approach park->above channel entry",
     "phase": "approach",
     "kind": "joint",
-    "configs": 51,
-    "min_margin_deg": 14.19,
+    "configs": 46,
+    "min_margin_deg": 14.16,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 11.96,
+    "min_clearance_mm": 14.39,
     "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w3)"
    },
    {
     "segment": "lower to channel entry",
     "phase": "approach",
     "kind": "joint",
-    "configs": 10,
-    "min_margin_deg": 14.19,
+    "configs": 9,
+    "min_margin_deg": 14.16,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -1889,8 +1883,8 @@
     "segment": "slide in along finger channel",
     "phase": "approach",
     "kind": "cartesian",
-    "configs": 17,
-    "min_margin_deg": 13.53,
+    "configs": 16,
+    "min_margin_deg": 14.16,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -1904,82 +1898,70 @@
     "phase": "approach",
     "kind": "cartesian",
     "configs": 12,
-    "min_margin_deg": 13.53,
+    "min_margin_deg": 14.5,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 15.54,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w8)"
+    "min_clearance_mm": 5.55,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w7)"
    },
    {
     "segment": "touch fixed finger to P2",
     "phase": "approach",
     "kind": "cartesian",
-    "configs": 4,
-    "min_margin_deg": 22.02,
+    "configs": 5,
+    "min_margin_deg": 23.11,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": -0.38,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w6)"
+    "min_clearance_mm": -0.36,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w7)"
    },
    {
     "segment": "close on P2",
     "phase": "pick",
     "kind": "grip",
     "configs": 19,
-    "min_margin_deg": 22.29,
+    "min_margin_deg": 23.11,
     "binding": "wrist_flex",
     "rule_deg": 10.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 13.19,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w9)"
+    "min_clearance_mm": 5.3,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w5)"
    },
    {
     "segment": "lift from carousel_pick",
     "phase": "carry",
     "kind": "cartesian",
     "configs": 12,
-    "min_margin_deg": 13.78,
+    "min_margin_deg": 14.41,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
-    "contacts": 12,
-    "worst_contact": {
-     "pair": [
-      "beaker_P2",
-      "beaker_P1"
-     ],
-     "depth_mm": 18.51
-    },
-    "min_clearance_mm": -5.08,
-    "clearance_at": "beaker_P2(beaker_P2_w18) x carousel(pocket3_w13)"
+    "contacts": 0,
+    "worst_contact": null,
+    "min_clearance_mm": 0.0,
+    "clearance_at": "beaker_P2(beaker_P2_floor) x carousel(tt04_floor)"
    },
    {
     "segment": "carry carousel_pick->scale_pan",
     "phase": "carry",
     "kind": "joint",
-    "configs": 18,
+    "configs": 23,
     "min_margin_deg": 7.95,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
-    "contacts": 12,
-    "worst_contact": {
-     "pair": [
-      "beaker_P2",
-      "beaker_P1"
-     ],
-     "depth_mm": 22.09
-    },
-    "min_clearance_mm": -22.06,
-    "clearance_at": "beaker_P2(beaker_P2_floor) x beaker_P1(beaker_P1_w9)"
+    "contacts": 0,
+    "worst_contact": null,
+    "min_clearance_mm": 11.67,
+    "clearance_at": "beaker_P2(beaker_P2_floor) x carousel(pocket0_w3)"
    },
    {
     "segment": "lower onto scale_pan",
@@ -2020,8 +2002,8 @@
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": -0.38,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w6)"
+    "min_clearance_mm": -0.36,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w7)"
    },
    {
     "segment": "lift 20 mm",
@@ -2062,8 +2044,8 @@
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 13.1,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w10)"
+    "min_clearance_mm": 12.97,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w9)"
    }
   ],
   "7 water pour": [
@@ -2593,62 +2575,50 @@
     "segment": "carry scale_pan->carousel_pick",
     "phase": "carry",
     "kind": "joint",
-    "configs": 18,
+    "configs": 23,
     "min_margin_deg": 7.95,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
-    "contacts": 12,
-    "worst_contact": {
-     "pair": [
-      "beaker_P2",
-      "beaker_P1"
-     ],
-     "depth_mm": 22.09
-    },
-    "min_clearance_mm": -22.09,
-    "clearance_at": "beaker_P2(beaker_P2_floor) x beaker_P1(beaker_P1_w9)"
+    "contacts": 0,
+    "worst_contact": null,
+    "min_clearance_mm": 11.67,
+    "clearance_at": "beaker_P2(beaker_P2_floor) x carousel(pocket0_w3)"
    },
    {
     "segment": "lower onto carousel_pick",
     "phase": "carry",
     "kind": "cartesian",
     "configs": 11,
-    "min_margin_deg": 13.78,
+    "min_margin_deg": 14.41,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
-    "contacts": 11,
-    "worst_contact": {
-     "pair": [
-      "beaker_P2",
-      "beaker_P1"
-     ],
-     "depth_mm": 18.51
-    },
-    "min_clearance_mm": -3.64,
-    "clearance_at": "beaker_P2(beaker_P2_floor) x carousel(pocket3_w13)"
+    "contacts": 0,
+    "worst_contact": null,
+    "min_clearance_mm": -0.08,
+    "clearance_at": "beaker_P2(beaker_P2_w1) x carousel(pocket0rib_w3)"
    },
    {
     "segment": "release",
     "phase": "place",
     "kind": "grip",
     "configs": 19,
-    "min_margin_deg": 21.66,
+    "min_margin_deg": 22.48,
     "binding": "wrist_flex",
     "rule_deg": 10.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 14.04,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w9)"
+    "min_clearance_mm": 6.8,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w5)"
    },
    {
     "segment": "move fixed finger off P2",
     "phase": "retreat",
     "kind": "cartesian",
-    "configs": 4,
-    "min_margin_deg": 21.39,
+    "configs": 5,
+    "min_margin_deg": 22.48,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -2662,21 +2632,21 @@
     "phase": "retreat",
     "kind": "cartesian",
     "configs": 12,
-    "min_margin_deg": 12.91,
+    "min_margin_deg": 13.85,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 16.27,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket3_w8)"
+    "min_clearance_mm": 7.0,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x carousel(pocket0_w7)"
    },
    {
     "segment": "slide out along finger channel",
     "phase": "retreat",
     "kind": "cartesian",
-    "configs": 16,
-    "min_margin_deg": 12.91,
+    "configs": 17,
+    "min_margin_deg": 13.51,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -2689,14 +2659,14 @@
     "segment": "return to park",
     "phase": "park",
     "kind": "joint",
-    "configs": 59,
-    "min_margin_deg": 13.56,
+    "configs": 55,
+    "min_margin_deg": 13.51,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 9.86,
+    "min_clearance_mm": 14.39,
     "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w2)"
    }
   ]
@@ -3664,37 +3634,37 @@
     {
      "dz_mm": 0,
      "reachable": true,
-     "min_margin_deg": 22.02
+     "min_margin_deg": 23.18
     },
     {
      "dz_mm": 10,
      "reachable": true,
-     "min_margin_deg": 17.82
+     "min_margin_deg": 18.93
     },
     {
      "dz_mm": 20,
      "reachable": true,
-     "min_margin_deg": 13.66
+     "min_margin_deg": 14.63
     },
     {
      "dz_mm": 30,
      "reachable": true,
-     "min_margin_deg": 9.5
+     "min_margin_deg": 10.26
     },
     {
      "dz_mm": 40,
      "reachable": true,
-     "min_margin_deg": 5.29
+     "min_margin_deg": 5.76
     },
     {
      "dz_mm": 50,
      "reachable": true,
-     "min_margin_deg": 1.01
+     "min_margin_deg": 1.05
     },
     {
      "dz_mm": 60,
      "reachable": true,
-     "min_margin_deg": -3.42
+     "min_margin_deg": -3.96
     },
     {
      "dz_mm": 80,
@@ -3749,19 +3719,14 @@
    ]
   }
  ],
- "collision_free": false,
+ "collision_free": true,
  "rule_issues": [
   "2 developer pour / close on dev: margin 9.01 deg < rule 10 (wrist_flex)",
   "2 developer pour / release: margin 9.67 deg < rule 10 (wrist_flex)",
   "3 P1 funnel pour / close on P1: margin 7.54 deg < rule 10 (wrist_flex)",
   "3 P1 funnel pour / release: margin 8.12 deg < rule 10 (wrist_flex)",
-  "4 P1 scale->carousel / lower onto carousel_pick: contact {'pair': ('beaker_P1', 'carousel'), 'depth_mm': 4.58}",
-  "6 P2 carousel->scale / lift from carousel_pick: contact {'pair': ('beaker_P2', 'beaker_P1'), 'depth_mm': 18.51}",
-  "6 P2 carousel->scale / carry carousel_pick->scale_pan: contact {'pair': ('beaker_P2', 'beaker_P1'), 'depth_mm': 22.09}",
   "8 P2 funnel pour / close on P2: margin 7.54 deg < rule 10 (wrist_flex)",
-  "8 P2 funnel pour / release: margin 8.12 deg < rule 10 (wrist_flex)",
-  "9 P2 scale->carousel / carry scale_pan->carousel_pick: contact {'pair': ('beaker_P2', 'beaker_P1'), 'depth_mm': 22.09}",
-  "9 P2 scale->carousel / lower onto carousel_pick: contact {'pair': ('beaker_P2', 'beaker_P1'), 'depth_mm': 18.51}"
+  "8 P2 funnel pour / release: margin 8.12 deg < rule 10 (wrist_flex)"
  ],
- "seconds": 11.2
+ "seconds": 10.8
 }

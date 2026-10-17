@@ -18,7 +18,7 @@ from .units import m
 
 ARMS = ('pourer', 'transfer')
 BEAKERS = {                                        # name -> initial station (demo_process 5.2)
-    'P1': 'carousel_pocket_0', 'P2': 'carousel_pocket_1', 'dev': 'rack_1', 'water': 'rack_3',
+    'P1': 'carousel_pocket_0', 'P2': 'carousel_pocket_2', 'dev': 'rack_1', 'water': 'rack_3',
 }
 STATIC, STAGE, CAROUSEL, PAN, ALL = 1, 2, 4, 8, 15
 FINGER, BEAKER = 16, 32
