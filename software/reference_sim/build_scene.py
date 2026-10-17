@@ -100,10 +100,21 @@ def add_scale(world: ET.Element) -> None:
                                   "damping": "60"})
     # The central weighing surface sits at Z=63.7 mm; the outer locating ring rises to 71.7.
     add_cylinder(pan, "scale_pan_geom", (0, 0, 0.003), 0.052, 0.003, "0.68 0.72 0.75 1")
-    add_cylinder(pan, "scale_locating_ring_visual", (0, 0, 0.010), 0.058, 0.004,
-                 "0.68 0.72 0.75 0.55", collision=False)
+    # The 56.6 mm locating bore clears a 56 mm beaker by 0.3 mm per side.
+    ring_inner_radius, ring_height, ring_wall, segments = 0.0283, 0.008, 0.001, 64
+    ring_radius = (ring_inner_radius + ring_wall / 2) / math.cos(math.pi / segments)
+    for i in range(segments):
+        angle = 2 * math.pi * i / segments
+        px, py = ring_radius * math.cos(angle), ring_radius * math.sin(angle)
+        arc_half = ring_radius * math.sin(math.pi / segments) * 0.98
+        quat = f"{num(math.cos(angle / 2))} 0 0 {num(math.sin(angle / 2))}"
+        ET.SubElement(pan, "geom", {
+            "name": f"scale_locating_ring_{i:02d}", "type": "box",
+            "pos": v3(px, py, 0.010), "quat": quat,
+            "size": v3(ring_wall / 2, arc_half, ring_height / 2),
+            "rgba": "0.68 0.72 0.75 0.55",
+        })
     ET.SubElement(pan, "site", {"name": "scale_sensor_site", "pos": "0 0 0", "size": "0.002"})
-    add_beaker(world, "scale_beaker", (0.620, 0.407), 0.0637, dynamic=True)
 
 
 def add_beaker(parent: ET.Element, name: str, xy: tuple[float, float], bottom_z: float,
@@ -129,6 +140,8 @@ def add_beaker(parent: ET.Element, name: str, xy: tuple[float, float], bottom_z:
             "rgba": "0.77 0.90 0.95 0.18", "contype": "1" if dynamic else "0",
             "conaffinity": "1" if dynamic else "0",
         })
+    ET.SubElement(body, "site", {"name": f"{name}_grasp", "pos": "0 0 0.052",
+                                  "size": "0.002", "rgba": "0.9 0.1 0.1 0.6"})
     return body
 
 
@@ -161,9 +174,9 @@ def add_carousel(world: ET.Element, actuator: ET.Element) -> None:
                                      "diaginertia": "0.0022 0.0022 0.0044"})
     ET.SubElement(body, "joint", {"name": "carousel_hinge", "type": "hinge", "axis": "0 0 1",
                                   "range": "-6.28319 6.28319", "limited": "true", "damping": "0.4"})
-    # The real deck is cut out around each pocket. Visual-only disks avoid blocking the auger post.
+    # The deck supports four independent free beakers in the pocket ring.
     add_cylinder(body, "carousel_deck", (0, 0, 0.0035), 0.118, 0.0035,
-                 "0.45 0.47 0.50 1", collision=False)
+                 "0.45 0.47 0.50 1")
     add_cylinder(body, "carousel_ring", (0, 0, 0.010), 0.105, 0.006,
                  "0.75 0.77 0.80 1", collision=False)
     initial = math.radians(cfg["rotation_deg"])
@@ -182,10 +195,22 @@ def add_carousel(world: ET.Element, actuator: ET.Element) -> None:
                 "quat": quat, "size": v3(0.001, half_tangent, 0.006),
                 "rgba": "0.18 0.39 0.48 1",
             })
-        add_beaker(body, f"carousel_beaker_{i + 1}", (px, py), 0.0071, dynamic=False)
     ET.SubElement(actuator, "position", {"name": "carousel_position", "joint": "carousel_hinge",
                                          "kp": "8", "kv": "1.5", "forcerange": "-3.43 3.43",
                                          "ctrlrange": "-6.28319 6.28319"})
+
+
+def add_carousel_beakers(world: ET.Element) -> None:
+    """Use free bodies on the rotating deck so an arm can actually pick a beaker."""
+    cfg = load_layout()["carousel"]
+    cx, cy = (v / 1000 for v in cfg["centre"])
+    radius = 0.084
+    initial = math.radians(cfg["rotation_deg"])
+    for i in range(4):
+        angle = initial + i * math.pi / 2
+        xy = (cx + radius * math.cos(angle), cy + radius * math.sin(angle))
+        add_beaker(world, f"carousel_beaker_{i + 1}", xy, cfg["beaker_bottom_z"] / 1000,
+                   dynamic=True)
 
 
 def add_stage(world: ET.Element, actuator: ET.Element) -> None:
@@ -228,11 +253,33 @@ def build() -> Path:
     add_rack_and_auger(world)
     actuator = ET.SubElement(model, "actuator")
     add_carousel(world, actuator)
+    add_carousel_beakers(world)
     add_stage(world, actuator)
 
     layout = load_layout()
     add_robot(model, source, "pourer_", tuple(v / 1000 for v in layout["pourer_base"]["xy"]))
     add_robot(model, source, "transfer_", tuple(v / 1000 for v in layout["transfer_base"]["xy"]))
+
+    equality = ET.SubElement(model, "equality")
+    pickable = ["rack_beaker_1", "rack_beaker_2", "rack_beaker_3"] + \
+               [f"carousel_beaker_{i}" for i in range(1, 5)]
+    for arm in ("pourer", "transfer"):
+        for beaker in pickable:
+            ET.SubElement(equality, "weld", {
+                "name": f"weld_{arm}_{beaker}", "site1": f"{arm}_gripperframe",
+                "site2": f"{beaker}_grasp", "active": "false",
+                "solref": "0.01 1", "solimp": "0.95 0.99 0.001",
+            })
+
+    # Proximity plus the weld is the grasp abstraction. Do not let the stock jaw
+    # geometry fight that constraint against the thin beaker wall meshes.
+    contact = ET.SubElement(model, "contact")
+    for arm in ("pourer", "transfer"):
+        for beaker in pickable:
+            for gripper_body in (f"{arm}_gripper", f"{arm}_moving_jaw_so101_v1"):
+                ET.SubElement(contact, "exclude", {
+                    "body1": gripper_body, "body2": beaker,
+                })
 
     sensor = ET.SubElement(model, "sensor")
     ET.SubElement(sensor, "jointpos", {"name": "scale_deflection", "joint": "scale_flex"})
