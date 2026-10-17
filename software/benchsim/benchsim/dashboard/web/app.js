@@ -5,7 +5,7 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const fmt = (v, d = 1) => (v === null || v === undefined || Number.isNaN(v)) ? '–' : Number(v).toFixed(d);
 
-const STATUS = { pending: '○ pending', running: '● running', passed: '✓ passed', failed: '✕ failed', skipped: '– skipped' };
+const GLYPH = { pending: '□', running: '■', passed: '✔', failed: '✕', skipped: '–' };
 const STATE = { IDLE: 'ready', PRECHECK: 'precheck', RUNNING: 'running', DONE: 'done', SAFE_STOP: 'safe stop', FAILED: 'failed' };
 const ARM = { pourer: 'Pourer arm (west)', transfer: 'Transfer arm (east)' };
 
@@ -34,7 +34,7 @@ function toast(msg) {
 
 // ------------------------------------------------------------------ render
 function render(s) {
-  renderBar(s); renderSpeeds(s); renderCams(s); renderTimeline(s); renderCaption(s); renderNow(s); renderChem(s); renderTwin(s);
+  renderBar(s); renderSpeeds(s); renderCams(s); renderCaption(s); renderRun(s); renderChem(s); renderTwin(s);
   renderWire(s); renderErrors(s);
 }
 
@@ -111,12 +111,6 @@ function renderBar(s) {
   $('runner').textContent = runner ? 'Runner: ' + runner.name + ' · log: ' + runner.out : '';
 }
 
-function renderTimeline(s) {
-  $('timeline').innerHTML = s.steps.map((st) =>
-    '<li class="' + st.status + '" title="' + esc(st.reason || st.type) + '"><span class="n">' + st.index + '</span>' +
-    esc(st.label.replace(/^\d+\s*/, '') || st.type) + '<span class="st">' + STATUS[st.status] + '</span></li>').join('');
-}
-
 function meter(cur, s) {
   // a pour fills toward its target; a wait counts down
   if (!cur) return null;
@@ -159,21 +153,69 @@ function renderCaption(s) {
   }
 }
 
-function renderNow(s) {
-  const cur = s.current;
-  if (!cur) { $('now-title').textContent = $('cap-title').textContent; $('now-detail').textContent = ''; $('now-science').hidden = true; $('now-facts').innerHTML = ''; return; }
-  const n = cur.narration;
-  $('now-title').textContent = n.title; $('now-detail').textContent = n.detail || '';
-  $('now-science').hidden = !n.science;
-  if (n.science) $('now-science').innerHTML = '<div class="eq">' + esc(n.science.equation) + '</div><div class="small">' + esc(n.science.text) + '</div>';
-  const facts = [['Step type', cur.type], ['Elapsed', fmt(cur.elapsed_s, 1) + ' s']];
-  if (cur.remaining_s !== null) facts.push(['Timeout in', fmt(cur.remaining_s, 0) + ' s']);
+// Run panel, styled like the Claude Code terminal: a spinner line for the current step, then the steps as a todo list
+// with finished steps folded away and the current step's details nested under it
+const SPIN = ['·', '✢', '✳', '✶', '✻', '✽'];
+const SPIN_LOOP = SPIN.concat(SPIN.slice(1, -1).reverse());   // forward, then back
+const STILL = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const spinGlyph = () => STILL ? '✻' : SPIN_LOOP[Math.floor(performance.now() / 120) % SPIN_LOOP.length];
+setInterval(() => { const g = document.querySelector('#run-head .spin'); if (g) g.textContent = spinGlyph(); }, 120);
+let runOpen = false;   // finished steps unfolded
+let runHtml = '';
+
+function runHead(s) {
+  // -> [class, glyph (null = spinner), title, muted suffix]
+  const cur = s.current; const runner = s.probes && s.probes.runner; const n = s.steps.length;
+  if (s.seq_state === 'SAFE_STOP' || s.seq_state === 'FAILED') return ['stopped', '✕', 'Safe stop: ' + (s.stop_reason || (s.errors || [])[0] || s.seq_state), ''];
+  if (cur) return ['busy', null, cur.narration.title + '…', '(' + fmt(cur.elapsed_s, 1) + ' s' + (cur.remaining_s !== null ? ' · times out in ' + fmt(cur.remaining_s, 0) + ' s' : '') + ')'];
+  if (runner && runner.phase === 'building') return ['busy', null, 'Building the bench…', ''];
+  if (s.seq_state === 'PRECHECK' || s.seq_state === 'RUNNING') return ['busy', null, s.seq_state === 'PRECHECK' ? 'Running prechecks…' : 'Running…', ''];
+  if (s.seq_state === 'DONE') {
+    const ok = s.steps.filter((st) => st.status === 'passed').length;
+    return ['done', '✔', 'Run complete · ' + (ok === n ? 'all ' + n + ' steps passed' : ok + ' of ' + n + ' steps passed'), ''];
+  }
+  return ['idle', '✻', 'Ready · press Start to run ' + n + ' steps', ''];
+}
+
+function runFacts(s, cur) {
+  const n = cur.narration; const facts = [['Step type', cur.type]];
   if (n.chemical) facts.push(['Chemical', n.chemical.name + (n.chemical.formula ? ' (' + n.chemical.formula + ')' : '')]);
   if (n.amount_g !== null) facts.push(['Target', fmt(n.amount_g, 1) + ' g' + (n.tol_g ? ' ± ' + fmt(n.tol_g, 1) : '')]);
   if (s.scale.g !== null) facts.push(['Scale', fmt(s.scale.g, 1) + ' g' + (s.scale.rate_hz ? ' · ' + s.scale.rate_hz + ' samples/s' : '')]);
   if (n.clearance) facts.push(['Tightest gap', n.clearance.mm + ' mm (' + n.clearance.between + ')']);
-  $('now-facts').innerHTML = facts.map(([k, v]) => '<dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd>').join('');
+  return '<dl class="facts">' + facts.map(([k, v]) => '<dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd>').join('') + '</dl>';
 }
+
+function runRow(st, s) {
+  const cur = s.current && s.current.index === st.index ? s.current : null;
+  let sub = '';
+  if (cur) {
+    const n = cur.narration;
+    sub = (n.detail ? '<p>' + esc(n.detail) + '</p>' : '') +
+      (n.science ? '<div class="science"><div class="eq">' + esc(n.science.equation) + '</div><div>' + esc(n.science.text) + '</div></div>' : '') + runFacts(s, cur);
+  } else if (st.status === 'failed' && st.reason) sub = '<p class="why">' + esc(st.reason) + '</p>';
+  return '<li class="' + st.status + '" title="' + esc(st.reason || st.type) + '"><span class="g">' + GLYPH[st.status] + '</span><span class="n">' + st.index +
+    '</span><span class="lbl">' + esc(st.label.replace(/^\d+\s*/, '') || st.type) + '</span>' + (sub ? '<div class="sub">' + sub + '</div>' : '') + '</li>';
+}
+
+function renderRun(s) {
+  const [cls, glyph, title, meta] = runHead(s);
+  $('run-head').className = 'run-head ' + cls;
+  $('run-head').innerHTML = '<span class="g' + (glyph ? '' : ' spin') + '">' + (glyph || spinGlyph()) + '</span><span><span class="t">' + esc(title) + '</span>' +
+    (meta ? ' <span class="meta">' + esc(meta) + '</span>' : '') + '</span>';
+  const steps = s.steps;
+  let focus = steps.findIndex((st) => st.status !== 'passed' && st.status !== 'skipped');
+  if (focus < 0) focus = steps.length;
+  const fold = focus >= 3 ? focus - 1 : 0;   // finished steps folded away; the last finished one stays in view
+  const more = $('run-more'); more.hidden = !fold;
+  if (fold) {
+    const skipped = steps.slice(0, fold).filter((st) => st.status === 'skipped').length;
+    more.textContent = runOpen ? '− hide ' + fold + ' finished steps' : '… +' + fold + ' steps done' + (skipped ? ' (' + skipped + ' skipped)' : '');
+  }
+  const html = steps.slice(runOpen ? 0 : fold).map((st) => runRow(st, s)).join('');
+  if (html !== runHtml) { runHtml = html; $('run-steps').innerHTML = html; }
+}
+$('run-more').addEventListener('click', () => { runOpen = !runOpen; if (last) renderRun(last); });
 
 const TIGHTEST_MM = 5.3;   // smallest verified clearance in the demo (held beaker vs funnel, demo_process 4)
 const JOINT = { shoulder_pan: 'pan', shoulder_lift: 'lift', elbow_flex: 'elbow', wrist_flex: 'w.flex', wrist_roll: 'w.roll' };
