@@ -1,0 +1,8 @@
+Elephant toothpaste, the standard bench demo. The flask already holds the dish soap and food colouring.
+
+1. Put the empty beaker P1 on the scale and pour 39 g of the 12 % hydrogen peroxide developer into it (within 2 g).
+2. Pour P1 into the flask through the funnel, then put P1 back in the carousel.
+3. Dose one packet of instant yeast, about 7 g (within 0.7 g, at most two top-ups), into P2 with the auger.
+4. Bring P2 to the scale and check the yeast weight.
+5. Add 30 g of warm water on top of the yeast (within 2 g) and let it activate for 60 seconds.
+6. Pour the yeast slurry into the flask, put P2 back in the carousel, then move the stage to ERUPT.
