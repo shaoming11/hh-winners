@@ -1,0 +1,77 @@
+{
+ "$defs": {
+  "PlanStep": {
+   "additionalProperties": false,
+   "description": "One step of benchsim.process.steps.  `params` is checked by `steps.validate`, the only\ngate before execution - it is deliberately an open dict here so the two never drift.",
+   "properties": {
+    "type": {
+     "enum": [
+      "TRANSFER",
+      "POUR_TO_SCALE",
+      "POUR_TO_FUNNEL",
+      "CAROUSEL",
+      "DOSE_YEAST",
+      "VERIFY_MASS",
+      "WAIT",
+      "STAGE"
+     ],
+     "title": "Type",
+     "type": "string"
+    },
+    "params": {
+     "additionalProperties": true,
+     "description": "per-type params; see benchsim.process.steps",
+     "title": "Params",
+     "type": "object"
+    },
+    "label": {
+     "default": "",
+     "title": "Label",
+     "type": "string"
+    }
+   },
+   "required": [
+    "type"
+   ],
+   "title": "PlanStep",
+   "type": "object"
+  }
+ },
+ "additionalProperties": false,
+ "properties": {
+  "title": {
+   "title": "Title",
+   "type": "string"
+  },
+  "steps": {
+   "items": {
+    "$ref": "#/$defs/PlanStep"
+   },
+   "title": "Steps",
+   "type": "array"
+  },
+  "source": {
+   "default": "manual",
+   "enum": [
+    "llm",
+    "preset",
+    "manual",
+    "agent"
+   ],
+   "title": "Source",
+   "type": "string"
+  },
+  "notes": {
+   "default": "",
+   "title": "Notes",
+   "type": "string"
+  }
+ },
+ "required": [
+  "title",
+  "steps"
+ ],
+ "title": "Plan",
+ "type": "object",
+ "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

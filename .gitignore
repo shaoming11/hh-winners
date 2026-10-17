@@ -15,3 +15,9 @@ MUJOCO_LOG.TXT
 .DS_Store
 __pycache__/
 *.py[cod]
+# Simulation outputs and fetched third-party assets (python -m benchsim.assets fetch)
+software/out/
+.pytest_cache/
+software/MUJOCO_LOG.TXT
+.env
+*.env

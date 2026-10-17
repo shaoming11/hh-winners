@@ -1,0 +1,203 @@
+[
+ {
+  "test": "PING",
+  "ok": true,
+  "t": 0.01,
+  "reply": {
+   "fw": "benchsim-mega 0.1",
+   "ok": true,
+   "seq": 2,
+   "sim": true,
+   "t": 5
+  }
+ },
+ {
+  "test": "scale stream + tare reads ~0 g",
+  "ok": true,
+  "t": 0.309,
+  "grams": 0.004,
+  "samples_per_s": 80
+ },
+ {
+  "test": "scale stream rate 80 Hz",
+  "ok": true,
+  "t": 1.309,
+  "samples_in_1s": 80
+ },
+ {
+  "test": "pourer joint goal reached",
+  "ok": true,
+  "t": 1.609,
+  "max_err_deg": 0.058,
+  "move_s": 0.3,
+  "loads_permille": [
+   -2.0,
+   -133.0,
+   -121.0,
+   -26.0,
+   4.0,
+   4.0
+  ]
+ },
+ {
+  "test": "transfer joint goal reached",
+  "ok": true,
+  "t": 2.189,
+  "max_err_deg": 0.037,
+  "move_s": 0.28,
+  "loads_permille": [
+   16.0,
+   -5.0,
+   -34.0,
+   -34.0,
+   -12.0,
+   4.0
+  ]
+ },
+ {
+  "test": "arm goal outside joint range rejected",
+  "ok": true,
+  "t": 2.469,
+  "detail": "pourer goal outside joint range: [ 30.  -29.1 -60.  201.2   "
+ },
+ {
+  "test": "blocked arm motion detected as stall (goal error + load)",
+  "ok": true,
+  "t": 4.709,
+  "goal_error_deg": 44.17,
+  "max_load_permille": 1000.0
+ },
+ {
+  "test": "carousel TT 90 deg",
+  "ok": true,
+  "t": 9.514,
+  "done": {
+   "cmd": "TT",
+   "deg": 90.09,
+   "done": true,
+   "seq": 7,
+   "t": 9509
+  },
+  "deck_deg": 90.12
+ },
+ {
+  "test": "stage ST 150 deg (ERUPT)",
+  "ok": true,
+  "t": 12.189,
+  "done": {
+   "cmd": "ST",
+   "deg": 149.4,
+   "done": true,
+   "seq": 46,
+   "t": 12179
+  },
+  "sled_travel_mm": 97.2
+ },
+ {
+  "test": "stage back to WORK",
+  "ok": true,
+  "t": 14.874
+ },
+ {
+  "test": "auger AUG 2 rev",
+  "ok": true,
+  "t": 17.579,
+  "done": {
+   "cmd": "AUG",
+   "done": true,
+   "rev": 2.0,
+   "seq": 96,
+   "stalls": 0,
+   "t": 17574
+  }
+ },
+ {
+  "test": "unknown command -> BADCMD",
+  "ok": true,
+  "t": 17.584,
+  "got": "BADCMD",
+  "detail": "unknown command 'FLY'"
+ },
+ {
+  "test": "TT out of range -> RANGE",
+  "ok": true,
+  "t": 17.589,
+  "got": "RANGE",
+  "detail": "TT deg 400.0 outside [-10.0, 280.0]"
+ },
+ {
+  "test": "TT faster than 2 s per 45 deg -> RANGE",
+  "ok": true,
+  "t": 17.594,
+  "got": "RANGE",
+  "detail": "TT 90 deg needs >= 4000 ms"
+ },
+ {
+  "test": "AUG > 50 rev -> RANGE",
+  "ok": true,
+  "t": 17.599,
+  "got": "RANGE",
+  "detail": "AUG rev 60.00 outside (0, 50]"
+ },
+ {
+  "test": "ST while carousel moving -> BUSY",
+  "ok": true,
+  "t": 17.609,
+  "got": "BUSY",
+  "detail": "TT running"
+ },
+ {
+  "test": "AUG while carousel moving -> BUSY",
+  "ok": true,
+  "t": 17.614,
+  "got": "BUSY",
+  "detail": "TT running"
+ },
+ {
+  "test": "e-stop during carousel move -> ESTOP fault, no done",
+  "ok": true,
+  "t": 23.709,
+  "deck_deg_at_estop": 4.6,
+  "deck_deg_after": 6.7
+ },
+ {
+  "test": "command while e-stop latched -> ESTOP",
+  "ok": true,
+  "t": 23.714,
+  "got": "ESTOP",
+  "detail": "latched"
+ },
+ {
+  "test": "CLR with e-stop still pressed -> STATE",
+  "ok": true,
+  "t": 23.719,
+  "got": "STATE",
+  "detail": "e-stop still pressed"
+ },
+ {
+  "test": "CLR after release",
+  "ok": true,
+  "t": 23.724
+ },
+ {
+  "test": "host silent 500 ms during a move -> WDT fault",
+  "ok": true,
+  "t": 28.434
+ },
+ {
+  "test": "jammed auger -> AUGER_JAM after 3 stalls",
+  "ok": true,
+  "t": 33.649,
+  "stalls": 3
+ },
+ {
+  "test": "HX711 silent -> HX_TIMEOUT fault",
+  "ok": true,
+  "t": 33.954
+ },
+ {
+  "test": "STOP is always accepted",
+  "ok": true,
+  "t": 33.964
+ }
+]

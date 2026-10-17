@@ -1,0 +1,106 @@
+{
+ "additionalProperties": false,
+ "properties": {
+  "id": {
+   "title": "Id",
+   "type": "string"
+  },
+  "ts": {
+   "title": "Ts",
+   "type": "string"
+  },
+  "severity": {
+   "enum": [
+    "info",
+    "warning",
+    "critical"
+   ],
+   "title": "Severity",
+   "type": "string"
+  },
+  "code": {
+   "description": "SPILL | ESTOP | FAULT | OVERRUN | SCALE_RATE | DOSE_ERROR | COMMS | TEMP | BEAKER_MISSING | NEEDS_APPROVAL",
+   "title": "Code",
+   "type": "string"
+  },
+  "message": {
+   "title": "Message",
+   "type": "string"
+  },
+  "run_id": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Run Id"
+  },
+  "step": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Step"
+  },
+  "data": {
+   "additionalProperties": true,
+   "title": "Data",
+   "type": "object"
+  },
+  "acknowledged_by": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Acknowledged By"
+  },
+  "acknowledged_at": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Acknowledged At"
+  },
+  "resolved": {
+   "default": false,
+   "title": "Resolved",
+   "type": "boolean"
+  },
+  "notified": {
+   "description": "channels/people the agent told (e.g. 'imessage:+1555')",
+   "items": {
+    "type": "string"
+   },
+   "title": "Notified",
+   "type": "array"
+  }
+ },
+ "required": [
+  "id",
+  "severity",
+  "code",
+  "message"
+ ],
+ "title": "Alert",
+ "type": "object",
+ "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
