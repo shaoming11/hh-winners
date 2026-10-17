@@ -179,9 +179,10 @@ class Builder:
             self.cyl(wb, (c[0], c[1], base / 2 + 1.5), rout, (base + 3) / 2, rgba=PLA, name='rk03_cup%d_post' % (i + 1))
             self.ring_walls(wb, c, rin, rout, z0, z0 + 22.0, n=20, name='rk03_cup%d' % (i + 1))
             wb.add_site(name='rack_%d' % (i + 1), pos=m([c[0], c[1], z0]))
-        for a, b in zip(cups[:-1], cups[1:]):
+        for k, (a, b) in enumerate(zip(cups[:-1], cups[1:])):
             d = np.subtract(b, a); L = np.linalg.norm(d); mid = (np.add(a, b)) / 2
-            self.box(wb, (mid[0], mid[1], z0 - 6), (L / 2 - rout + 2, 4, 5), quat=quat_z(math.degrees(math.atan2(d[1], d[0]))), name=None)
+            self.box(wb, (mid[0], mid[1], z0 - 6), (L / 2 - rout + 2, 4, 5), quat=quat_z(math.degrees(math.atan2(d[1], d[0]))),
+                     name='rk03_web%d' % k)
         self.box(wb, (240.0, (cups[0][1] + cups[2][1]) / 2, 30), (5, (cups[2][1] - cups[0][1]) / 2 + 30, 30), name='rk03_spine')
         self.fid.add('reagent rack RK-03', 'procedural', 'cup posts + 20-box cup walls + webs + spine',
                      'update13_final rack_stands + rack_beaker_bottom_z', 'cup walls 22 mm tall around the beaker; spine on the Y-left west face')
@@ -191,11 +192,11 @@ class Builder:
         cc = S['crank_centre']; r = S['crank_r']; L = S['rod_l']; fun = self.st['funnel']
         pin_work = cc[1] + r + L
         self.box(wb, (450, 65, 23.6), (93, 30.5, 3.6), rgba=PLA, name='st12_bridge', cls=STAGE)
-        crank = wb.add_body(name='crank', pos=m([cc[0], cc[1], 51]))
+        crank = wb.add_body(name='crank', pos=m([cc[0], cc[1], 48]))
         jc = crank.add_joint(name='crank', type=mujoco.mjtJoint.mjJNT_HINGE, axis=[0, 0, 1], damping=[0.2, 0, 0], armature=0.005)
         jc.range = [math.radians(-5), math.radians(160)]
         self.box(crank, (0, r / 2, 0), (7, r / 2 + 6, 3), rgba=PLA_DARK, cls=STAGE, collide=False, name='st13_crank')
-        rod = crank.add_body(name='rod', pos=m([0, r, 7]))
+        rod = crank.add_body(name='rod', pos=m([0, r, 10]))
         rod.add_joint(name='rod', type=mujoco.mjtJoint.mjJNT_HINGE, axis=[0, 0, 1], damping=[0.01, 0, 0])
         self.box(rod, (0, L / 2, 0), (7, L / 2 + 8, 3), rgba=PLA_DARK, collide=False, name='st14_rod')
         sled = wb.add_body(name='sled', pos=m([fun['xy'][0], fun['xy'][1], 0]))
@@ -204,7 +205,6 @@ class Builder:
         sled.mass = 0.6; sled.inertia = [3e-3, 3e-3, 3e-3]; sled.explicitinertial = True
         z0, z1 = S['sled_plate_z']; sx, sy = S['sled_size_xy']
         self.box(sled, (0, 0, (z0 + z1) / 2), (sx / 2, sy / 2, (z1 - z0) / 2), cls=STAGE, rgba=PLA, name='st11_sled')
-        pin_local = (0.0, pin_work - fun['xy'][1], 58.0 - 51.0 + 51.0 - 0.0)
         sled.add_site(name='sled_pin', pos=m([0, pin_work - fun['xy'][1], 58]))
         eq = self.spec.add_equality(type=mujoco.mjtEq.mjEQ_CONNECT, name='rod_to_sled', objtype=mujoco.mjtObj.mjOBJ_BODY)
         eq.name1 = 'rod'; eq.name2 = 'sled'; eq.data[0:3] = m([0, L, 0])
@@ -356,6 +356,32 @@ class Builder:
                 e.name1 = '%s/gripper' % arm; e.name2 = 'beaker_' + bk; e.active = False
                 e.solref = [0.004, 1.0]
 
+    CAD_HIDES = {'RK-03': ('rk03_',), 'TT-04': ('tt04_floor', 'pocket'), 'TT-02': ('tt02_deck',), 'WS-02': ('scale_pan_floor', 'scale_ring'),
+                 'ST-11': ('st11_sled',), 'ST-12': ('st12_bridge',), 'ST-13': ('st13_crank',), 'ST-14': ('st14_rod',),
+                 'ST-07': ('st07_',), 'ST-05': ('st05_',), 'TT-01': ('tt01_base',)}
+
+    def cad_meshes(self):
+        """imported part-local STLs placed by benchsim.meshfit (config/mesh_fits.json); visual only. The procedural
+        geoms of the same parts stay as collision geometry and move to the hidden group 3."""
+        from . import meshfit
+        fits = json.loads(meshfit.FITS_JSON.read_text()); hide = []
+        colors = {'RK-03': (0.95, 0.95, 0.95, 1), 'TT-04': (0.95, 0.75, 0.2, 1), 'TT-02': PLA, 'WS-02': PLA, 'ST-11': PLA, 'ST-12': PLA,
+                  'ST-13': PLA_DARK, 'ST-14': PLA_DARK, 'ST-07': (0.85, 0.9, 0.95, 0.45), 'ST-05': PLA, 'TT-01': PLA_DARK}
+        for f in fits:
+            V, F = meshes.read_stl(paths.PRINTS_V2 / f['file'])
+            c, s_ = math.cos(math.radians(f['yaw_deg'])), math.sin(math.radians(f['yaw_deg']))
+            V = V.copy(); V[:, :2] = V[:, :2] @ np.array([[c, -s_], [s_, c]]).T; V += f['t']
+            body = self.spec.worldbody if f['body'] == 'world' else self.spec.body(f['body'])
+            key = f['part'].split()[0]
+            self.mesh(body, V, F, rgba=colors.get(key, PLA), name='cad_' + key.replace('-', '').lower())
+            hide += list(self.CAD_HIDES.get(key, ()))
+            self.fid.add(f['part'], 'cad-mesh', 'procedural (see the matching procedural row)', f['file'],
+                         '%s%s' % (f['verified'], '' if f['residual_mm'] is None else '; residual %.3f mm' % f['residual_mm']))
+        for g in self._iter_geoms(self.spec.worldbody):
+            if g.name and g.name.startswith(tuple(hide)):
+                g.group = 3
+                if g.contype == 0: g.rgba = [0, 0, 0, 0]
+
     def cameras(self):
         wb = self.spec.worldbody
         def cam(name, pos, target, fovy=45):
@@ -372,7 +398,7 @@ class Builder:
 
     def build(self):
         self.world(); self.frame(); self.scale(); self.carousel(); self.auger(); self.rack(); self.stage()
-        self.beakers(); self.arms(); self.grasp_welds(); self.cameras()
+        self.beakers(); self.arms(); self.grasp_welds(); self.cad_meshes(); self.cameras()
         self.spec.compiler.autolimits = True
         model = self.spec.compile()
         return model

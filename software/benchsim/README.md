@@ -35,6 +35,20 @@ is Apache-2.0; its `LICENSE` is fetched alongside it.
 .venv/bin/python -m benchsim.cadmap     # CAD as-built pose fit (writes benchsim/config/cad_asbuilt_fit.json)
 ```
 
+## Verification
+
+```bash
+.venv/bin/python -m benchsim.verify_layout   # phase 2 gate -> reports/layout_report.{md,json}
+.venv/bin/python -m benchsim.meshfit         # re-fit imported CAD mesh placements -> benchsim/config/mesh_fits.json
+.venv/bin/python -m pytest -q tests
+```
+
+Station centres in the compiled model are compared with update13_final (gate 1 mm). Because the scene is built
+from the same JSON, that check guards the config → scene pipeline (unit conversion, frames). The independent
+evidence that CAD and layout agree is the feature fit of part-local STLs: the RK-03 rack's three cup floors land
+on the rack pockets to 0.000 mm, the TT-04 ring's four pocket bores on the r 84 pockets to 0.12 mm and its floor
+on the recorded beaker-bottom Z 61.7, and the WS-02 pan floor on Z 63.7.
+
 ## Conventions
 
 - World: +X east, +Y north, table top at Z 0 (`docs/demo_process.md` §2.1).

@@ -47,7 +47,7 @@ lip_radius = 28.0
 # WS-01 v4 on E6, WS-02 v3 pan (80 dia, 14 tall, 100 mL ring) -> exports/prints_v2 STL extents
 pan_od = 80.0
 pan_height = 14.0
-ring_id = 57.0                              # 100 mL locating ring, 0.5 mm radial clearance: assumed
+ring_id = 60.3                              # 100 mL locating ring: WS-02 v3 STL bore r 30.16 (benchsim.meshfit)
 base_size = [117.0, 67.8, 45.0]             # WS-01 STL extent
 saddle_x = [547.0, 664.0]                   # update13_final scale.mount
 pan_mass_g = 45.0                           # assumed (PLA pan + screws)
