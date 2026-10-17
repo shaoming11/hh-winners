@@ -34,6 +34,11 @@ Run the numerical acceptance checks with:
 software/reference_sim/.venv/bin/python software/reference_sim/validate.py
 ```
 
+The simulator also exposes shared control interfaces in `hal/base.py`. `hal/sim.py` implements
+the SO-101 joint bus and an asynchronous Mega-like device. The demo routes tare, auger, carousel,
+and stage commands through that device and the newline JSON codec. Arm joint goals are accepted in
+degrees and actuated by the official MuJoCo position servos.
+
 ## What is represented
 
 - Both official SO-101 arms are loaded as articulated MuJoCo models at the two final base
@@ -48,9 +53,10 @@ software/reference_sim/.venv/bin/python software/reference_sim/validate.py
 
 ## Limits
 
-This first reference version does **not** yet simulate arm pick-and-place motion or a calibrated
-CAD-to-MJCF trajectory bridge. Its 10-step process run checks the analytical chemistry targets
-and the carousel/stage mechanisms, but arm actions in the log are process events, not physical
-arm playback. The liquid model is not CFD. The current flow and auger constants are placeholders
-until measured on the assembled bench. It is useful for comparing layout, dose and flow assumptions,
-not for claiming that untested hardware code will work unchanged.
+The demo currently moves one arm joint as a control smoke check, but it does **not** play the
+recorded pick-and-place trajectories or physically grasp and move the beakers. Process arm actions
+in the 10-step log remain logical events until the CAD-to-MJCF calibration and grasp model are
+implemented. Yeast dosing is a calibrated grams-per-revolution equation, and the flow and auger
+constants are placeholders until measured on the assembled bench. The liquid model is not CFD.
+This is useful for comparing layout, dose, mechanism, and control-interface assumptions. It does
+not establish that the hardware demo will work unchanged.

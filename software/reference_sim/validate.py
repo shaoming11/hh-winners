@@ -4,6 +4,7 @@ from __future__ import annotations
 from run_demo import run
 from verify_layout import run as verify_layout
 from chemistry import PourPlant
+from hal.protocol import LineDecoder, decode_line, encode_line
 
 
 def main() -> None:
@@ -11,6 +12,17 @@ def main() -> None:
     assert all(row["pass"] for row in layout_rows), "one or more station radii are outside 1 mm"
 
     result = run()
+    smoke = result["arm_control_smoke"]
+    assert abs(smoke["reached_deg"] - smoke["target_deg"]) <= 1.0
+    assert abs(smoke["returned_deg"] - smoke["start_deg"]) <= 1.0
+    assert result["process_arm_trajectory_playback"] is False
+    assert result["mega_json_line_codec_exercised"] is True
+    example = {"cmd": "carousel", "deg": 45, "ms": 2500}
+    line = encode_line(example)
+    assert decode_line(line) == example
+    decoder = LineDecoder()
+    assert decoder.feed(line[:7]) == []
+    assert decoder.feed(line[7:]) == [example]
     events = {event["step"]: event for event in result["events"]}
     dev = events[2]["pour"]
     water = events[7]["pour"]
@@ -37,6 +49,7 @@ def main() -> None:
     print("PASS: simulated load-cell reads the added mass within 1 g")
     print("PASS: yeast target, carousel index, and 97.3 mm stage move are within tolerance")
     print("PASS: both funnel pours land inside the modeled opening")
+    print("PASS: SO-101 joint command, JSON-line codec, and simulated mechanism commands respond")
     print(f"PASS: 10 simulated 39 g pours mean {batch_mean:.2f} g, SD {batch_sd:.2f} g")
 
 

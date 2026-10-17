@@ -6,14 +6,45 @@ import json
 from pathlib import Path
 
 from chemistry import PourPlant
-from world import BenchWorld
+from hal.protocol import decode_line, encode_line
+from hal.sim import make_sim_bench
 
 
 def run() -> dict:
-    world = BenchWorld()
+    world, pourer, transfer, mega = make_sim_bench()
     world.step(2.0)
-    world.tare_scale()
     plant = PourPlant(seed=2026)
+
+    def scale_sample() -> dict:
+        for sample in mega.samples():
+            if "w" in sample:
+                return {"time_ms": sample["w"][0], "grams": sample["w"][1]}
+            if "f" in sample:
+                raise RuntimeError(f"Simulated Mega fault: {sample['f']}")
+        raise RuntimeError("weight stream ended unexpectedly")
+
+    def mega_command(command: dict) -> dict:
+        """Round-trip through the same JSON-line codec used for serial messages."""
+        response = decode_line(mega.handle_line(encode_line(command)))
+        if response.get("state") == "BUSY":
+            completion = mega.wait_until_idle()
+            if not completion.get("ok"):
+                raise RuntimeError(f"Simulated Mega command failed: {completion}")
+            response["completion"] = completion
+        if not response.get("ok"):
+            raise RuntimeError(f"Simulated Mega rejected command: {response}")
+        return response
+
+    arm_snapshot = {"pourer": pourer.read_positions(), "transfer": transfer.read_positions()}
+    arm_start_deg = arm_snapshot["pourer"]["wrist_roll"]
+    arm_target_deg = arm_start_deg + 5.0
+    pourer.write_goals({"wrist_roll": arm_target_deg})
+    world.step(0.25)
+    arm_reached_deg = pourer.read_positions()["wrist_roll"]
+    pourer.write_goals({"wrist_roll": arm_start_deg})
+    world.step(0.25)
+    arm_returned_deg = pourer.read_positions()["wrist_roll"]
+    tare_response = mega_command({"cmd": "tare"})
 
     events = []
     # Empty P1 is carried to the scale by the documented transfer arm sequence.
@@ -21,7 +52,8 @@ def run() -> dict:
     dev = plant.pour(80.0, 39.0, receiver_radius_mm=20.0, receiver_drop_mm=20.0)
     world.set_scale_payload_g(dev.landed_g)
     world.step(1.0)
-    dev_scale_g = world.scale_grams()
+    dev_scale = scale_sample()
+    dev_scale_g = dev_scale["grams"]
     events.append({"step": 2, "action": "developer onto P1", "pour": dev.__dict__,
                    "mujoco_scale_reading_g": dev_scale_g})
     world.set_scale_payload_g(0)
@@ -34,15 +66,18 @@ def run() -> dict:
     # Powder dosing has a simple calibrated revolutions model; no discrete yeast particles.
     grams_per_rev = 0.50
     auger_revs = 7.0 / grams_per_rev
+    auger = mega_command({"cmd": "auger", "revs": auger_revs, "ms": 7000})
     yeast_mass = round(auger_revs * grams_per_rev, 3)
-    world.set_scale_payload_g(yeast_mass)
     world.step(1.0)
-    yeast_scale_g = world.scale_grams()
+    yeast_scale = scale_sample()
+    yeast_scale_g = yeast_scale["grams"]
     world.set_scale_payload_g(0)
     world.step(1.0)
     events.append({"step": 5, "action": "dose yeast into P2", "target_g": 7.0,
-                   "revolutions": auger_revs, "actual_g": yeast_mass})
-    events.append({"step": 6, "action": "P2 to scale and verify yeast", "measured_g": yeast_scale_g})
+                   "revolutions": auger_revs, "actual_g": yeast_mass,
+                   "mega_command": auger})
+    events.append({"step": 6, "action": "P2 to scale and verify yeast", "measured_g": yeast_scale_g,
+                   "scale_sample": yeast_scale})
     water = plant.pour(80.0, 30.0, receiver_radius_mm=20.0, receiver_drop_mm=20.0)
     world.set_scale_payload_g(yeast_mass + water.landed_g)
     world.step(1.0)
@@ -57,17 +92,29 @@ def run() -> dict:
     events.append({"step": 8, "action": "P2 slurry into funnel", "pour": funnel_slurry.__dict__})
     events.append({"step": 9, "action": "P2 back to carousel", "virtual_arm_motion": False})
 
-    world.move_carousel(180, duration=8.0)
+    carousel_cmd = mega_command({"cmd": "carousel", "deg": 180, "ms": 8000})
     carousel_dose = world.status()
-    world.move_carousel(0, duration=8.0)
-    stage_mm = world.move_stage(150, duration=2.5)
+    mega_command({"cmd": "carousel", "deg": 0, "ms": 8000})
+    stage_cmd = mega_command({"cmd": "stage", "deg": 150, "ms": 2500})
+    stage_target_mm = stage_cmd["completion"]["travel_mm"]
+    stage_mm = world.status()["stage_travel_mm"]
     events.append({"step": 10, "action": "move stage to ERUPT", "stage_travel_mm": stage_mm,
-                   "carousel_dose_pose": carousel_dose["carousel_deg"]})
+                   "carousel_dose_pose": carousel_dose["carousel_deg"],
+                   "carousel_command": carousel_cmd, "stage_command": stage_cmd,
+                   "stage_target_mm": stage_target_mm})
     return {
         "simulator": "independent-reference-analytical-chemistry",
         "model_scope": "MuJoCo geometry and mechanisms; analytical liquid and yeast models",
         "hardware_used": False,
-        "arm_motion_simulated": False,
+        "process_arm_trajectory_playback": False,
+        "arm_bus_initial_positions_deg": arm_snapshot,
+        "arm_control_smoke": {
+            "joint": "pourer.wrist_roll", "start_deg": arm_start_deg,
+            "target_deg": arm_target_deg, "reached_deg": arm_reached_deg,
+            "returned_deg": arm_returned_deg,
+        },
+        "mega_tare_response": tare_response,
+        "mega_json_line_codec_exercised": True,
         "events": events,
         "final_mujoco": world.status(),
         "notes": [

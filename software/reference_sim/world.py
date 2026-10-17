@@ -21,6 +21,20 @@ class BenchWorld:
         self.scale_tare_m = 0.0
         self.scale_payload_g = 0.0
         self.scale_dof = int(self.model.jnt_dofadr[self._joint_id("scale_flex")])
+        self._torque_enabled: dict[str, bool] = {"pourer": True, "transfer": True}
+        self._actuator_power: dict[str, list[tuple[int, float, float]]] = {}
+        self._arm_joint_names = ("shoulder_pan", "shoulder_lift", "elbow_flex",
+                                 "wrist_flex", "wrist_roll", "gripper")
+        for arm in ("pourer", "transfer"):
+            self._actuator_power[arm] = []
+            prefix = f"{arm}_"
+            for joint in self._arm_joint_names:
+                aid = self._actuator_id(prefix + joint)
+                self._actuator_power[arm].append((
+                    aid,
+                    float(self.model.actuator_gainprm[aid, 0]),
+                    float(self.model.actuator_biasprm[aid, 1]),
+                ))
         mujoco.mj_forward(self.model, self.data)
 
     def _step_once(self) -> None:
@@ -37,6 +51,12 @@ class BenchWorld:
 
     def _actuator_id(self, name: str) -> int:
         return mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, name)
+
+    def set_actuator_goal_rad(self, actuator: str, target: float) -> None:
+        aid = self._actuator_id(actuator)
+        if aid < 0:
+            raise ValueError(f"Unknown actuator: {actuator}")
+        self.data.ctrl[aid] = float(target)
 
     def joint_position(self, name: str) -> float:
         jid = self._joint_id(name)
@@ -64,6 +84,54 @@ class BenchWorld:
             actuator = prefix + joint
             result[joint] = math.degrees(self.move_actuator(actuator, math.radians(degrees), duration))
         return result
+
+    def arm_positions_deg(self, arm: str) -> dict[str, float]:
+        """Read the six articulated joints in the official SO-101 convention."""
+        prefix = {"pourer": "pourer_", "transfer": "transfer_"}[arm]
+        return {name: math.degrees(self.joint_position(prefix + name))
+                for name in self._arm_joint_names}
+
+    def set_arm_goals_deg(self, arm: str, goals: dict[str, float]) -> None:
+        """Set position-servo goals without blocking the simulation step loop."""
+        prefix = {"pourer": "pourer_", "transfer": "transfer_"}[arm]
+        unknown = set(goals) - set(self._arm_joint_names)
+        if unknown:
+            raise ValueError(f"Unknown SO-101 joints: {sorted(unknown)}")
+        if not self._torque_enabled[arm]:
+            raise RuntimeError(f"Torque is disabled on {arm}")
+        for joint, degrees in goals.items():
+            aid = self._actuator_id(prefix + joint)
+            self.data.ctrl[aid] = math.radians(float(degrees))
+
+    def arm_load(self, arm: str) -> dict[str, float]:
+        """Return simulated Present_Load-like values in the usual -1000..1000 range.
+
+        This scales the MuJoCo actuator force to the configured 3.35 N m servo limit.
+        It is a useful load trend, not a calibrated Feetech register model.
+        """
+        prefix = f"{arm}_"
+        result = {}
+        for joint in self._arm_joint_names:
+            aid = self._actuator_id(prefix + joint)
+            force_limit = max(abs(float(x)) for x in self.model.actuator_forcerange[aid])
+            result[joint] = max(-1000.0, min(1000.0,
+                float(self.data.actuator_force[aid]) / max(force_limit, 1e-9) * 1000.0))
+        return result
+
+    def set_arm_torque(self, arm: str, enabled: bool) -> None:
+        """Enable or disable the MuJoCo position actuators for one arm."""
+        if arm not in self._torque_enabled:
+            raise ValueError(f"Unknown arm: {arm}")
+        if self._torque_enabled[arm] == enabled:
+            return
+        for aid, gain, bias in self._actuator_power[arm]:
+            if enabled:
+                self.model.actuator_gainprm[aid, 0] = gain
+                self.model.actuator_biasprm[aid, 1] = bias
+            else:
+                self.model.actuator_gainprm[aid, 0] = 0.0
+                self.model.actuator_biasprm[aid, 1] = 0.0
+        self._torque_enabled[arm] = enabled
 
     def move_carousel(self, degrees: float, duration: float = 2.0) -> float:
         return math.degrees(self.move_actuator("carousel_position", math.radians(degrees), duration))
