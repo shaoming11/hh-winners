@@ -40,8 +40,29 @@ is Apache-2.0; its `LICENSE` is fetched alongside it.
 ```bash
 .venv/bin/python -m benchsim.verify_layout   # phase 2 gate -> reports/layout_report.{md,json}
 .venv/bin/python -m benchsim.meshfit         # re-fit imported CAD mesh placements -> benchsim/config/mesh_fits.json
+.venv/bin/python -m benchsim.verify_kinematics   # phase 3 -> reports/kinematics_report.{md,json}, reports/native_plans.json
 .venv/bin/python -m pytest -q tests
 ```
+
+### Kinematics (phase 3)
+
+- **CAD → MJCF mapping: approximate, not calibrated.** `q_mj = o + s·q_cad`. The offsets `o` come from fitting the
+  upstream arm to the CAD as-built joint axes; all signs `s = +1`. Of the 32 sign combinations this is the only one
+  that keeps every recorded station frame in the joint limits, and it has the lowest error by a factor of three.
+  Recorded station endpoints land 3.4–10.4 mm from the stations. The binding joint matches the planner every time,
+  but margins differ by a constant 1.67°, so the wrist-flex zero is uncertain by about that much.
+- **Recorded-path playback: pending.** Pours replay cleanly: the lip sits within ±3 mm of the planner's 45/65 mm
+  design height and carried beakers stay within 1.1° of upright. Approach and pick frames collide by the size of
+  the residuals, and the planner's top-down frame puts the beaker 13–14 mm into the fixed finger.
+- **The simulator uses MuJoCo-native plans.** These are solved by IK, seeded from the mapped recorded poses, and saved
+  with `origin: mujoco-native` in `reports/native_plans.json`. All 8 arm steps are contact-free (penetration
+  ≤ 0.5 mm) with the other arm parked. Free-motion clearance is at least 3.1 mm.
+- **Open rule issues.** In the MJCF model the pourer's side-grasp picks miss the 10° pick rule: rack 1 reaches
+  9.0° (GRIP_H raised 40 → 44 mm) and the scale reaches 7.5° (GRIP_H 30 → 33 mm). The pour manifold limits how
+  far GRIP_H can rise. The planner reported 11.6° and 10.4° on its CAD model. These are the poses
+  `demo_process.md` §8 calls the tightest.
+- The transfer arm can lift a top-down beaker only about 20 mm before wrist flex runs out of margin; the recorded
+  paths do the same.
 
 Station centres in the compiled model are compared with update13_final (gate 1 mm). Because the scene is built
 from the same JSON, that check guards the config → scene pipeline (unit conversion, frames). The independent

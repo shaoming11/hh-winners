@@ -46,6 +46,8 @@ class Fidelity:
 
 
 class Builder:
+    TD_CLEAR = 3.0          # mm, fixed finger to beaker wall for the taught top-down pick (demo_process 3)
+
     def __init__(self, bench=None):
         self.bench = bench or layout.load_bench()
         self.P = self.bench['params']; self.st = self.bench['stations']
@@ -302,7 +304,13 @@ class Builder:
         bottom_td = c0 + (palm + self.P['beaker']['height'] - u0) * e1
         Rb, pb = cadmap.ArmFK(fit['pan_xy'], fit['base_z']).body_pose('gripper', cadmap.asbuilt_q(fit))
         Rside = np.c_[e1, e2, g]; zb = -e1; xb = g - zb * (g @ zb); xb /= np.linalg.norm(xb); Rtd = np.c_[xb, np.cross(zb, xb), zb]
-        sites = dict(grasp_side=((c0 - pb) @ Rb, Rb.T @ Rside), grasp_td=((bottom_td - pb) @ Rb, Rb.T @ Rtd))
+        # taught top-down grasp (demo_process 3): the planner's frame puts the beaker axis on the side-grasp centre line,
+        # which sinks the fixed finger tip into the beaker wall. Shift the beaker along +e2 (toward the moving jaw) until
+        # the fixed finger tip clears the wall by TD_CLEAR mm.
+        tip = BF + L * d; shift = (tip[1] + self.P['beaker']['od'] / 2 + self.TD_CLEAR) - c2[1]
+        self.meta['td_taught_shift_mm'] = float(shift)
+        sites = dict(grasp_side=((c0 - pb) @ Rb, Rb.T @ Rside), grasp_td=((bottom_td - pb) @ Rb, Rb.T @ Rtd),
+                     grasp_td_taught=((bottom_td + shift * e2 - pb) @ Rb, Rb.T @ Rtd))
         hinge = dict(pos=(gp - pb) @ Rb, axis=Rb.T @ g)
         return out, boxes, sites, hinge
 
