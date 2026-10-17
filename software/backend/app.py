@@ -36,7 +36,7 @@ sys.path.insert(0, str(SOFTWARE))
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response, StreamingResponse
+from fastapi.responses import JSONResponse, RedirectResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, TypeAdapter
 
@@ -343,6 +343,14 @@ async def feed_command(cmd: str, request: Request):
     """the dashboard's verbs: start | stop | reset | speed/<x> | camera/<name>"""
     ok, msg = await asyncio.get_running_loop().run_in_executor(None, runner.feed_control, cmd)
     return JSONResponse({"ok": ok, "message": msg}, status_code=200 if ok else 409)
+
+
+@app.api_route("/mcp", methods=["GET", "POST", "DELETE"], include_in_schema=False)
+def mcp_no_slash():
+    """An MCP client configured without the trailing slash falls past the /mcp mount into the static
+    mount below (404 on GET, 405 on POST).  307 keeps the method and the body, so the client's
+    initialize POST survives the hop and the connection just works."""
+    return RedirectResponse("/mcp/", status_code=307)
 
 
 @app.get("/")
