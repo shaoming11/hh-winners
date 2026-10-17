@@ -1,6 +1,9 @@
 """Run the reference simulator's layout, scale, pour, carousel and stage checks."""
 from __future__ import annotations
 
+import argparse
+from pathlib import Path
+
 from run_demo import run
 from verify_layout import run as verify_layout
 from chemistry import PourPlant
@@ -13,9 +16,13 @@ from verify_pour import run as verify_pour
 from verify_foam import run as verify_foam
 from verify_reach import run as verify_reach
 from verify_stage import run as verify_stage
+from audit_report import build_report, write_report
 
 
-def main() -> None:
+DEFAULT_AUDIT_PATH = Path(__file__).resolve().parent / "build" / "reference_audit.json"
+
+
+def main(audit_path: Path = DEFAULT_AUDIT_PATH) -> None:
     layout_rows = verify_layout()
     assert all(row["pass"] for row in layout_rows), "one or more station radii are outside 1 mm"
     reach = verify_reach()
@@ -91,6 +98,16 @@ def main() -> None:
     print("PASS: SO-101 joint command, JSON-line codec, and simulated mechanism commands respond")
     print(f"PASS: 10 simulated 39 g pours mean {batch_mean:.2f} g, SD {batch_sd:.2f} g")
 
+    report = build_report(layout_rows=layout_rows, reach=reach, stage=stage, motion=motion,
+                          transfer=transfer, carousel=carousel, rack_transfer=rack_transfer,
+                          physical_pour=physical_pour, foam=foam, demo=result,
+                          batch_mean_g=batch_mean, batch_sd_g=batch_sd)
+    path = write_report(report, audit_path)
+    print(f"Wrote {path} ({report['overall']}, schema {report['schema']})")
+
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--json-out", type=Path, default=DEFAULT_AUDIT_PATH,
+                        help="write comparison metrics to this JSON file")
+    main(parser.parse_args().json_out)

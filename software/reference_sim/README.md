@@ -45,6 +45,21 @@ Run the numerical acceptance checks with:
 software/reference_sim/.venv/bin/python software/reference_sim/validate.py
 ```
 
+The validation command writes a versioned comparison report to
+`software/reference_sim/build/reference_audit.json`. Its metric names, units, source hashes and
+comparison tolerances are shared with a second simulator that emits the same `wet-lab-sim-audit/v1`
+schema. Compare two reports with:
+
+```sh
+software/reference_sim/.venv/bin/python software/reference_sim/compare_audits.py \
+  software/reference_sim/build/reference_audit.json /path/to/teammate_audit.json \
+  --output software/reference_sim/build/comparison.json
+```
+
+The comparison command checks source layout and SO-101 revision, required check statuses, metric
+coverage, units, and per-metric differences. A teammate report should copy the metric keys and
+comparison tolerances from the reference report schema before comparing values.
+
 The simulator also exposes shared control interfaces in `hal/base.py`. `hal/sim.py` implements
 the SO-101 joint bus and an asynchronous Mega-like device. The demo routes tare, auger, carousel,
 and stage commands through that device and the newline JSON codec. Arm joint goals are accepted in

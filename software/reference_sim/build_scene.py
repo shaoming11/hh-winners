@@ -90,12 +90,18 @@ def add_extrusions(world: ET.Element) -> None:
 
 
 def add_scale(world: ET.Element) -> None:
+    layout = load_layout()
+    pan_x_mm, pan_y_mm, pan_top_z_mm = layout["scale"]["pan"]
+    pan_x, pan_y = pan_x_mm / 1000, pan_y_mm / 1000
+    pan_z = pan_top_z_mm / 1000 - 0.006
     # WS-01 base and load cell are represented by the measured envelope.
-    add_box(world, "scale_base", (0.547, 0.3867, 0.0), (0.664, 0.4545, 0.045), "0.16 0.19 0.22 1")
+    add_box(world, "scale_base", (pan_x - 0.073, pan_y - 0.0203, 0.0),
+            (pan_x + 0.044, pan_y + 0.0475, 0.045), "0.16 0.19 0.22 1")
     # Flexure block is rendered but not a hard support, so pan load passes through its spring.
-    add_box(world, "load_cell", (0.584, 0.401, 0.045), (0.659, 0.4137, 0.0577),
+    add_box(world, "load_cell", (pan_x - 0.036, pan_y - 0.006, 0.045),
+            (pan_x + 0.039, pan_y + 0.0067, pan_z),
             "0.68 0.70 0.72 1", collision=False)
-    pan = ET.SubElement(world, "body", {"name": "scale_pan", "pos": "0.620 0.407 0.0577"})
+    pan = ET.SubElement(world, "body", {"name": "scale_pan", "pos": v3(pan_x, pan_y, pan_z)})
     ET.SubElement(pan, "inertial", {"pos": "0 0 0.004", "mass": "0.10",
                                     "diaginertia": "0.0001 0.0001 0.0001"})
     ET.SubElement(pan, "joint", {"name": "scale_flex", "type": "slide", "axis": "0 0 1",
@@ -171,6 +177,9 @@ def add_rack_and_auger(world: ET.Element) -> None:
 def add_carousel(world: ET.Element, actuator: ET.Element) -> None:
     cfg = load_layout()["carousel"]
     cx, cy = (v / 1000 for v in cfg["centre"])
+    pick_x, pick_y = (v / 1000 for v in cfg["pick"])
+    radius = math.hypot(pick_x - cx, pick_y - cy)
+    initial = math.atan2(pick_y - cy, pick_x - cx)
     deck_z = 0.0546
     body = ET.SubElement(world, "body", {"name": "carousel", "pos": v3(cx, cy, deck_z)})
     ET.SubElement(body, "inertial", {"pos": "0 0 0.01", "mass": "2.0",
@@ -182,10 +191,9 @@ def add_carousel(world: ET.Element, actuator: ET.Element) -> None:
                  "0.45 0.47 0.50 1")
     add_cylinder(body, "carousel_ring", (0, 0, 0.010), 0.105, 0.006,
                  "0.75 0.77 0.80 1", collision=False)
-    initial = math.radians(cfg["rotation_deg"])
     for i in range(4):
         angle = initial + i * math.pi / 2
-        px, py = 0.084 * math.cos(angle), 0.084 * math.sin(angle)
+        px, py = radius * math.cos(angle), radius * math.sin(angle)
         # Four low locator rings around the beakers; the deck itself supports the bottoms.
         for j in range(12):
             a = 2 * math.pi * j / 12
@@ -207,8 +215,9 @@ def add_carousel_beakers(world: ET.Element) -> None:
     """Use free bodies on the rotating deck so an arm can actually pick a beaker."""
     cfg = load_layout()["carousel"]
     cx, cy = (v / 1000 for v in cfg["centre"])
-    radius = 0.084
-    initial = math.radians(cfg["rotation_deg"])
+    pick_x, pick_y = (v / 1000 for v in cfg["pick"])
+    radius = math.hypot(pick_x - cx, pick_y - cy)
+    initial = math.atan2(pick_y - cy, pick_x - cx)
     for i in range(4):
         angle = initial + i * math.pi / 2
         xy = (cx + radius * math.cos(angle), cy + radius * math.sin(angle))
@@ -217,7 +226,11 @@ def add_carousel_beakers(world: ET.Element) -> None:
 
 
 def add_stage(world: ET.Element, actuator: ET.Element) -> None:
-    body = ET.SubElement(world, "body", {"name": "stage_sled", "pos": "0.450 0.282 0.004"})
+    funnel_cfg = load_layout()["funnel"]
+    stage_x, stage_y = (v / 1000 for v in funnel_cfg["xy"])
+    stage_z = 0.004
+    funnel_local_z = funnel_cfg["rim_z"] / 1000 - stage_z
+    body = ET.SubElement(world, "body", {"name": "stage_sled", "pos": v3(stage_x, stage_y, stage_z)})
     ET.SubElement(body, "inertial", {"pos": "0 0 0.08", "mass": "0.69",
                                      "diaginertia": "0.008 0.008 0.008"})
     ET.SubElement(body, "joint", {"name": "stage_slide", "type": "slide", "axis": "0 1 0",
@@ -227,7 +240,7 @@ def add_stage(world: ET.Element, actuator: ET.Element) -> None:
     add_cylinder(body, "catch_well", (0, 0, 0.045), 0.065, 0.045, "0.60 0.63 0.67 0.25", collision=False)
     add_cylinder(body, "foam_column", (0, 0, 0.162), 0.001, 0.001,
                  "0.96 0.91 0.35 0", collision=False)
-    funnel = ET.SubElement(body, "body", {"name": "funnel", "pos": "0 0 0.229"})
+    funnel = ET.SubElement(body, "body", {"name": "funnel", "pos": v3(0, 0, funnel_local_z)})
     add_cylinder(funnel, "funnel_rim", (0, 0, 0.004), 0.051, 0.004, "0.20 0.66 0.42 0.75", collision=False)
     add_cylinder(funnel, "funnel_stem", (0, 0, -0.027), 0.012, 0.027, "0.20 0.66 0.42 0.75", collision=False)
     ET.SubElement(actuator, "position", {"name": "stage_position", "joint": "stage_slide",
