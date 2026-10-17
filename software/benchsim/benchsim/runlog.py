@@ -44,6 +44,15 @@ class RunLog:
         self.d['protocol'] = dict(source=source, text=text, steps=[s.to_dict() for s in steps], validation=validation,
                                   approved_by=approved_by, approved_utc=utc() if approved_by else None)
 
+    def set_traces(self, **paths_):
+        """trace files (scale_csv, joints_csv, pour_traces, ...) relative to the run directory"""
+        for k, v in paths_.items():
+            self.d['traces'][k] = [str(Path(x).relative_to(self.dir)) for x in v] if isinstance(v, (list, tuple)) else str(Path(v).relative_to(self.dir))
+
+    def set_approval(self, approval):
+        """the full approval record from benchsim.ai.pipeline (approver, operator, plan_sha256, reason)"""
+        if self.d['protocol'] is not None: self.d['protocol']['approval'] = approval
+
     def step(self, **row):
         self.d['steps'].append(row); return row
 
