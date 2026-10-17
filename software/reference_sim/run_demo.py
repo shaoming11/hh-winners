@@ -5,7 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
-from chemistry import PourPlant
+from chemistry import FoamReaction, PourPlant
 from hal.protocol import decode_line, encode_line
 from hal.sim import make_sim_bench
 from motion.pick_place import transfer_beaker
@@ -106,13 +106,30 @@ def run(*, physical_p1_transfer: bool = False) -> dict:
     stage_cmd = mega_command({"cmd": "stage", "deg": 150, "ms": 2500})
     stage_target_mm = stage_cmd["completion"]["travel_mm"]
     stage_mm = world.status()["stage_travel_mm"]
+    foam_model = FoamReaction()
+    h2o2_g = funnel_dev.landed_g * 0.12
+    foam_samples = []
+    for sample_index in range(1, 44):
+        time_s = sample_index / 10
+        sample = foam_model.sample(time_s, h2o2_g=h2o2_g, yeast_g=yeast_mass)
+        world.set_foam_height_mm(sample.height_mm)
+        world.step(0.1)
+        foam_samples.append({"time_s": sample.time_s, "height_mm": sample.height_mm})
+    foam_peak = foam_samples[-1]["height_mm"]
     events.append({"step": 10, "action": "move stage to ERUPT", "stage_travel_mm": stage_mm,
                    "carousel_dose_pose": carousel_dose["carousel_deg"],
                    "carousel_command": carousel_cmd, "stage_command": stage_cmd,
-                   "stage_target_mm": stage_target_mm})
+                   "stage_target_mm": stage_target_mm,
+                   "foam": {"h2o2_g": h2o2_g, "yeast_g": yeast_mass,
+                            "oxygen_estimate_l": foam_model.oxygen_l_at_reference *
+                            h2o2_g / foam_model.reference_h2o2_g,
+                            "induction_delay_s": foam_model.induction_delay_s,
+                            "growth_duration_s": foam_model.growth_duration_s,
+                            "peak_height_mm": foam_peak,
+                            "samples": foam_samples}})
     return {
         "simulator": "independent-reference-analytical-chemistry",
-        "model_scope": "MuJoCo geometry and mechanisms; analytical liquid and yeast models",
+        "model_scope": "MuJoCo geometry and mechanisms; analytical liquid, yeast, and foam models",
         "hardware_used": False,
         "process_arm_trajectory_playback": physical_p1_transfer,
         "arm_bus_initial_positions_deg": arm_snapshot,
@@ -130,6 +147,7 @@ def run(*, physical_p1_transfer: bool = False) -> dict:
              "remain logical events." if physical_p1_transfer else
              "The scenario exercises the process targets, not a calibrated arm trajectory replay."),
             "Liquid flow and landing are equations, not CFD or particle physics.",
+            "Foam growth duration and peak height are visual defaults, not measured reaction data.",
             "Weir coefficient and auger grams per revolution are uncalibrated defaults.",
         ],
     }
@@ -159,6 +177,10 @@ def main() -> None:
                   f"{len(transfer['arm_contacts'])} modeled arm contacts")
         elif "stage_travel_mm" in event:
             print(f"{event['step']:02d}. {desc}: {event['stage_travel_mm']:.2f} mm")
+            if "foam" in event:
+                foam = event["foam"]
+                print(f"    foam: {foam['peak_height_mm']:.1f} mm peak, "
+                      f"{foam['oxygen_estimate_l']:.2f} L oxygen estimate")
         else:
             print(f"{event['step']:02d}. {desc}")
     print(f"Wrote {args.output}")

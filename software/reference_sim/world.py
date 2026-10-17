@@ -19,6 +19,11 @@ class BenchWorld:
             build()
         self.model = mujoco.MjModel.from_xml_path(str(scene))
         self.data = mujoco.MjData(self.model)
+        self.foam_geom_id = mujoco.mj_name2id(
+            self.model, mujoco.mjtObj.mjOBJ_GEOM, "foam_column")
+        if self.foam_geom_id < 0:
+            raise ValueError("Scene is missing the foam visual geom")
+        self.foam_height_mm = 0.0
         self.scale_tare_m = 0.0
         self.scale_payload_g = 0.0
         self.scale_dof = int(self.model.jnt_dofadr[self._joint_id("scale_flex")])
@@ -275,6 +280,16 @@ class BenchWorld:
         """Apply the analytical liquid mass as a load on the MuJoCo scale flexure."""
         self.scale_payload_g = max(0.0, float(grams))
 
+    def set_foam_height_mm(self, height_mm: float) -> None:
+        """Update the non-colliding foam visual attached to the moving flask."""
+        height_m = max(0.0, min(0.300, float(height_mm) / 1000))
+        fraction = min(1.0, height_m / 0.140)
+        self.model.geom_size[self.foam_geom_id, 0] = 0.018 + 0.030 * fraction
+        self.model.geom_size[self.foam_geom_id, 1] = max(0.001, height_m / 2)
+        self.model.geom_pos[self.foam_geom_id, 2] = 0.162 + height_m / 2
+        self.model.geom_rgba[self.foam_geom_id, 3] = 0.0 if height_m == 0 else 0.72
+        self.foam_height_mm = height_m * 1000
+
     def scale_grams(self) -> float:
         stiffness_n_m = 20000.0
         delta = self.scale_deflection_m() - self.scale_tare_m
@@ -286,4 +301,5 @@ class BenchWorld:
             "carousel_deg": self.joint_position("carousel_hinge") * 180 / math.pi,
             "stage_travel_mm": -self.joint_position("stage_slide") * 1000,
             "scale_deflection_m": self.scale_deflection_m(),
+            "foam_height_mm": self.foam_height_mm,
         }

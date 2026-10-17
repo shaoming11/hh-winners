@@ -150,3 +150,47 @@ class PourPlant:
         return PourResult(target_g, landed, spilled, peak_flow,
                           sum_flow / max(1, round(time_s / dt)), peak_theta, time_s,
                           self.landing_offset_mm(receiver_drop_mm), traces)
+
+
+@dataclass
+class FoamSample:
+    time_s: float
+    height_mm: float
+    oxygen_l: float
+    activity: float
+
+
+class FoamReaction:
+    """Calibratable visual foam profile driven by peroxide and yeast masses.
+
+    The 1.7 L oxygen estimate is stoichiometric for 4.68 g of hydrogen peroxide.
+    Peak foam height and growth time are visual defaults, not measured chemistry.
+    """
+
+    def __init__(self, *, reference_h2o2_g: float = 4.68,
+                 reference_yeast_g: float = 7.0,
+                 oxygen_l_at_reference: float = 1.7,
+                 peak_height_mm: float = 140.0,
+                 induction_delay_s: float = 0.25,
+                 growth_duration_s: float = 4.0):
+        self.reference_h2o2_g = reference_h2o2_g
+        self.reference_yeast_g = reference_yeast_g
+        self.oxygen_l_at_reference = oxygen_l_at_reference
+        self.peak_height_mm = peak_height_mm
+        self.induction_delay_s = induction_delay_s
+        self.growth_duration_s = growth_duration_s
+
+    def sample(self, time_s: float, *, h2o2_g: float, yeast_g: float) -> FoamSample:
+        peroxide_fraction = max(0.0, h2o2_g) / self.reference_h2o2_g
+        yeast_fraction = max(0.0, yeast_g) / self.reference_yeast_g
+        activity = min(1.0, peroxide_fraction, yeast_fraction)
+        growth = max(0.0, min(1.0,
+                              (time_s - self.induction_delay_s) /
+                              max(self.growth_duration_s, 1e-9)))
+        growth = growth * growth * (3 - 2 * growth)
+        return FoamSample(
+            time_s=float(time_s),
+            height_mm=self.peak_height_mm * activity * growth,
+            oxygen_l=self.oxygen_l_at_reference * peroxide_fraction,
+            activity=activity,
+        )

@@ -9,6 +9,7 @@ from verify_motion import run as verify_motion
 from verify_transfer import run as verify_transfer
 from verify_carousel import run as verify_carousel
 from verify_rack_transfer import run as verify_rack_transfer
+from verify_foam import run as verify_foam
 
 
 def main() -> None:
@@ -18,6 +19,7 @@ def main() -> None:
     transfer = verify_transfer()
     carousel = verify_carousel()
     rack_transfer = verify_rack_transfer()
+    foam = verify_foam()
 
     result = run()
     smoke = result["arm_control_smoke"]
@@ -44,6 +46,7 @@ def main() -> None:
     assert events[8]["pour"]["spilled_g"] < 0.1
     assert abs(events[10]["carousel_dose_pose"] - 180.0) <= 1.0
     assert abs(events[10]["stage_travel_mm"] - 97.3) <= 1.0
+    assert abs(events[10]["foam"]["peak_height_mm"] - foam["peak_height_mm"]) <= 1.0
 
     batch_plant = PourPlant(seed=42)
     batch = [batch_plant.pour(80.0, 39.0).landed_g for _ in range(10)]
@@ -69,6 +72,8 @@ def main() -> None:
     print(f"PASS: four carousel beakers follow a {carousel['reached_deg']:.2f}° index and stay in their pockets")
     print(f"PASS: rack-to-scale transfer lands {rack_transfer['final_site_error_mm']:.2f} mm off target, "
           f"tilt {rack_transfer['upright_error_deg']:.2f}°")
+    print(f"PASS: analytical foam reaches {foam['peak_height_mm']:.1f} mm; "
+          f"oxygen estimate {foam['oxygen_estimate_l']:.2f} L")
     print("PASS: SO-101 joint command, JSON-line codec, and simulated mechanism commands respond")
     print(f"PASS: 10 simulated 39 g pours mean {batch_mean:.2f} g, SD {batch_sd:.2f} g")
 

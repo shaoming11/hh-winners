@@ -225,6 +225,8 @@ def add_stage(world: ET.Element, actuator: ET.Element) -> None:
     add_box(body, "stage_plate", (-0.07, -0.07, -0.001), (0.07, 0.07, 0.005), "0.24 0.27 0.29 1")
     add_cylinder(body, "flask", (0, 0, 0.088), 0.043, 0.074, "0.70 0.86 0.93 0.25", collision=False)
     add_cylinder(body, "catch_well", (0, 0, 0.045), 0.065, 0.045, "0.60 0.63 0.67 0.25", collision=False)
+    add_cylinder(body, "foam_column", (0, 0, 0.162), 0.001, 0.001,
+                 "0.96 0.91 0.35 0", collision=False)
     funnel = ET.SubElement(body, "body", {"name": "funnel", "pos": "0 0 0.229"})
     add_cylinder(funnel, "funnel_rim", (0, 0, 0.004), 0.051, 0.004, "0.20 0.66 0.42 0.75", collision=False)
     add_cylinder(funnel, "funnel_stem", (0, 0, -0.027), 0.012, 0.027, "0.20 0.66 0.42 0.75", collision=False)
