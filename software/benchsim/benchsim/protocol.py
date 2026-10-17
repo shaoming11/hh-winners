@@ -1,8 +1,10 @@
 """JSON-lines protocol shared by the simulated Mega and the Arduino Mega firmware (250000 baud, docs/electrical.md 4).
 
-One JSON object per line, UTF-8, '\\n' terminated, with a CRC-8/ATM (poly 0x07) of the compact JSON written without
-the "crc" field, as two hex digits. The same codec is used by the simulator transport and the serial transport, so a
-host program cannot tell them apart.
+One JSON object per line, UTF-8, '\\n' terminated. The body is compact JSON with sorted keys; the CRC-8/ATM
+(poly 0x07) of that exact body text is appended as a final field, so every line ends ``,"crc":"xx"}`` and a
+receiver checks the CRC on the bytes it received (no re-serialisation; the firmware strips the last 13 characters
+and appends '}'). The same codec is used by the simulator transport and the serial transport, so a host program
+cannot tell them apart.
 
 Host -> Mega commands (``cmd`` plus a host sequence number ``seq``):
 
@@ -52,21 +54,24 @@ def crc8(data: bytes) -> int:
     return c
 
 
+CRC_TAIL = len(',"crc":"00"}')
+
+
 def encode(msg: dict) -> str:
-    body = {k: v for k, v in msg.items() if k != 'crc'}
-    raw = json.dumps(body, separators=(',', ':'), sort_keys=True)
-    body['crc'] = '%02x' % crc8(raw.encode())
-    return json.dumps(body, separators=(',', ':'), sort_keys=True) + '\n'
+    body = json.dumps({k: v for k, v in msg.items() if k != 'crc'}, separators=(',', ':'), sort_keys=True)
+    return body[:-1] + ',"crc":"%02x"}\n' % crc8(body.encode())
 
 
 def decode(line: str) -> dict:
-    try: msg = json.loads(line)
+    line = line.strip()
+    if line.endswith('"}') and line[-CRC_TAIL:].startswith(',"crc":"'):
+        body = line[:-CRC_TAIL] + '}'; crc = line[-CRC_TAIL + 8:-2]
+        if '%02x' % crc8(body.encode()) != crc.lower(): raise ProtocolError('CRC', 'got %s' % crc)
+    else:
+        body = line                                   # CRC is optional for hand-typed bench commands
+    try: msg = json.loads(body)
     except json.JSONDecodeError as e: raise ProtocolError('BADCMD', 'not JSON: %s' % e)
     if not isinstance(msg, dict): raise ProtocolError('BADCMD', 'not an object')
-    crc = msg.pop('crc', None)
-    if crc is not None:
-        raw = json.dumps(msg, separators=(',', ':'), sort_keys=True)
-        if '%02x' % crc8(raw.encode()) != crc: raise ProtocolError('CRC', 'got %s' % crc)
     return msg
 
 
