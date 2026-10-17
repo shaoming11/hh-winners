@@ -260,6 +260,11 @@ def build() -> Path:
     add_carousel(world, actuator)
     add_carousel_beakers(world)
     add_stage(world, actuator)
+    stream_body = ET.SubElement(world, "body", {"name": "pour_stream_body", "mocap": "true"})
+    ET.SubElement(stream_body, "geom", {
+        "name": "pour_stream", "type": "capsule", "size": "0.0035 0.001",
+        "rgba": "0.20 0.78 0.96 0", "contype": "0", "conaffinity": "0",
+    })
 
     layout = load_layout()
     add_robot(model, source, "pourer_", tuple(v / 1000 for v in layout["pourer_base"]["xy"]))

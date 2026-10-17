@@ -246,6 +246,12 @@ def pour_with_arm(world: BenchWorld, arm: str, beaker: str, receiver: str, *,
         offset_mm = plant.landing_offset_mm(fall_mm)
         landing_xy = lip[:2] + direction[:2] * offset_mm / 1000
         landing_error_mm = float(np.linalg.norm(landing_xy - receiver_xy) * 1000)
+        if rate > 0.05:
+            world.set_pour_stream(
+                lip, np.array([landing_xy[0], landing_xy[1], receiver_rim_z]),
+                opacity=min(0.9, 0.25 + rate / 10.0))
+        else:
+            world.set_pour_stream()
 
         in_flight.append(amount)
         landed_now = in_flight.popleft()
@@ -289,6 +295,7 @@ def pour_with_arm(world: BenchWorld, arm: str, beaker: str, receiver: str, *,
         raise RuntimeError(f"Arm never reached the weir: max tilt {max_actual_tilt:.1f} degrees")
     if target_tilt_deg > 0.0 or actual_tilt > 3.0:
         raise RuntimeError("Arm failed to return the held beaker to an upright pose")
+    world.set_pour_stream()
 
     return {
         "target_g": float(target_g),

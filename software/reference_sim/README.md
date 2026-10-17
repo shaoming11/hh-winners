@@ -22,7 +22,7 @@ software/reference_sim/.venv/bin/python software/reference_sim/verify_pour.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_carousel.py
 software/reference_sim/.venv/bin/python software/reference_sim/verify_foam.py
 software/reference_sim/.venv/bin/python software/reference_sim/run_demo.py --physical-p1-transfer
-software/reference_sim/.venv/bin/python software/reference_sim/run_demo.py --physical-pour
+software/reference_sim/.venv/bin/python software/reference_sim/run_demo.py --physical-pour --record
 software/reference_sim/.venv/bin/python software/reference_sim/viewer.py
 ```
 
@@ -57,8 +57,9 @@ degrees and actuated by the official MuJoCo position servos.
 - The carousel is a MuJoCo hinge and the stage is a slider driven from the 50 mm crank / 80 mm rod
   relation, calibrated to the documented 97.3 mm travel at 150 degrees.
 - Liquid delivery uses a tilted-cylinder volume calculation, a weir-flow equation, 120 ms stream
-  delay, noisy 80 Hz scale readings and a ballistic landing estimate. Yeast dosing is a calibrated
-  grams-per-revolution calculation.
+  delay, noisy 80 Hz scale readings and a ballistic landing estimate. Recorded pours show a
+  non-colliding capsule for that analytical stream. Yeast dosing is a calibrated grams-per-revolution
+  calculation.
 - The final stage move grows a non-colliding foam visual from peroxide and yeast masses. Its oxygen
   estimate is stoichiometric; the 4 s growth and 140 mm peak height are visual defaults.
 - `verify_motion.py` checks joint-limited IK to a carousel beaker, a proximity-triggered weld grasp,
@@ -77,7 +78,7 @@ degrees and actuated by the official MuJoCo position servos.
   10-step scenario and records the motion metrics in `build/reference_run.json`.
 - `run_demo.py --physical-pour` also performs step 2 with both SO-101 arms, tilts a held donor
   beaker, and reports the analytical stream and scale measurements. Remaining process transfers
-  and pours are logical events.
+  and pours are logical events. Add `--record` to save an overview MP4 beside the JSON output.
 
 ## Limits
 
@@ -89,6 +90,7 @@ check and weld constraint. The custom GR-01/02/03 geometry is not yet modeled, a
 collisions with beakers are excluded because they do not reproduce the custom fin-ray fingers.
 Contact checks currently report no arm-to-scene contact on the P1 transfer or pour tilt paths.
 Yeast dosing is a calibrated grams-per-revolution equation, and the flow and auger constants are
-placeholders until measured on the assembled bench. Foam is a timed visual model, not reaction
-kinetics or CFD. The checks compare geometry, dose, mechanism, and control-interface assumptions;
+placeholders until measured on the assembled bench. The stream capsule visualizes the calculated
+path, not fluid particles. Foam is a timed visual model, not reaction kinetics or CFD. The checks
+compare geometry, dose, mechanism, and control-interface assumptions;
 they do not prove a hardware run will work unchanged.

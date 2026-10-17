@@ -4,6 +4,7 @@ from __future__ import annotations
 import math
 from pathlib import Path
 
+import cv2
 import mujoco
 import numpy as np
 
@@ -23,12 +24,26 @@ class BenchWorld:
             self.model, mujoco.mjtObj.mjOBJ_GEOM, "foam_column")
         if self.foam_geom_id < 0:
             raise ValueError("Scene is missing the foam visual geom")
+        self.pour_stream_geom_id = mujoco.mj_name2id(
+            self.model, mujoco.mjtObj.mjOBJ_GEOM, "pour_stream")
+        stream_body_id = mujoco.mj_name2id(
+            self.model, mujoco.mjtObj.mjOBJ_BODY, "pour_stream_body")
+        if self.pour_stream_geom_id < 0 or stream_body_id < 0:
+            raise ValueError("Scene is missing the pour stream visual")
+        self.pour_stream_mocap_id = int(self.model.body_mocapid[stream_body_id])
         self.foam_height_mm = 0.0
         self.scale_tare_m = 0.0
         self.scale_payload_g = 0.0
         self.scale_dof = int(self.model.jnt_dofadr[self._joint_id("scale_flex")])
         self._torque_enabled: dict[str, bool] = {"pourer": True, "transfer": True}
         self._held: dict[str, str] = {}
+        self._renderer: mujoco.Renderer | None = None
+        self._video_writer: cv2.VideoWriter | None = None
+        self._recording_path: Path | None = None
+        self._recording_fps = 12.0
+        self._recording_next_time = 0.0
+        self._recording_frames = 0
+        self._camera: mujoco.MjvCamera | None = None
         self._actuator_power: dict[str, list[tuple[int, float, float]]] = {}
         self._arm_joint_names = ("shoulder_pan", "shoulder_lift", "elbow_flex",
                                  "wrist_flex", "wrist_roll", "gripper")
@@ -47,6 +62,65 @@ class BenchWorld:
     def _step_once(self) -> None:
         self.data.qfrc_applied[self.scale_dof] = -self.scale_payload_g / 1000 * 9.81
         mujoco.mj_step(self.model, self.data)
+        self._capture_video_frame()
+
+    def start_recording(self, path: Path, *, fps: float = 12.0,
+                        width: int = 640, height: int = 480) -> None:
+        """Start an offscreen MP4 recording from a fixed overview camera."""
+        if self._video_writer is not None:
+            raise RuntimeError("A video recording is already active")
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self._renderer = mujoco.Renderer(self.model, height=height, width=width)
+        self._camera = mujoco.MjvCamera()
+        mujoco.mjv_defaultCamera(self._camera)
+        self._camera.type = mujoco.mjtCamera.mjCAMERA_FREE
+        self._camera.lookat[:] = (0.53, 0.36, 0.16)
+        self._camera.distance = 1.50
+        self._camera.azimuth = 45.0
+        self._camera.elevation = -25.0
+        self._recording_fps = float(fps)
+        self._recording_path = path
+        self._recording_frames = 0
+        self._recording_next_time = float(self.data.time)
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+        self._video_writer = cv2.VideoWriter(str(path), fourcc, self._recording_fps,
+                                             (width, height))
+        if not self._video_writer.isOpened():
+            self._video_writer.release()
+            self._video_writer = None
+            self._renderer.close()
+            self._renderer = None
+            raise RuntimeError(f"Could not open video output: {path}")
+        self._capture_video_frame(force=True)
+
+    def _capture_video_frame(self, *, force: bool = False) -> None:
+        if self._video_writer is None or self._renderer is None or self._camera is None:
+            return
+        frame_period = 1.0 / self._recording_fps
+        if not force and self.data.time + 1e-9 < self._recording_next_time:
+            return
+        self._renderer.update_scene(self.data, camera=self._camera)
+        rgb = self._renderer.render()
+        self._video_writer.write(cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
+        self._recording_frames += 1
+        while self._recording_next_time <= self.data.time:
+            self._recording_next_time += frame_period
+
+    def stop_recording(self) -> dict | None:
+        """Close the MP4 and return its path and frame count."""
+        if self._video_writer is None:
+            return None
+        self._video_writer.release()
+        self._video_writer = None
+        if self._renderer is not None:
+            self._renderer.close()
+            self._renderer = None
+        result = {"path": str(self._recording_path), "frames": self._recording_frames,
+                  "fps": self._recording_fps}
+        self._recording_path = None
+        self._camera = None
+        return result
 
     def step(self, seconds: float) -> None:
         n = max(1, round(seconds / self.model.opt.timestep))
@@ -305,6 +379,39 @@ class BenchWorld:
         self.model.geom_pos[self.foam_geom_id, 2] = 0.162 + height_m / 2
         self.model.geom_rgba[self.foam_geom_id, 3] = 0.0 if height_m == 0 else 0.72
         self.foam_height_mm = height_m * 1000
+
+    def set_pour_stream(self, start_xyz: np.ndarray | None = None,
+                        end_xyz: np.ndarray | None = None, *,
+                        opacity: float = 0.78) -> None:
+        """Move the non-colliding visual capsule that depicts analytical stream flow."""
+        alpha = float(np.clip(opacity, 0.0, 1.0))
+        if start_xyz is None or end_xyz is None:
+            self.model.geom_rgba[self.pour_stream_geom_id, 3] = 0.0
+            return
+        start, end = np.asarray(start_xyz, float), np.asarray(end_xyz, float)
+        vector = end - start
+        length = float(np.linalg.norm(vector))
+        if length < 0.002 or alpha == 0.0:
+            self.model.geom_rgba[self.pour_stream_geom_id, 3] = 0.0
+            return
+        direction = vector / length
+        local_z = np.array([0.0, 0.0, 1.0])
+        axis = np.cross(local_z, direction)
+        axis_norm = float(np.linalg.norm(axis))
+        cosine = float(np.clip(local_z @ direction, -1.0, 1.0))
+        if axis_norm < 1e-9:
+            quaternion = ([1.0, 0.0, 0.0, 0.0] if cosine > 0 else
+                          [0.0, 1.0, 0.0, 0.0])
+        else:
+            half_angle = 0.5 * math.atan2(axis_norm, cosine)
+            axis /= axis_norm
+            sine = math.sin(half_angle)
+            quaternion = [math.cos(half_angle), *(axis * sine)]
+        self.data.mocap_pos[self.pour_stream_mocap_id] = (start + end) / 2
+        self.data.mocap_quat[self.pour_stream_mocap_id] = quaternion
+        self.model.geom_size[self.pour_stream_geom_id, 0] = 0.0035
+        self.model.geom_size[self.pour_stream_geom_id, 1] = length / 2
+        self.model.geom_rgba[self.pour_stream_geom_id, 3] = alpha
 
     def scale_grams(self) -> float:
         stiffness_n_m = 20000.0

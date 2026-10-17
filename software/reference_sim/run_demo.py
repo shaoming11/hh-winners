@@ -12,8 +12,11 @@ from motion.pick_place import transfer_beaker
 from motion.pour import pour_with_arm
 
 
-def run(*, physical_p1_transfer: bool = False, physical_pour: bool = False) -> dict:
+def run(*, physical_p1_transfer: bool = False, physical_pour: bool = False,
+        record_video: Path | None = None) -> dict:
     world, pourer, transfer, mega = make_sim_bench()
+    if record_video is not None:
+        world.start_recording(record_video)
     world.step(2.0)
     plant = PourPlant(seed=2026)
 
@@ -146,6 +149,7 @@ def run(*, physical_p1_transfer: bool = False, physical_pour: bool = False) -> d
                             "growth_duration_s": foam_model.growth_duration_s,
                             "peak_height_mm": foam_peak,
                             "samples": foam_samples}})
+    video = world.stop_recording()
     return {
         "simulator": "independent-reference-analytical-chemistry",
         "model_scope": ("MuJoCo arm motion with analytical liquid, yeast, and foam models"
@@ -162,6 +166,7 @@ def run(*, physical_p1_transfer: bool = False, physical_pour: bool = False) -> d
         "mega_tare_response": tare_response,
         "mega_json_line_codec_exercised": True,
         "events": events,
+        "video": video,
         "final_mujoco": world.status(),
         "notes": [
             (("P1 carousel-to-scale and the developer pour use joint-limited MuJoCo arm motion. "
@@ -182,11 +187,14 @@ def main() -> None:
                         help="move empty P1 from the carousel to the scale with the transfer arm")
     parser.add_argument("--physical-pour", action="store_true",
                         help="also move a developer beaker and pour into P1 with the pourer arm")
+    parser.add_argument("--record", action="store_true",
+                        help="write an overview MP4 beside the JSON output")
     parser.add_argument("--output", type=Path,
                         default=Path(__file__).resolve().parent / "build" / "reference_run.json")
     args = parser.parse_args()
     result = run(physical_p1_transfer=args.physical_p1_transfer,
-                 physical_pour=args.physical_pour)
+                 physical_pour=args.physical_pour,
+                 record_video=args.output.with_suffix(".mp4") if args.record else None)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n")
     for event in result["events"]:
@@ -215,6 +223,8 @@ def main() -> None:
         else:
             print(f"{event['step']:02d}. {desc}")
     print(f"Wrote {args.output}")
+    if result["video"] is not None:
+        print(f"Wrote video {result['video']['path']} ({result['video']['frames']} frames)")
 
 
 if __name__ == "__main__":
