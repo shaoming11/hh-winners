@@ -1,0 +1,196 @@
+{
+ "A1-1_TPU_fingers-sleeves": {
+  "printer": "a1",
+  "material": "tpu",
+  "infill": 30,
+  "supports": false,
+  "parts": [
+   "GR03",
+   "GR03",
+   "GR03",
+   "GR03",
+   "ST09",
+   "ST09"
+  ],
+  "plates": 1,
+  "time": [
+   "3h 25m 57s"
+  ],
+  "grams": [
+   "82.31 g"
+  ]
+ },
+ "A1-3_CAL-01x2": {
+  "printer": "a1",
+  "material": "pla",
+  "infill": 15,
+  "supports": false,
+  "parts": [
+   "CAL01",
+   "CAL01"
+  ],
+  "plates": 1,
+  "time": [
+   "2h 43m 20s"
+  ],
+  "grams": [
+   "97.85 g"
+  ]
+ },
+ "H2D-1_gripper-bodies": {
+  "printer": "h2d",
+  "material": "pla",
+  "infill": 30,
+  "supports": true,
+  "parts": [
+   "GR01",
+   "GR01",
+   "GR02",
+   "GR02"
+  ],
+  "plates": 1,
+  "time": [
+   "5h 5m 12s"
+  ],
+  "grams": [
+   "121.39 g"
+  ]
+ },
+ "H2D-3_ST-01-v2": {
+  "printer": "h2d",
+  "material": "pla",
+  "infill": 15,
+  "supports": false,
+  "parts": [
+   "ST01"
+  ],
+  "plates": 1,
+  "time": [
+   "3h 3m 35s"
+  ],
+  "grams": [
+   "125.09 g"
+  ]
+ },
+ "X2-1_scale-spacers-gauge": {
+  "printer": "h2d",
+  "material": "pla",
+  "infill": 15,
+  "supports": false,
+  "parts": [
+   "WS01",
+   "WS02",
+   "ST08",
+   "ST08",
+   "ST08",
+   "ST08",
+   "ST08",
+   "ST08",
+   "GA01"
+  ],
+  "plates": 1,
+  "time": [
+   "2h 28m 8s"
+  ],
+  "grams": [
+   "99.76 g"
+  ]
+ },
+ "X2-2_TT-04": {
+  "printer": "h2d",
+  "material": "pla",
+  "infill": 15,
+  "supports": false,
+  "parts": [
+   "TT04"
+  ],
+  "plates": 1,
+  "time": [
+   "2h 7m 47s"
+  ],
+  "grams": [
+   "80.69 g"
+  ]
+ },
+ "X2-3_RK-02": {
+  "printer": "h2d",
+  "material": "pla",
+  "infill": 15,
+  "supports": false,
+  "parts": [
+   "RK02"
+  ],
+  "plates": 1,
+  "time": [
+   "2h 5m 29s"
+  ],
+  "grams": [
+   "90.38 g"
+  ]
+ },
+ "X2-4_CAL-02": {
+  "printer": "h2d",
+  "material": "pla",
+  "infill": 15,
+  "supports": false,
+  "parts": [
+   "CAL02"
+  ],
+  "plates": 1,
+  "time": [
+   "1h 12m 27s"
+  ],
+  "grams": [
+   "49.27 g"
+  ]
+ },
+ "H2D-2b_auger-screw-v3x2": {
+  "printer": "h2d",
+  "material": "pla",
+  "infill": 99,
+  "supports": true,
+  "parts": [
+   "DH02",
+   "DH02"
+  ],
+  "plates": 1,
+  "time": [
+   "1h 47m 6s"
+  ],
+  "grams": [
+   "27.84 g"
+  ]
+ },
+ "A1-2_PS-01-auger-post": {
+  "printer": "a1",
+  "material": "pla",
+  "infill": 30,
+  "supports": false,
+  "parts": [
+   "AG01"
+  ],
+  "plates": 1,
+  "time": [
+   "2h 10m 46s"
+  ],
+  "grams": [
+   "95.24 g"
+  ]
+ },
+ "H2D-2_auger-head-v4": {
+  "printer": "h2d",
+  "material": "pla",
+  "infill": 15,
+  "supports": true,
+  "parts": [
+   "DH01"
+  ],
+  "plates": 1,
+  "time": [
+   "2h 36m 28s"
+  ],
+  "grams": [
+   "82.57 g"
+  ]
+ }
+}
