@@ -131,6 +131,7 @@ tools/
   layout/                    planner record (layout_final.md/.json), auger review
   cad/                       Fusion scripts that build and update the parts
 software/tools/planner/      grasp and kinematics models
+software/sim/pour_sim.py     exploratory liquid/scale pour simulation
 analysis/                    load cases and fastener-reach checks (pre-final geometry)
 review/                      design brief and CDR records (history)
 ```
@@ -141,6 +142,7 @@ reagent rack on Y-right) is in git history at commit `644fa86`.
 ## Team plan and pitch
 - [docs/plan_36h.md](docs/plan_36h.md): the 36-hour build plan by person (Nick, Nehal, Shao, Jerry), with go/no-go checkpoints and fallbacks
 - [docs/pitch.md](docs/pitch.md): the pitch, judge Q&A, and what not to claim
+- [docs/pour_simulation.md](docs/pour_simulation.md): how to run and interpret the exploratory pour model
 
 ## Possibility we may explore (not committed): Jev as a fast decision layer
 [Jev](https://pub.towardsai.net/what-is-jev-ai-a-practical-guide-to-system-one-and-executable-decisions-c289a750a3ae) (TypeSafe AI, public since Sept 2026) is a *decision* model, not a chatbot.

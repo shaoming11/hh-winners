@@ -676,25 +676,25 @@ lip (about 24 mL net) contains the worst-case overflow of an 80 mL-line reagent 
 
 ## 9. Testing, modes, logging and bring-up
 
-### 9.1 Tests without hardware (`software/tests/`, `software/sim/`)
+### 9.1 Proposed tests and simulation
 
-- `test_protocol.py`: CRC-8/ATM framing, the reply state machine, BUSY/RANGE/STATE/CRC paths,
-  watchdog latch semantics against a simulated Mega.
-- `test_export.py`: joint limits, raw-tick range and wrap, upright and speed limits, manifold
-  checks, hash mismatch. It **must reject frames 541-599** of the current frames.json.
-- `test_safe_stop.py`: §8.1.
-- `test_recipe.py`: every state timeout, PAUSE/resume preconditions, RESET, the STAGE_OUT
-  timing rule, the interlocks.
-- **`sim/pour_sim.py`** is the plant model for tuning the §5 controller:
-  - tilted-cylinder V(θ) for the measured beaker;
-  - weir flow q = C · w · h^1.5;
-  - 0.12 s fall delay plus stream momentum force on the scale;
-  - σ_m = 0.05 g at the measured HX711 rate;
-  - the production LSQ filter chain (the same code, not a copy);
-  - a 270°/s wrist rate limit and 20 ms command latency.
+This architecture document is a historical proposal. The files listed here as future tests and
+controller components are not implemented in this checkout. An exploratory liquid-and-scale model
+now exists at `software/sim/pour_sim.py`; see [`pour_simulation.md`](pour_simulation.md) for run
+instructions and limitations.
 
-  Acceptance: §5.3 tracking criterion, and settled error within the demo tolerance across
-  46-80 mL fills.
+The prototype models tilted-cylinder volume, approximate weir flow, stream travel and momentum,
+scale delay/noise, and a reimplementation of the proposed pour-control logic. It does not import a
+production controller because no production pour controller exists here. Its dimensions and flow
+parameters have not yet been fitted against water-pour measurements, and the proposed acceptance
+criterion below has not been demonstrated.
+
+The following remain proposed offline tests, not current files: `test_protocol.py` for CRC-8/ATM
+framing and a simulated Mega; `test_export.py` for trajectory limits and provenance;
+`test_safe_stop.py` for §8.1; and `test_recipe.py` for state timeouts, pause/resume, reset, and
+interlocks. The proposed simulation acceptance criterion is the §5.3 tracking criterion and settled
+error within the demo tolerance across 46-80 mL fills. Validate that criterion only after the model
+has been calibrated and compared with measured water pours.
 
 ### 9.2 Run modes
 
