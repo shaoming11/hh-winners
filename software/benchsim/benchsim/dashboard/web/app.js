@@ -5,7 +5,7 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const fmt = (v, d = 1) => (v === null || v === undefined || Number.isNaN(v)) ? '–' : Number(v).toFixed(d);
 
-const GLYPH = { pending: '□', running: '■', passed: '✔', failed: '✕', skipped: '–' };
+const GLYPH = { pending: '☐', running: '◐', passed: '☒', failed: '✗', skipped: '–' };   // the thematrix task-tree glyphs
 const STATE = { IDLE: 'ready', PRECHECK: 'precheck', RUNNING: 'running', DONE: 'done', SAFE_STOP: 'safe stop', FAILED: 'failed' };
 const ARM = { pourer: 'Pourer arm (west)', transfer: 'Transfer arm (east)' };
 
@@ -17,7 +17,7 @@ let replayVideo = null;   // the <video> element in replay mode
 function connect() {
   const es = new EventSource('/events');
   es.onmessage = (m) => { last = JSON.parse(m.data); render(last); };
-  es.onerror = () => { $('state').textContent = 'reconnecting…'; $('state').className = 'pill'; };
+  es.onerror = () => { $('state').textContent = 'reconnecting…'; $('dot').className = 'dot lost'; };
 }
 
 async function command(cmd) {
@@ -44,7 +44,7 @@ function renderSpeeds(s) {
   const r = s.probes && s.probes.runner; const cur = replayVideo ? replayVideo.playbackRate : (r ? r.speed : null);
   if (String(cur) === speedKey) return;
   speedKey = String(cur);
-  $('speeds').innerHTML = SPEEDS.map((x) => '<button data-speed="' + x + '" class="' + (x === cur ? 'on' : '') + '" title="' + x + '× real time">' + x + '×</button>').join('');
+  $('speeds').innerHTML = SPEEDS.map((x) => '<button data-speed="' + x + '" class="pill' + (x === cur ? ' active' : '') + '" title="' + x + '× real time">×' + x + '</button>').join('');
 }
 $('speeds').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-speed]'); if (!b) return;
@@ -94,6 +94,7 @@ function renderCams(s) {
   }
   for (const b of $('cams').children) b.classList.toggle('on', b.dataset.cam === v.camera);
   $('cams').querySelector('.live').textContent = v.camera === 'auto' ? ' · ' + (CAM[v.shown] || v.shown) : '';
+  $('stage-sub').textContent = 'simulated camera · ' + (v.camera === 'auto' ? 'follows the step · showing ' + (CAM[v.shown] || v.shown).toLowerCase() : (CAM[v.camera] || v.camera).toLowerCase());
 }
 $('cams').addEventListener('click', (e) => { const b = e.target.closest('button[data-cam]'); if (b) command('camera/' + b.dataset.cam); });
 
@@ -103,9 +104,9 @@ function renderBar(s) {
   $('mode').textContent = (s.mode || 'sim').toUpperCase();
   const st = $('state');
   st.textContent = phase === 'building' ? 'building bench…' : (STATE[s.seq_state] || s.seq_state);
-  st.className = 'pill ' + ({ RUNNING: 'running', PRECHECK: 'running', DONE: 'done', SAFE_STOP: 'stopped', FAILED: 'stopped' }[s.seq_state] || '');
-  $('clock').textContent = 't = ' + fmt(s.t, 1) + ' s';
-  $('rtf').textContent = runner && runner.rtf ? 'sim speed ' + fmt(runner.rtf, 2) + '×' : '';
+  $('dot').className = 'dot ' + ({ RUNNING: 'running', PRECHECK: 'running', DONE: 'done', SAFE_STOP: 'stopped', FAILED: 'stopped' }[s.seq_state] || '');
+  $('clock').textContent = 't ' + fmt(s.t, 1) + ' s';
+  $('rtf').textContent = runner && runner.rtf ? '· sim ×' + fmt(runner.rtf, 2) : '';
   $('btn-start').disabled = phase !== 'ready';
   $('btn-stop').disabled = !(phase === 'running' || phase === 'starting');
   $('btn-reset').disabled = !(phase === 'ready' || phase === 'finished');
@@ -167,15 +168,15 @@ let runHtml = '';
 function runHead(s) {
   // -> [class, glyph (null = spinner), title, muted suffix]
   const cur = s.current; const runner = s.probes && s.probes.runner; const n = s.steps.length;
-  if (s.seq_state === 'SAFE_STOP' || s.seq_state === 'FAILED') return ['stopped', '✕', 'Safe stop: ' + (s.stop_reason || (s.errors || [])[0] || s.seq_state), ''];
+  if (s.seq_state === 'SAFE_STOP' || s.seq_state === 'FAILED') return ['stopped', '✗', 'Safe stop: ' + (s.stop_reason || (s.errors || [])[0] || s.seq_state), ''];
   if (cur) return ['busy', null, cur.narration.title + '…', '(' + fmt(cur.elapsed_s, 1) + ' s' + (cur.remaining_s !== null ? ' · times out in ' + fmt(cur.remaining_s, 0) + ' s' : '') + ')'];
   if (runner && runner.phase === 'building') return ['busy', null, 'Building the bench…', ''];
   if (s.seq_state === 'PRECHECK' || s.seq_state === 'RUNNING') return ['busy', null, s.seq_state === 'PRECHECK' ? 'Running prechecks…' : 'Running…', ''];
   if (s.seq_state === 'DONE') {
     const ok = s.steps.filter((st) => st.status === 'passed').length;
-    return ['done', '✔', 'Run complete · ' + (ok === n ? 'all ' + n + ' steps passed' : ok + ' of ' + n + ' steps passed'), ''];
+    return ['done', '☒', 'Run complete · ' + (ok === n ? 'all ' + n + ' steps passed' : ok + ' of ' + n + ' steps passed'), ''];
   }
-  return ['idle', '✻', 'Ready · press Start to run ' + n + ' steps', ''];
+  return ['idle', '☐', 'Ready · press start to run ' + n + ' steps', ''];
 }
 
 function runFacts(s, cur) {
@@ -213,6 +214,9 @@ function renderRun(s) {
     const skipped = steps.slice(0, fold).filter((st) => st.status === 'skipped').length;
     more.textContent = runOpen ? '− hide ' + fold + ' finished steps' : '… +' + fold + ' steps done' + (skipped ? ' (' + skipped + ' skipped)' : '');
   }
+  const n = (k) => steps.filter((st) => st.status === k).length;
+  $('run-sub').textContent = steps.length + ' steps · ' + n('passed') + ' passed' + (n('failed') ? ' · ' + n('failed') + ' failed' : '') +
+    (n('skipped') ? ' · ' + n('skipped') + ' skipped' : '') + (s.current ? ' · step ' + s.current.index + ' running' : '');
   const html = steps.slice(runOpen ? 0 : fold).map((st) => runRow(st, s)).join('');
   if (html !== runHtml) { runHtml = html; $('run-steps').innerHTML = html; }
 }
@@ -296,12 +300,6 @@ function renderErrors(s) {
 
 // ------------------------------------------------------------------ wiring
 document.querySelectorAll('button[data-cmd]').forEach((b) => b.addEventListener('click', () => command(b.dataset.cmd)));
-$('btn-theme').addEventListener('click', () => {
-  const root = document.documentElement;
-  root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-  try { localStorage.setItem('wlb-theme', root.dataset.theme); } catch (e) { /* storage unavailable */ }
-});
-try { const t = localStorage.getItem('wlb-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) { /* storage unavailable */ }
 // ------------------------------------------------------------------ replay (python -m benchsim.dashboard --replay RUN_DIR)
 const upto = (arr, t) => {   // index of the last item with .t <= t, or -1
   let lo = 0, hi = arr.length - 1, ans = -1;
@@ -314,7 +312,7 @@ async function startReplay() {
   try { r = await fetch('/replay/tape.json'); } catch (e) { return false; }
   if (!r.ok) return false;
   const tape = await r.json();
-  document.body.classList.add('replay'); $('brand-mode').textContent = '· replay';
+  document.body.classList.add('replay'); $('brand-mode').textContent = 'replay';
   const v = document.createElement('video');
   v.src = '/replay/video.mp4'; v.controls = true; v.muted = true; v.playsInline = true;
   $('video').replaceWith(v); $('novideo').hidden = true; replayVideo = v;
