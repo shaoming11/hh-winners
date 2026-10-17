@@ -36,7 +36,8 @@ def fw_run(fw_build, script):
 # ------------------------------------------------------------------ the C++ host test
 @needs_cxx
 def test_firmware_core_compiles_without_warnings(fw_build):
-    assert fw_build['warnings'] == '', fw_build['warnings']
+    fw = [l for l in fw_build['warnings'].splitlines() if 'wlb_mega/' in l]       # the harness may warn on other compilers
+    assert fw == [], fw_build['warnings']
 
 
 @needs_cxx

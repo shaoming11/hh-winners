@@ -17,8 +17,9 @@ convention. ``JointMap`` converts with the calibration JSON (``config/hardware_c
     gripper: the same form, or a two-point map tick_closed/deg_closed -> tick_open/deg_open
 
 The calibration is only as good as the bring-up that records it (software/benchsim/docs/bringup.md, A1-A5); the
-example file holds placeholders. The LeRobot adapter is written against the ``FeetechMotorsBus`` API of LeRobot
->= 0.2 (``sync_read``/``sync_write`` with ``normalize=False``); it has not been run against a real bus here.
+example file holds placeholders. The LeRobot adapter is written against LeRobot's ``FeetechMotorsBus`` API
+(``lerobot.motors.feetech``, or ``lerobot.common.motors.feetech`` in older releases; ``sync_read``/``sync_write`` with
+``normalize=False``). It is tested against a stub of that API only; it has not been run against a real bus here.
 
 The second half of the module holds the offline hardware checks behind ``python -m benchsim hw-check``: the
 calibration schema, the firmware constants against bench_params.toml, and the firmware host test
@@ -42,7 +43,7 @@ from .. import paths, protocol
 from ..interfaces import BenchBackends, MegaClient
 from ..units import deg as to_deg, rad as to_rad
 
-JOINTS = ('shoulder_pan', 'shoulder_lift', 'elbow_flex', 'wrist_flex', 'wrist_roll', 'gripper')
+JOINTS = ('shoulder_pan', 'shoulder_lift', 'elbow_flex', 'wrist_flex', 'wrist_roll', 'gripper')   # = state.ARM_JOINTS (state imports MuJoCo)
 CALIBRATION_SCHEMA = 'benchsim.hardware_calibration/1'
 EXAMPLE_CALIBRATION = paths.CONFIG / 'hardware_calibration.example.json'
 REAL_FLAG, CONFIRM_FLAG = '--real', '--i-understand-this-moves-hardware'
@@ -298,7 +299,7 @@ def _import_lerobot():
             return motors.Motor, motors.MotorNormMode, feetech.FeetechMotorsBus
         except ImportError:
             continue
-    raise ImportError("lerobot (>= 0.2, with the feetech extra) is needed for the arms: pip install -e '.[hardware]'")
+    raise ImportError("lerobot (with its feetech extra) is needed for the arms: pip install -e '.[hardware]'")
 
 
 class LeRobotBus:
@@ -444,7 +445,7 @@ class LeRobotArm:
 
     def is_moving(self):
         try: return any(self._read('Moving').values())
-        except (KeyError, NotImplementedError): pass
+        except (KeyError, ValueError, NotImplementedError): pass     # a bus without the Moving register
         if self._goal is None: return False
         tol = self.cal['goal_tolerance_deg'] * self.tpr / 360.0; now = self.read_ticks()
         return any(abs(now[n] - self._goal[n]) > tol for n in JOINTS)

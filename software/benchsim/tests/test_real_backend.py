@@ -242,6 +242,11 @@ def test_fingerprint_mismatch_refuses_the_arm(cal):
     assert a.read_fingerprint() == arm['fingerprint'] and not a.warnings
 
 
+def test_joint_order_matches_the_simulator():
+    from benchsim import state
+    assert list(JOINTS) == state.ARM_JOINTS
+
+
 def test_present_load_sign_bit_is_decoded():
     assert [real.decode_load(v) for v in (0, 300, 0x400 | 300, 0x400 | 1000, -42)] == [0, 300, -300, -1000, -42]
 
