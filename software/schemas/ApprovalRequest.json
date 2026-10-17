@@ -1,0 +1,136 @@
+{
+ "additionalProperties": false,
+ "properties": {
+  "id": {
+   "title": "Id",
+   "type": "string"
+  },
+  "ts": {
+   "title": "Ts",
+   "type": "string"
+  },
+  "kind": {
+   "enum": [
+    "run_plan",
+    "hardware_command"
+   ],
+   "title": "Kind",
+   "type": "string"
+  },
+  "requested_by": {
+   "description": "which system asked (agent/frontend/...)",
+   "enum": [
+    "frontend",
+    "agent",
+    "operator",
+    "backend",
+    "sequencer"
+   ],
+   "title": "Requested By",
+   "type": "string"
+  },
+  "requested_by_person": {
+   "default": "",
+   "description": "the human behind the request, if known",
+   "title": "Requested By Person",
+   "type": "string"
+  },
+  "summary": {
+   "title": "Summary",
+   "type": "string"
+  },
+  "requires": {
+   "description": "why a human must decide: 'moves the arms', 'doses 20 g of 12% peroxide', ...",
+   "items": {
+    "type": "string"
+   },
+   "title": "Requires",
+   "type": "array"
+  },
+  "payload": {
+   "additionalProperties": true,
+   "description": "the HardwareCommand awaiting approval",
+   "title": "Payload",
+   "type": "object"
+  },
+  "status": {
+   "default": "pending",
+   "enum": [
+    "pending",
+    "approved",
+    "rejected",
+    "expired"
+   ],
+   "title": "Status",
+   "type": "string"
+  },
+  "expires_at": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "description": "pending requests expire; the asker must re-request",
+   "title": "Expires At"
+  },
+  "asked_of": {
+   "description": "operators who were told about it (person ids)",
+   "items": {
+    "type": "string"
+   },
+   "title": "Asked Of",
+   "type": "array"
+  },
+  "snoozed_until": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "description": "don't remind anyone before this",
+   "title": "Snoozed Until"
+  },
+  "decided_by": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Decided By"
+  },
+  "decided_at": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Decided At"
+  }
+ },
+ "required": [
+  "id",
+  "kind",
+  "requested_by",
+  "summary",
+  "payload"
+ ],
+ "title": "ApprovalRequest",
+ "type": "object",
+ "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

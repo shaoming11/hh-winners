@@ -1,0 +1,16 @@
+{
+ "version": "0.1.0",
+ "schemas": {
+  "HardwareCommand": "HardwareCommand.json",
+  "HardwareReply": "HardwareReply.json",
+  "ExperimentState": "ExperimentState.json",
+  "Event": "Event.json",
+  "Alert": "Alert.json",
+  "ApprovalRequest": "ApprovalRequest.json",
+  "Plan": "Plan.json",
+  "RunSummary": "RunSummary.json",
+  "Delta": "Delta.json",
+  "Describe": "Describe.json",
+  "Person": "Person.json"
+ }
+}

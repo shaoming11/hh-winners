@@ -1,0 +1,499 @@
+{
+ "$defs": {
+  "Alert": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "ts": {
+     "title": "Ts",
+     "type": "string"
+    },
+    "severity": {
+     "enum": [
+      "info",
+      "warning",
+      "critical"
+     ],
+     "title": "Severity",
+     "type": "string"
+    },
+    "code": {
+     "description": "SPILL | ESTOP | FAULT | OVERRUN | SCALE_RATE | DOSE_ERROR | COMMS | TEMP | BEAKER_MISSING | NEEDS_APPROVAL",
+     "title": "Code",
+     "type": "string"
+    },
+    "message": {
+     "title": "Message",
+     "type": "string"
+    },
+    "run_id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Run Id"
+    },
+    "step": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Step"
+    },
+    "data": {
+     "additionalProperties": true,
+     "title": "Data",
+     "type": "object"
+    },
+    "acknowledged_by": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Acknowledged By"
+    },
+    "acknowledged_at": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Acknowledged At"
+    },
+    "resolved": {
+     "default": false,
+     "title": "Resolved",
+     "type": "boolean"
+    },
+    "notified": {
+     "description": "channels/people the agent told (e.g. 'imessage:+1555')",
+     "items": {
+      "type": "string"
+     },
+     "title": "Notified",
+     "type": "array"
+    }
+   },
+   "required": [
+    "id",
+    "severity",
+    "code",
+    "message"
+   ],
+   "title": "Alert",
+   "type": "object"
+  },
+  "ApprovalRequest": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "ts": {
+     "title": "Ts",
+     "type": "string"
+    },
+    "kind": {
+     "enum": [
+      "run_plan",
+      "hardware_command"
+     ],
+     "title": "Kind",
+     "type": "string"
+    },
+    "requested_by": {
+     "description": "which system asked (agent/frontend/...)",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Requested By",
+     "type": "string"
+    },
+    "requested_by_person": {
+     "default": "",
+     "description": "the human behind the request, if known",
+     "title": "Requested By Person",
+     "type": "string"
+    },
+    "summary": {
+     "title": "Summary",
+     "type": "string"
+    },
+    "requires": {
+     "description": "why a human must decide: 'moves the arms', 'doses 20 g of 12% peroxide', ...",
+     "items": {
+      "type": "string"
+     },
+     "title": "Requires",
+     "type": "array"
+    },
+    "payload": {
+     "additionalProperties": true,
+     "description": "the HardwareCommand awaiting approval",
+     "title": "Payload",
+     "type": "object"
+    },
+    "status": {
+     "default": "pending",
+     "enum": [
+      "pending",
+      "approved",
+      "rejected",
+      "expired"
+     ],
+     "title": "Status",
+     "type": "string"
+    },
+    "expires_at": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "pending requests expire; the asker must re-request",
+     "title": "Expires At"
+    },
+    "asked_of": {
+     "description": "operators who were told about it (person ids)",
+     "items": {
+      "type": "string"
+     },
+     "title": "Asked Of",
+     "type": "array"
+    },
+    "snoozed_until": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "don't remind anyone before this",
+     "title": "Snoozed Until"
+    },
+    "decided_by": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Decided By"
+    },
+    "decided_at": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Decided At"
+    }
+   },
+   "required": [
+    "id",
+    "kind",
+    "requested_by",
+    "summary",
+    "payload"
+   ],
+   "title": "ApprovalRequest",
+   "type": "object"
+  },
+  "Dose": {
+   "additionalProperties": false,
+   "properties": {
+    "target": {
+     "title": "Target",
+     "type": "number"
+    },
+    "actual": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Actual"
+    },
+    "error": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Error"
+    },
+    "topups": {
+     "default": 0,
+     "title": "Topups",
+     "type": "integer"
+    },
+    "theta_first": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Theta First"
+    },
+    "rev_first_pass": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Rev First Pass"
+    }
+   },
+   "required": [
+    "target"
+   ],
+   "title": "Dose",
+   "type": "object"
+  },
+  "Event": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "integer"
+    },
+    "ts": {
+     "title": "Ts",
+     "type": "string"
+    },
+    "bench_t": {
+     "default": 0.0,
+     "title": "Bench T",
+     "type": "number"
+    },
+    "level": {
+     "default": "info",
+     "enum": [
+      "debug",
+      "info",
+      "warning",
+      "error"
+     ],
+     "title": "Level",
+     "type": "string"
+    },
+    "kind": {
+     "enum": [
+      "log",
+      "step",
+      "dose",
+      "fault",
+      "alert",
+      "command",
+      "reply",
+      "approval",
+      "camera",
+      "message",
+      "state",
+      "note"
+     ],
+     "title": "Kind",
+     "type": "string"
+    },
+    "run_id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Run Id"
+    },
+    "step": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Step"
+    },
+    "source": {
+     "default": "backend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "message": {
+     "title": "Message",
+     "type": "string"
+    },
+    "data": {
+     "additionalProperties": true,
+     "title": "Data",
+     "type": "object"
+    }
+   },
+   "required": [
+    "id",
+    "kind",
+    "message"
+   ],
+   "title": "Event",
+   "type": "object"
+  }
+ },
+ "additionalProperties": false,
+ "description": "What changed since an event id - the answer to 'anything new?'.",
+ "properties": {
+  "since": {
+   "title": "Since",
+   "type": "integer"
+  },
+  "last_event_id": {
+   "title": "Last Event Id",
+   "type": "integer"
+  },
+  "changes": {
+   "description": "human-readable, newest last",
+   "items": {
+    "type": "string"
+   },
+   "title": "Changes",
+   "type": "array"
+  },
+  "steps_completed": {
+   "items": {
+    "type": "string"
+   },
+   "title": "Steps Completed",
+   "type": "array"
+  },
+  "doses": {
+   "additionalProperties": {
+    "$ref": "#/$defs/Dose"
+   },
+   "title": "Doses",
+   "type": "object"
+  },
+  "alerts_opened": {
+   "items": {
+    "$ref": "#/$defs/Alert"
+   },
+   "title": "Alerts Opened",
+   "type": "array"
+  },
+  "alerts_resolved": {
+   "items": {
+    "type": "string"
+   },
+   "title": "Alerts Resolved",
+   "type": "array"
+  },
+  "approvals": {
+   "description": "requested or decided in the window",
+   "items": {
+    "$ref": "#/$defs/ApprovalRequest"
+   },
+   "title": "Approvals",
+   "type": "array"
+  },
+  "run_outcome": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "description": "set when a run finished in the window",
+   "title": "Run Outcome"
+  },
+  "messages": {
+   "description": "chat messages in the window",
+   "items": {
+    "$ref": "#/$defs/Event"
+   },
+   "title": "Messages",
+   "type": "array"
+  },
+  "nothing_new": {
+   "default": false,
+   "title": "Nothing New",
+   "type": "boolean"
+  }
+ },
+ "required": [
+  "since",
+  "last_event_id"
+ ],
+ "title": "Delta",
+ "type": "object",
+ "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

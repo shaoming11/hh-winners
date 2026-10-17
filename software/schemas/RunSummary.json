@@ -1,0 +1,186 @@
+{
+ "$defs": {
+  "Dose": {
+   "additionalProperties": false,
+   "properties": {
+    "target": {
+     "title": "Target",
+     "type": "number"
+    },
+    "actual": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Actual"
+    },
+    "error": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Error"
+    },
+    "topups": {
+     "default": 0,
+     "title": "Topups",
+     "type": "integer"
+    },
+    "theta_first": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Theta First"
+    },
+    "rev_first_pass": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Rev First Pass"
+    }
+   },
+   "required": [
+    "target"
+   ],
+   "title": "Dose",
+   "type": "object"
+  },
+  "Recipe": {
+   "additionalProperties": false,
+   "properties": {
+    "developer_g": {
+     "default": 39.0,
+     "title": "Developer G",
+     "type": "number"
+    },
+    "yeast_g": {
+     "default": 7.0,
+     "title": "Yeast G",
+     "type": "number"
+    },
+    "water_g": {
+     "default": 30.0,
+     "title": "Water G",
+     "type": "number"
+    },
+    "activate_s": {
+     "default": 60.0,
+     "title": "Activate S",
+     "type": "number"
+    }
+   },
+   "title": "Recipe",
+   "type": "object"
+  }
+ },
+ "additionalProperties": false,
+ "properties": {
+  "run_id": {
+   "title": "Run Id",
+   "type": "string"
+  },
+  "backend": {
+   "enum": [
+    "sim",
+    "real"
+   ],
+   "title": "Backend",
+   "type": "string"
+  },
+  "started_at": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "title": "Started At"
+  },
+  "outcome": {
+   "title": "Outcome",
+   "type": "string"
+  },
+  "recipe": {
+   "anyOf": [
+    {
+     "$ref": "#/$defs/Recipe"
+    },
+    {
+     "type": "null"
+    }
+   ]
+  },
+  "doses": {
+   "additionalProperties": {
+    "anyOf": [
+     {
+      "$ref": "#/$defs/Dose"
+     },
+     {
+      "type": "number"
+     }
+    ]
+   },
+   "title": "Doses",
+   "type": "object"
+  },
+  "faults": {
+   "items": {
+    "type": "string"
+   },
+   "title": "Faults",
+   "type": "array"
+  },
+  "foam_h_mm": {
+   "anyOf": [
+    {
+     "type": "number"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Foam H Mm"
+  },
+  "bench_seconds": {
+   "default": 0.0,
+   "title": "Bench Seconds",
+   "type": "number"
+  }
+ },
+ "required": [
+  "run_id",
+  "backend",
+  "started_at",
+  "outcome",
+  "recipe"
+ ],
+ "title": "RunSummary",
+ "type": "object",
+ "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
