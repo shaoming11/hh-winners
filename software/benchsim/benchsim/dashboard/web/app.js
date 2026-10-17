@@ -63,7 +63,7 @@ function renderChem(s) {
     const total = parts.reduce((a, [k]) => a + comp[k], 0);
     const bar = parts.map(([k, , c]) => '<i style="--c: var(' + c + '); width: ' + (comp[k] / top * 100) + '%" title="' + esc(k) + ' ' + fmt(comp[k], 1) + ' g"></i>').join('');
     const txt = parts.length ? parts.map(([k]) => k + ' ' + fmt(comp[k], 1)).join(' · ') + ' g' : 'empty';
-    return '<div class="vessel' + (parts.length ? '' : ' empty') + '"><span class="name">' + esc(label) + '</span><span class="bar">' + bar + '</span>' +
+    return '<div class="vessel' + (parts.length ? '' : ' empty') + '"><span class="name">' + esc(label) + '</span><span class="vbar">' + bar + '</span>' +
       '<span class="txt">' + esc(txt) + (parts.length > 1 ? ' (' + fmt(total, 1) + ' g)' : '') + '</span></div>';
   }).join('');
   const f = s.probes && s.probes.foam; const bits = [];

@@ -34,7 +34,9 @@ body { background: var(--page); color: var(--ink); font: 15px/1.4 system-ui, -ap
 .muted { color: var(--muted); } .secondary { color: var(--ink-2); } .small { font-size: 13px; }
 .grow { flex: 1; }
 
-.bar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--ring); flex-wrap: wrap; }
+.bar { position: relative; display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--ring); flex-wrap: wrap; }
+#toast { position: absolute; right: 16px; top: 100%; margin-top: 6px; padding: 4px 10px; border-radius: 6px; background: var(--surface); border: 1px solid var(--ring); z-index: 2; }
+#toast:empty { display: none; }
 .brand { font-weight: 650; font-size: 18px; }
 .badge { font-size: 12px; font-weight: 700; letter-spacing: .06em; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--axis); color: var(--ink-2); }
 .pill { font-weight: 650; padding: 3px 12px; border-radius: 999px; background: var(--grid); }
@@ -88,12 +90,12 @@ button.danger:not(:disabled) { background: var(--critical); border-color: var(--
 .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; background: var(--c); }
 .vessel { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); gap: 2px 10px; align-items: center; padding: 3px 0; }
 .vessel .name { color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.vessel .bar { display: flex; gap: 2px; height: 12px; }
-.vessel .bar i { display: block; height: 100%; background: var(--c); }
-.vessel .bar i:first-child { border-radius: 4px 0 0 4px; } .vessel .bar i:last-child { border-radius: 0 4px 4px 0; }
-.vessel .bar i:only-child { border-radius: 4px; }
+.vessel .vbar { display: flex; gap: 2px; height: 12px; }
+.vessel .vbar i { display: block; height: 100%; background: var(--c); }
+.vessel .vbar i:first-child { border-radius: 4px 0 0 4px; } .vessel .vbar i:last-child { border-radius: 0 4px 4px 0; }
+.vessel .vbar i:only-child { border-radius: 4px; }
 .vessel .txt { grid-column: 2; color: var(--muted); font-variant-numeric: tabular-nums; }
-.vessel.empty .bar { background: var(--grid); border-radius: 4px; height: 4px; }
+.vessel.empty .vbar { background: var(--grid); border-radius: 4px; height: 4px; }
 .facts-row { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .facts-row b { color: var(--ink); font-weight: 650; }
 
