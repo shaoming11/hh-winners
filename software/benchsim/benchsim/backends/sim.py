@@ -313,7 +313,7 @@ class SimMega(Plugin):
         if name in ('TT', 'ST'):
             act, jnt = (self.tt_act, self.tt_jnt) if name == 'TT' else (self.st_act, self.st_jnt)
             extra = self.w.P['carousel' if name == 'TT' else 'stage']['timeout_extra_s']
-            self.motion = dict(cmd=name, seq=seq, t0=self.w.time, a0=self.w.d.ctrl[act], a1=math.radians(cmd['deg']), dur=cmd['ms'] / 1000.0,
+            self.motion = dict(cmd=name, seq=seq, t0=self.w.time, a0=self.w.d.ctrl[act], a1=math.radians(cmd['deg']), dur=max(cmd['ms'] / 1000.0, 1e-3),
                                act=act, jadr=jnt.qposadr[0], timeout=cmd['ms'] / 1000.0 + extra)
         else:
             self.motion = dict(cmd='AUG', seq=seq, t0=self.w.time, target_rev=float(cmd['rev']), dir=cmd['dir'], done_rev=0.0, phase='dose',

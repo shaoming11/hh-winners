@@ -177,6 +177,26 @@ and the ones marked *assumed* have no measurement behind them.
   happens at WORK. `--erupt-before-return` swaps steps 9 and 10, but the pourer's own return still takes about
   20 s. The real induction time needs measuring before relying on an eruption at the audience position.
 
+## Hardware handoff (phase 10)
+
+```bash
+.venv/bin/python -m benchsim hw-check        # offline: imports, calibration schema, firmware host test, protocol parity; opens no port
+```
+
+- `benchsim/backends/real.py` provides `make_real_bench(...)`, reached only through `make_bench('real', allow_hardware=True)`.
+  `--real` alone is refused. Live output needs `--real --i-understand-this-moves-hardware`, and `--dry-run` reads
+  without writing. Arms use LeRobot's Feetech bus (imported lazily), with radians ↔ ticks mapping from
+  `config/hardware_calibration.example.json` (schema `benchsim.hardware_calibration/1`). The Mega uses
+  `SerialTransport` at 250000 baud, opened with `dtr=False, rts=False`. Torque and goal writes are disabled until
+  the caller turns dry-run off.
+- `firmware/mega/wlb_mega/` is the Arduino Mega 2560 sketch: pins per `docs/electrical.md` §4, Timer4 50 Hz PWM
+  with D6/D7/D8 low at boot, HX711 at 80 SPS, auger feedback with the stall rule, e-stop latch, 500 ms watchdog and
+  the same JSON-lines protocol. `protocol_core.cpp` builds on the host: 371 checks pass under ASan/UBSan, including
+  CRC and validation parity with `benchsim.protocol`. Differences from SimMega are listed in `firmware/mega/README.md`.
+- `docs/bringup.md` maps the electrical bring-up tests E1–E10 to exact commands and pass criteria.
+- Not done: no avr-gcc or arduino-cli build here, no hardware attached, and the LeRobot adapter has only been
+  checked against a stub API.
+
 ## Conventions
 
 - World: +X east, +Y north, table top at Z 0 (`docs/demo_process.md` §2.1).
