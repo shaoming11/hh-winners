@@ -1,10 +1,17 @@
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "benchsim"))   # benchsim is a sibling package
+
+# Set BEFORE any test module imports backend.app, which builds its Store at import time.  Without
+# this the suite's chat/people/run records land in the demo's shared out/backend - test handles
+# like "+1999" used to pile up in out/backend/people.json and run folders in out/backend/runs.
+os.environ.setdefault("WLB_BACKEND_DIR", tempfile.mkdtemp(prefix="wlb-test-store-"))
 
 
 @pytest.fixture(scope="session")

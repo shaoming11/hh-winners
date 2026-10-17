@@ -22,8 +22,8 @@ from backend.schemas import (ALL_SCHEMAS, ArmGoalsCmd, CarouselCmd, ChemistrySta
                              HardwareCommand, MegaState, MegaSimpleCmd, Recipe, RunPlanCmd, StageCmd, TareCmd)
 from backend.store import Store
 from backend.watchdog import Watchdog
-from bench.config import load
-from bench.paths import OUT_DIR
+from backend.config import load
+from backend.app import OUT_DIR
 
 SOFTWARE = Path(__file__).resolve().parents[1]
 CMD = TypeAdapter(HardwareCommand)

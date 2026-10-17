@@ -1,10 +1,11 @@
 """The one place state lives.  Thread-safe; every mutation bumps `version` and wakes SSE
 listeners.  Events are appended to out/backend/events.jsonl so a restart keeps the log; run
-history is read from the existing out/run_<stamp>.json records written by run_demo.py and by
+history is read from the existing out/run_<stamp>.json records written by
 the runner here (same format, so old runs show up too)."""
 from __future__ import annotations
 
 import json
+import os
 import threading
 import time
 import uuid
@@ -17,7 +18,9 @@ OUT_DIR = Path(__file__).resolve().parents[1] / "out"
 from backend.schemas import (Alert, ApprovalRequest, Event, EventKind, ExperimentState, Recipe,
                              RunSummary, Source, now_iso)
 
-BACKEND_DIR = OUT_DIR / "backend"
+# WLB_BACKEND_DIR moves the whole store (events.jsonl, people.json, run records) somewhere else.
+# The test suite points it at a tmp dir so a test run never writes into the demo's shared store.
+BACKEND_DIR = Path(os.environ["WLB_BACKEND_DIR"]) if os.environ.get("WLB_BACKEND_DIR") else OUT_DIR / "backend"
 
 
 class Store:
