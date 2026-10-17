@@ -1,0 +1,156 @@
+[
+ {
+  "part": "RK-03 reagent rack",
+  "file": "RK-03_reagent_rack.stl",
+  "body": "world",
+  "yaw_deg": 2.8273734808609753e-07,
+  "t": [
+   192.29999939998774,
+   394.5999992012835,
+   0.0
+  ],
+  "verified": "fit: 3 cup floors to update13_final rack_stands + floor Z",
+  "residual_mm": 2.398858007977328e-06,
+  "note": "cup floor r 28.26 at local Z 60.2"
+ },
+ {
+  "part": "TT-04 v4 beaker ring",
+  "file": "TT-04_beaker-ring-v4-4x100mL_qty1.stl",
+  "body": "carousel",
+  "yaw_deg": 18.105325832605825,
+  "t": [
+   -0.016734985655944,
+   0.0018549595239392147,
+   58.6
+  ],
+  "verified": "fit: 4 pocket bores to the r84 pockets + floor Z",
+  "residual_mm": 0.12335734710567181,
+  "note": "body frame = carousel deck at angle 0; bore r 30.34, locating ribs r 28.25"
+ },
+ {
+  "part": "TT-02 carousel deck",
+  "file": "TT-02_carousel-deck_qty1.stl",
+  "body": "carousel",
+  "yaw_deg": 0.0,
+  "t": [
+   0.0,
+   0.0,
+   51.6
+  ],
+  "verified": "concentric with the carousel axis (symmetric part); Z = ring base - 7",
+  "residual_mm": null,
+  "note": ""
+ },
+ {
+  "part": "WS-02 v3 scale pan",
+  "file": "WS-02_scale-pan-v3-100mL_qty1.stl",
+  "body": "scale_pan",
+  "yaw_deg": 0.0,
+  "t": [
+   -0.05037419498978579,
+   0.0,
+   57.7
+  ],
+  "verified": "ring centre and floor Z: floor lands on the update13_final beaker bottom Z 63.7",
+  "residual_mm": 0.0,
+  "note": "locating ring r 30.16; one feature, so yaw is free (part is symmetric)"
+ },
+ {
+  "part": "ST-11 stage sled",
+  "file": "ST-11_stage-sled_qty1_SUPPORTS.stl",
+  "body": "sled",
+  "yaw_deg": 0.0,
+  "t": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "verified": "part frame = tools/cad/stage_b.py origin (450, 282, 0); catch-well ring centre found at local (0.01, 0.04)",
+  "residual_mm": 0.03821961484705944,
+  "note": "sled body origin is the funnel axis at WORK"
+ },
+ {
+  "part": "ST-12 servo bridge",
+  "file": "ST-12_servo-bridge_qty1.stl",
+  "body": "world",
+  "yaw_deg": 0.0,
+  "t": [
+   450.0,
+   65.0,
+   20.0
+  ],
+  "verified": "part frame = tools/cad/stage_b.py Part origin (explicit world coordinates)",
+  "residual_mm": null,
+  "note": ""
+ },
+ {
+  "part": "ST-13 crank",
+  "file": "ST-13_crank_qty1.stl",
+  "body": "crank",
+  "yaw_deg": 0.0,
+  "t": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "verified": "part frame = tools/cad/stage_b.py Part origin (explicit world coordinates)",
+  "residual_mm": null,
+  "note": ""
+ },
+ {
+  "part": "ST-14 connecting rod",
+  "file": "ST-14_connecting-rod_qty1.stl",
+  "body": "rod",
+  "yaw_deg": 0.0,
+  "t": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "verified": "part frame = tools/cad/stage_b.py Part origin (explicit world coordinates)",
+  "residual_mm": null,
+  "note": ""
+ },
+ {
+  "part": "ST-07 catch well",
+  "file": "ST-07_catch-well_qty1.stl",
+  "body": "sled",
+  "yaw_deg": 0.0,
+  "t": [
+   0.0,
+   0.0,
+   9.0
+  ],
+  "verified": "concentric in the ST-11 locating ring (symmetric part); Z = sled plate top",
+  "residual_mm": null,
+  "note": ""
+ },
+ {
+  "part": "ST-05 flask collar",
+  "file": "ST-05_flask-collar_qty1.stl",
+  "body": "sled",
+  "yaw_deg": 0.0,
+  "t": [
+   0.0,
+   0.0,
+   11.0
+  ],
+  "verified": "concentric, on the catch-well floor (assumed 2 mm)",
+  "residual_mm": null,
+  "note": ""
+ },
+ {
+  "part": "TT-01 v2 turntable base",
+  "file": "TT-01_turntable-base-v2_qty1.stl",
+  "body": "world",
+  "yaw_deg": 220.6,
+  "t": [
+   807.9,
+   523.5,
+   0.0
+  ],
+  "verified": "assumed: local origin on the carousel axis, rotated with the unit by update13_final carousel.rotation_deg",
+  "residual_mm": null,
+  "note": "orientation not independently verified"
+ }
+]

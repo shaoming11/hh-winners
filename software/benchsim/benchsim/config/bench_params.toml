@@ -1,0 +1,329 @@
+# Wet Lab Bench simulator parameters. Units: millimetres, degrees, grams, seconds.
+# Station centres are NOT here: they come from tools/layout/layout_final.json key update13_final
+# (see benchsim/layout.py). This file holds the dimensions update13_final does not record, each with
+# its source. "assumed" means no project source was found; those values are listed in the README
+# assumptions table and need measurement on the bench.
+
+[world]
+# docs/demo_process.md 2.1: +X east, +Y north, table top Z 0
+table_xy = [-80.0, -80.0, 1000.0, 760.0]   # table top extent drawn in the scene (x0, y0, x1, y1), assumed
+timestep_s = 0.001
+
+[frame]
+section = 20.0                              # 2020 extrusion
+rail_top_z = 20.0                           # rails lie on the table (tools/cad/stage_b.py: riders on rail tops at Z 20)
+# name = [x0, y0, x1, y1]; source in the comment
+[frame.rails]
+Y_left  = [245.0, 290.0, 265.0, 690.0]      # demo_process 2.2: Y-left Y 290-690; tape X datum = west face X 245
+Y_right = [665.0, 270.0, 685.0, 670.0]      # demo_process 2.2: Y 270-670; X rails 400 long from X 265 -> X 665
+X_front = [265.0, 572.5, 665.0, 592.5]      # update13_final X_rails.front_centre_Y 582.5 (centre +-10)
+X_back  = [265.0, 642.3, 665.0, 662.3]      # update13_final X_rails.rear_centre_Y 652.3
+E6      = [265.0, 430.0, 665.0, 450.0]      # tools/cad/stage_a.py: X265-665, Y430-450
+S1      = [360.0, 30.0, 380.0, 430.0]       # tools/cad/stage_a.py: X360-380, Y30-430
+S2      = [520.0, 30.0, 540.0, 430.0]       # tools/cad/stage_a.py: X520-540, Y30-430
+
+[arm]
+# SO-101 base frame: upstream MJCF +X (arm forward at pan 0) points to world -Y (south), as in the CAD
+# as-built pose where the arm plane faces straight out of the base (tools/layout/urdf_limits.py: pan offset 0).
+base_yaw_deg = -90.0
+pan_axis_in_base = [38.8353, 0.0]           # upstream so101_new_calib.xml shoulder body x offset
+base_z = 22.4                               # rail top 20 + 2.4 (upstream base mesh sits 2.4 mm below its frame);
+                                            # the CAD as-built fit gives 22.5 (benchsim/cadmap.py)
+park_deg_cad = [30.0, 60.0, -150.0, 30.0, 0.0]   # tools/layout/anim_paths.json "park" (CAD convention)
+# STS3215 (LeRobot SO-101): speed and torque used to rate-limit and saturate joint goals
+max_speed_deg_s = 180.0                     # assumed conservative (no-load ~ 270 deg/s at 7.4 V)
+grip_force_limit_nm = 0.6                   # gripper closes to a torque limit (demo_process 3); assumed value
+
+[beaker]
+# EISCO 100 mL PP, 56 x 74 (demo_process 3, DUMMY-BEAKER STL 56x74); wall/floor from _beaker_wall/_floor STLs
+od = 56.0
+height = 74.0
+wall = 1.2
+floor = 1.2
+empty_mass_g = 18.0                         # assumed
+lip_radius = 28.0
+
+[scale]
+# WS-01 v4 on E6, WS-02 v3 pan (80 dia, 14 tall, 100 mL ring) -> exports/prints_v2 STL extents
+pan_od = 80.0
+pan_height = 14.0
+ring_id = 60.3                              # 100 mL locating ring: WS-02 v3 STL bore r 30.16 (benchsim.meshfit)
+base_size = [117.0, 67.8, 45.0]             # WS-01 STL extent
+saddle_x = [547.0, 664.0]                   # update13_final scale.mount
+pan_mass_g = 45.0                           # assumed (PLA pan + screws)
+stiffness_n_per_m = 20000.0                 # 1 kg bar cell, ~0.5 mm at full scale: assumed flexure model
+damping_ratio = 0.25                        # assumed
+rate_hz = 80.0                              # electrical.md 5 (RATE mod)
+noise_g = 0.07                              # electrical.md 5: 0.05-0.1 g at 80 SPS
+counts_per_g = 420.0                        # HX711 at gain 128 with a 1 kg cell, typical: assumed
+quant_counts = 1                            # one count quantisation
+
+[carousel]
+# TT-04 v4 ring, 4 pockets at r 84 (update13_final + layout_final.py World: pocket walls r 28.3-30.3, Z 58.6-70.6)
+pitch_r = 84.0
+pocket_ids_deg = [220.6, 310.6, 40.6, 130.6]   # pocket angles at deck angle 0 (pick, +90, auger, +270); layout_final.py LAY
+pocket_inner_r = 28.3                       # locating ribs (TT-04 v4 STL: r 28.25 over local Z 6.1-9.0)
+pocket_wall_r = 30.3
+pocket_bore_r = 30.6                        # TT-04 v4 STL bore above and below the ribs (benchsim.meshfit profile)
+pocket_rib_z = [3.0, 6.0]                   # rib band above the beaker bottom (STL local Z 6.1-9.0, floor at 3.1)
+ring_z = [58.6, 70.6]
+ring_od = 216.6                             # TT-04 v4 STL extent
+deck_od = 236.0                             # TT-02 STL extent
+deck_z = [51.6, 58.6]                       # 7 mm deck under the ring
+base_size = [151.3, 110.0, 43.0]            # TT-01 v2 STL extent
+# motion: docs/software_architecture.md 7.4 (historical) gives >= 2 s per 45 deg; same limit kept
+min_s_per_45deg = 2.0
+deck_range_deg = [-10.0, 280.0]             # M45CHW 270-deg servo travel plus trim: assumed
+timeout_extra_s = 2.0                       # architecture 4: commanded duration + 2 s
+
+[auger]
+# DH-01 v5 head on PS-01 v2 post; outlet 169.5 above the table (demo_process step 5)
+outlet_z = 169.5
+outlet_d = 10.0
+post_size = [40.0, 52.0, 160.0]             # PS-01 v2 STL extent
+head_size = [90.0, 131.0, 70.0]             # DH-01 v5 STL extent
+g_per_rev_nominal = 0.85                    # assumed until the electrical.md E8 calibration
+g_per_rev_cv = 0.06                         # rev-to-rev coefficient of variation: assumed
+rev_s = 1.2                                 # one revolution at the dosing pulse: assumed
+first_pass_frac = 0.85                      # electrical.md 6
+max_topups = 2                              # electrical.md 6
+reverse_rev = 0.25                          # electrical.md 6
+stall_window_s = 0.150                      # electrical.md 6: < 5 deg in 150 ms
+stall_min_deg = 5.0
+max_stalls = 3
+hopper_empty_g_per_10rev = 1.0
+max_revs = 50.0                             # architecture 7.4: > 50 rev -> RANGE
+dose_timeout_s = 60.0                       # architecture 4
+
+[stage]
+# tools/cad/stage_b.py: crank r 50 at (450, 77), rod 80; WORK = crank 0 deg (pin Y 207); demo_process 3: limit 150 deg
+crank_centre = [450.0, 77.0]
+crank_r = 50.0
+rod_l = 80.0
+work_deg = 0.0
+erupt_deg = 150.0
+expected_travel_mm = 97.3
+move_s = 2.5                                # demo_process step 10
+sled_plate_z = [3.0, 9.0]
+sled_size_xy = [138.0, 154.0]               # ST-11 plate X 381-519, Y 196-350 at WORK
+timeout_extra_s = 2.0
+
+[flask]
+# 250 mL Erlenmeyer (borosilicate, standard narrow neck): assumed nominal dimensions
+base_od = 85.0
+height = 145.0
+neck_od = 34.0
+neck_id = 28.0
+neck_h = 30.0
+collar = [126.0, 23.0]                      # ST-05 STL extent (od, h)
+catch_well = [130.0, 90.0]                  # ST-07 STL extent (od, h)
+soap_ml = 15.0                              # demo_process recipe
+
+[funnel]
+# REF-FUNNEL-EISCO4; rim Z 233 and axis from update13_final; 100 mm (4 in) rim assumed from the name
+rim_d = 100.0
+stem_od = 16.0
+cone_h = 70.0
+stem_h = 45.0
+
+[rack]
+# RK-03 one-piece rack; beaker bottom Z 60.2 from update13_final
+cup_wall = 2.4
+cup_h = 72.2                                # RK-03 STL height
+cup_inner_r = 28.6                          # 0.6 mm radial clearance: assumed
+
+[gripper]
+# fin-ray gripper; geometry from software/tools/planner/gripper_design.json and the GR-0x STLs in prints_v2
+# MuJoCo gripper joint = CAD q6 + offset. The offset is a modelling convention, not a hardware calibration.
+cad_to_mj_offset_deg = 55.0
+contact_tol_deg = 3.0                       # observed jaw angle within this of the expected contact angle = grasp
+miss_margin_deg = 2.5                       # observed jaw closing this far past the contact angle = miss
+squeeze_deg = 6.0                           # close command this far past contact (torque limit stops the jaw); firmware SQUEEZE 4 in gripper_design
+# expected jaw angle at contact (MJCF gripper joint, deg). side: gripper_design.json q_contact(56) + offset = 7.72; the
+# simulated closes stop at 7.56-8.35. top-down: beaker 16 mm toward the moving jaw, fixed finger touching before the
+# close; the simulated close stops at 22.94 (benchsim.grasp_demo --calibrate). Both must be re-taught on the real gripper.
+contact_deg_side = 7.72
+contact_deg_td = 22.94
+scale_delta_min_g = 8.0                     # a lift/place must change the scale by at least this (empty beaker ~18 g)
+
+[recipe]
+# demo_process 1: targets and design tolerances
+developer_g = 39.0
+developer_tol_g = 2.0
+yeast_g = 7.0
+yeast_tol_g = 0.7
+water_g = 30.0
+water_tol_g = 2.0
+activate_wait_s = 60.0
+
+[vision]
+# Shared image checks (benchsim.vision), applied identically to sim renders and webcam frames. Calibrated on the sim
+# bench_cam render at 640 x 480 (numbers below); assumed for the webcam until measured with the real print colours
+# and lighting on the bench.
+roi_margin_px = 4                           # padding around a projected beaker ROI: assumed
+beaker_s_max = 0.25                         # HSV saturation below this ...
+beaker_v_min = 0.55                         # ... and value above this = clear/white PP wall: assumed
+beaker_min_frac = 0.495                     # sim pick pocket: 0.620 with P1, 0.371 empty (midpoint). Not for the
+                                            # white scale pan (0.660 vs 0.554): use the reference test there
+reference_diff_min = 8.0                    # mean |RGB difference| (0-255) to an empty-station frame. Sim: 45.5 pick,
+                                            # 29.3 scale with a beaker, 0 without; webcam noise allowance assumed
+foam_rgb = [245.0, 245.0, 240.0]            # undyed foam, near white: assumed
+foam_rgb_tol = 45.0                         # Euclidean RGB distance: assumed
+foam_row_min_frac = 0.3                     # a ROI row is foam when this fraction of it is foam-coloured: assumed
+foam_max_gap_rows = 2                       # gap tolerated inside the foam column: assumed
+
+[liquid]
+# Analytic pour model (benchsim/chem/liquid.py), NOT CFD: flat horizontal free surface in a tilted cylinder
+# (beaker inside: od/2 - wall, height - floor), rectangular-weir flow over the lip, ballistic stream, parcels.
+cd = 0.62                                   # sharp-crested weir discharge coefficient (textbook 0.60-0.62); assumed for a PP lip
+lip_width_mm = 14.0                         # effective width of the EISCO spout incl. rim curvature: assumed, measure the spout
+hold_head_mm = 0.5                          # capillary hold-up: no flow until the surface is this far above the lip: assumed
+exit_velocity_coeff = 1.0                   # x critical-depth velocity sqrt(g 2h/3) at the lip (free-overfall brink): assumed
+transport_delay_s = 0.03                    # liquid running down the lip before free fall: assumed
+jet_radius_mm = 3.0                         # stream footprint radius for the receiver-opening overlap: assumed
+impact_force = true                         # stream momentum flux (m_dot * v) pushes on the receiver beaker (scale overshoot)
+funnel_delay_s = 0.8                        # funnel cone + stem transit into the flask: assumed
+residual_film_ml = 0.4                      # wetted-wall film that never drains from a beaker: assumed
+drip_ml = 0.1                               # lip film built up while pouring, dripped off after the stream stops: assumed
+drip_tau_s = 0.5                            # after-drip time constant: assumed
+
+[pour]
+# Closed-loop pour controller (benchsim/process/pour.py). Section numbers: docs/software_architecture.md 5.
+control_dt_s = 0.025                        # host control period (40 Hz goal writes): assumed
+fit_window_s = 0.5                          # 5.1 rolling least-squares line fit (mass and flow)
+outlier_sigma = 5.0                         # 5.1 outlier gate
+outlier_sigma_floor_g = 0.07                # gate sigma never below the HX711 noise ([scale] noise_g)
+outlier_reset_n = 4                         # this many gated samples in a row is a real step: restart the window: assumed
+theta_start_deg = 40.0                      # 5.2 manifold start
+theta_max_deg = 105.0                       # 5.2 manifold end
+fast_rate_deg_s = 120.0                     # 5.2 "fast move to 40": assumed command rate (arm max 180 deg/s)
+ramp_rate_deg_s = 3.0                       # 5.2
+first_drop_q_g_s = 0.5                      # 5.1 first drop: q_hat above this for first_drop_n samples
+first_drop_n = 3
+first_drop_dm_g = 0.3                       # 5.1 and dm_f above this
+kp_deg_per_gs = 0.15                        # 5.3
+ki_deg_per_s_per_gs = 1.5                   # 5.3 gives 0.3 as the initial value. With 0.3 the simulated loop misses the 5.3/9.1
+                                            # acceptance (q* within +-1 g/s after 1.5 s): worst 4.5 g/s over the plant sweep in
+                                            # reports/pour_report.md; 1.5 meets it (worst 0.76 g/s). Retune on hardware.
+max_rate_deg_s = 10.0                       # 5.3 tilt-rate clamp
+q_gain_per_s = 0.6                          # 5.3 q* = clamp(0.6 (target - m), 1, ceiling)
+q_min_g_s = 1.0
+q_ceiling_g_s = 8.0
+cut_a_g = 0.3                               # 5.4 cut when m >= target - (a + b q_hat); initial values, refit from pours
+cut_b_s = 0.15
+untilt_fast_deg = 5.0                       # 5.4 fast untilt delta
+untilt_fast_big_deg = 8.0                   # 5.4 delta when q_hat at the cut > untilt_big_q_g_s
+untilt_big_q_g_s = 5.0
+untilt_rate_deg_s = 60.0                    # 5.4 then <= 60 deg/s
+untilt_total_deg = 15.0                     # 5.4 down to theta_cut - 15
+drip_hold_s = 1.5                           # 5.4
+settle_window_s = 0.5                       # 5.5
+settle_timeout_s = 5.0                      # 5.5
+settle_sigma_g = 0.15                       # 5.5 says 0.05 g, which is below the HX711 per-sample noise (electrical.md 5:
+                                            # 0.05-0.1 g); read here as ~2x the per-sample noise of the window
+settle_flow_g_s = 0.25                      # settled also needs |q_hat| below this (~3x the slope noise of a 0.5 s fit): assumed
+topup_back_deg = 3.0                        # 5.5 top-up: ramp to theta_cut - 3 at 10 deg/s, then +0.5 deg every 0.6 s
+topup_ramp_deg_s = 10.0
+topup_step_deg = 0.5
+topup_period_s = 0.6
+topup_flow_g_s = 0.3                        # 5.5 until q_hat > 0.3 g/s or the cut law fires
+max_topup_pulses = 6                        # 5.5 PAUSE after 6 pulses
+max_pour_s = 45.0                           # whole-pour timeout -> PAUSE_TIMEOUT: assumed
+# mass-deficit (spill) check: an addition to section 5, not in the architecture doc. While flowing, expected =
+# rho (V_first - V_table(theta)) - (spill_allow_g + spill_allow_s q_hat); the allowance covers the liquid standing
+# above the lip (~6-18 g at 1-8 g/s in the [liquid] model) and estimator lag. PAUSE_SPILL if the scale shows less
+# than spill_ratio * expected for spill_hold_s. Values assumed; see reports/pour_report.md for the margins seen.
+spill_check = true
+spill_allow_g = 8.0
+spill_allow_s = 1.5
+spill_ratio = 0.6
+spill_hold_s = 1.0
+spill_arm_s = 2.0                           # check only after the flow has run this long (the start-up transient stands
+                                            # liquid above the lip faster than the scale sees it)
+# funnel pour (5.6): fixed profile, open loop
+funnel_theta_deg = 105.0
+funnel_rate_deg_s = 10.0                    # ramp 40 -> 105 deg: assumed (same as the closed-loop rate clamp)
+funnel_hold_s = 3.0                         # hold at 105 deg so the beaker drains: assumed
+
+[pour.developer]
+low_fill_ml = 46.0                          # 5.2 PAUSE("refill developer") below 1.2 x 38.5 mL
+fill_offset_ml = 9.2                        # 5.2 V_first = V_table(theta_first) + offset. Simulated value from 3 weighed-fill
+                                            # pours (python -m benchsim.pour_trials --calibrate: 8.99 / 9.21 / 9.51 mL at
+                                            # 60 / 70 / 80 mL), mostly first-drop detection lag. Re-measure on the bench
+
+[pour.water]
+low_fill_ml = 36.0                          # 5.2 PAUSE("refill water") below 1.2 x 30 mL
+fill_offset_ml = 9.2                        # assumed equal to the developer value (same beaker; the liquid model has no
+                                            # viscosity term); 5.2 says measure it from 3 weighed-fill water pours
+
+[auger_model]
+# benchsim.chem.auger (analytic dosing model, not a granular-flow simulation) and the host dosing procedure in
+# benchsim.mechanisms. g/rev mean and CV are [auger] g_per_rev_nominal and g_per_rev_cv.
+true_over_nominal = 1.0                     # simulated screw's true g/rev over g_per_rev_nominal: assumed (no calibration yet)
+recover_dispenses = false                   # assumed: forward travel that re-covers a reversed angle dispenses nothing
+hopper_window_rev = 10                      # electrical.md 6: "if 10 revolutions add less than 1 g, fault"
+hopper_load_g = 40.0                        # assumed: one hopper fill (architecture 5: refill every 4 runs of 7 g)
+rev_resolution = 0.1                        # architecture 6 / 7.4: round((target - m) / g_per_rev, 0.1) rev; AUG <revs x 10>
+cal_revs = 10.0                             # architecture 6: calibrate_auger.py, 3 x 10 rev into a tared cup
+cal_runs = 3                                # architecture 6
+host_reply_margin_s = 2.0                   # assumed: host waits this long past the Mega's AUG timeout before giving up
+
+[foam]
+# benchsim.chem.foam: analytic elephant-toothpaste model (not CFD). First-order H2O2 decomposition after an induction
+# delay; soap traps part of the O2 as foam, which fills the flask headspace, then a column above the neck, then
+# overflows into the catch well. Approximations are listed in the module docstring.
+h2o2_mass_frac = 0.12                       # demo_process 1: 12 % H2O2 (40-volume clear developer)
+h2o2_molar_mass = 34.015                    # g/mol; 2 H2O2 -> 2 H2O + O2
+o2_molar_volume_l = 24.47                   # L/mol, ideal gas at 25 C, 101.325 kPa: 39 g developer -> 1.68 L O2 (demo_process 1: ~1.7 L)
+induction_s = 2.0                           # assumed: catalyst mixing/wetting delay after yeast meets peroxide
+k_ml_per_g_s = 1.2                          # assumed: k = k_ml_per_g_s * yeast g / liquid mL (7 g in ~94 mL -> 0.09 /s, half-life ~8 s)
+soap_min_g = 1.0                            # assumed: less soap than this traps no foam
+trap_frac_soap = 0.7                        # assumed: fraction of the released O2 held in foam when soap is present
+trap_frac_no_soap = 0.0                     # assumed: without soap the bubbles burst at the surface
+liquid_frac = 0.05                          # assumed: foam liquid volume fraction (expansion ratio 20); foam liquid <= flask liquid
+collapse_tau_s = 30.0                       # assumed: drainage/collapse time constant of standing foam
+column_max_mm = 200.0                       # assumed: tallest standing column above the neck before it topples into the catch well
+dye_g = 0.2                                 # assumed: "a few drops" of food colouring with the soap (demo_process 1)
+rgba_dyed = [1.0, 0.45, 0.6, 0.95]          # scene.py foam colour (food colouring)
+rgba_plain = [0.96, 0.95, 0.90, 0.95]       # assumed: undyed foam
+update_dt_s = 0.01                          # model integration step (s)
+
+[mega]
+# Arduino Mega 2560 firmware (firmware/mega/wlb_mega). protocol_core.cpp default_config() compiles these in;
+# tests/test_firmware_core.py and `python -m benchsim hw-check` fail if the two disagree. Change both, then
+# rebuild and reflash (firmware/mega/README.md).
+baud = 250000                               # electrical.md 4
+wdt_ms = 500                                # electrical.md 7: host link silent 500 ms -> all PWM off (SimMega.WDT_S)
+progress_ms = 200                           # protocol.py: auger progress at 5 Hz (SimMega.PROGRESS_S)
+settle_ms = 150                             # assumed: M45CHW lag after the profile; done = profile + settle (open loop)
+estop_release_ms = 500                      # software_architecture.md 7.4 RESET: D2 LOW >= 500 ms before CLR clears ESTOP
+hx_timeout_min_ms = 100                     # electrical.md 7: no HX711 data within max(100 ms, 4 x measured interval)
+hx_timeout_intervals = 4                    # electrical.md 7
+tare_samples = 8                            # SimMega TARE: mean of 8 conversions
+home_tt_deg = 0.0                           # deck home = its 0 deg mark; stage home = [stage] work_deg
+# M45CHW pulses: us = us_at_zero + us_per_deg * deg. All assumed until commissioning (electrical.md E10 and the
+# software_architecture.md 7.4 gauge). Carousel: deck_range_deg [-10, 280] spread over 500-2500 us (2000/290 us/deg);
+# if the servo covers only 270 deg over that pulse range, [carousel] deck_range_deg must shrink.
+# Stage: 2000 us per 270 deg with crank 75 deg (mid-stroke) at 1500 us.
+servo_us_min = 500                          # assumed M45CHW pulse range
+servo_us_max = 2500                         # assumed
+tt_us_at_zero = 568.9655                    # assumed: 500 + 10 * 2000/290
+tt_us_per_deg = 6.896552                    # assumed: 2000/290
+st_us_at_zero = 944.4445                    # assumed: 1500 - 75 * 2000/270
+st_us_per_deg = 7.407407                    # assumed: 2000/270
+# FB5311M-360 auger (electrical.md 4 and 6, software_architecture.md 6)
+aug_us_stop = 1500                          # architecture 6: about 1500 us = stop; measure the exact centre (E8)
+aug_us_offset = 200                         # architecture 6: dosing pulse 1500 +- 200 us
+aug_dir_sign = 1                            # assumed: pulse above the stop centre for dir = +1 (feeds yeast)
+aug_fb_sign = 1                             # assumed: A2 angle rises when the pulse is above the stop centre
+aug_fb_adc_min = 0                          # assumed: A2 reading at 0 deg; record min/max/wrap at E8
+aug_fb_adc_max = 1023                       # assumed: A2 reading at 360 deg
+aug_fb_max_step_deg = 45.0                  # assumed: a larger jump between two loop passes is a feedback glitch
+aug_fb_glitch_resync = 20                   # assumed: glitches in a row before resynchronising without counting
+
+[sts3215]
+# Feetech STS3215 register units (Feetech STS memory table), used by benchsim.backends.real
+goal_velocity_unit_ticks_s = 1.0            # Goal_Velocity (reg 46): steps/s; 0 means maximum, so never written as 0
+acceleration_unit_ticks_s2 = 100.0          # Acceleration (reg 41): 100 steps/s^2; 0 means maximum
+acceleration_reg_max = 254
+load_unit_permille = 1.0                    # Present_Load (reg 60): 0.1 % of max torque, bit 10 = direction

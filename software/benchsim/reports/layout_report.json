@@ -1,0 +1,730 @@
+{
+ "source": "layout_final.json:update13_final",
+ "tolerance_mm": 1.0,
+ "pass_": true,
+ "stations": [
+  {
+   "station": "pourer base axis",
+   "model_mm": [
+    397.4,
+    599.7
+   ],
+   "source_mm": [
+    397.4,
+    599.7
+   ],
+   "error_mm": 0.0,
+   "pass_": true,
+   "source": "update13_final"
+  },
+  {
+   "station": "transfer base axis",
+   "model_mm": [
+    604.8,
+    599.7
+   ],
+   "source_mm": [
+    604.8,
+    599.7
+   ],
+   "error_mm": 0.0,
+   "pass_": true,
+   "source": "update13_final"
+  },
+  {
+   "station": "scale pan centre",
+   "model_mm": [
+    620.0,
+    407.0,
+    63.68
+   ],
+   "source_mm": [
+    620.0,
+    407.0,
+    63.7
+   ],
+   "error_mm": 0.022,
+   "pass_": true,
+   "source": "update13_final"
+  },
+  {
+   "station": "funnel rim (sled at WORK)",
+   "model_mm": [
+    450.0,
+    282.0,
+    233.0
+   ],
+   "source_mm": [
+    450.0,
+    282.0,
+    233.0
+   ],
+   "error_mm": 0.0,
+   "pass_": true,
+   "source": "update13_final"
+  },
+  {
+   "station": "carousel centre",
+   "model_mm": [
+    807.9,
+    523.5
+   ],
+   "source_mm": [
+    807.9,
+    523.5
+   ],
+   "error_mm": 0.0,
+   "pass_": true,
+   "source": "update13_final"
+  },
+  {
+   "station": "carousel pick pocket",
+   "model_mm": [
+    744.12,
+    468.83,
+    61.7
+   ],
+   "source_mm": [
+    744.1,
+    468.8,
+    61.7
+   ],
+   "error_mm": 0.041,
+   "pass_": true,
+   "source": "update13_final"
+  },
+  {
+   "station": "carousel auger pocket",
+   "model_mm": [
+    871.68,
+    578.17,
+    61.7
+   ],
+   "source_mm": [
+    871.6,
+    578.2,
+    61.7
+   ],
+   "error_mm": 0.086,
+   "pass_": true,
+   "source": "update13_final"
+  },
+  {
+   "station": "rack pocket 1",
+   "model_mm": [
+    192.3,
+    394.6,
+    60.2
+   ],
+   "source_mm": [
+    192.3,
+    394.6,
+    60.2
+   ],
+   "error_mm": 0.0,
+   "pass_": true,
+   "source": "update13_final"
+  },
+  {
+   "station": "rack pocket 2",
+   "model_mm": [
+    134.6,
+    477.1,
+    60.2
+   ],
+   "source_mm": [
+    134.6,
+    477.1,
+    60.2
+   ],
+   "error_mm": 0.0,
+   "pass_": true,
+   "source": "update13_final"
+  },
+  {
+   "station": "rack pocket 3",
+   "model_mm": [
+    108.5,
+    574.4,
+    60.2
+   ],
+   "source_mm": [
+    108.5,
+    574.4,
+    60.2
+   ],
+   "error_mm": 0.0,
+   "pass_": true,
+   "source": "update13_final"
+  },
+  {
+   "station": "X-front rail centre Y",
+   "model_mm": [
+    582.5
+   ],
+   "source_mm": [
+    582.5
+   ],
+   "error_mm": 0.0,
+   "pass_": true,
+   "source": "update13_final"
+  },
+  {
+   "station": "X-back rail centre Y",
+   "model_mm": [
+    652.3
+   ],
+   "source_mm": [
+    652.3
+   ],
+   "error_mm": 0.0,
+   "pass_": true,
+   "source": "update13_final"
+  },
+  {
+   "station": "auger outlet over auger pocket",
+   "model_mm": [
+    871.6,
+    578.2
+   ],
+   "source_mm": [
+    871.6,
+    578.2
+   ],
+   "error_mm": 0.0,
+   "pass_": true,
+   "source": "demo_process 2.4: +-20 mm is fine"
+  }
+ ],
+ "beakers": [
+  {
+   "beaker": "P1",
+   "station": "carousel_pocket_0",
+   "final_mm": [
+    744.12,
+    468.83,
+    61.59
+   ],
+   "target_mm": [
+    744.12,
+    468.83,
+    61.7
+   ],
+   "error_mm": 0.112,
+   "moved_mm": 0.162,
+   "tilt_deg": 0.048,
+   "initial_penetration_mm": 0.0,
+   "pass_": true
+  },
+  {
+   "beaker": "P2",
+   "station": "carousel_pocket_1",
+   "final_mm": [
+    862.56,
+    459.72,
+    61.59
+   ],
+   "target_mm": [
+    862.57,
+    459.72,
+    61.7
+   ],
+   "error_mm": 0.113,
+   "moved_mm": 0.163,
+   "tilt_deg": 0.058,
+   "initial_penetration_mm": 0.0,
+   "pass_": true
+  },
+  {
+   "beaker": "dev",
+   "station": "rack_1",
+   "final_mm": [
+    192.3,
+    394.6,
+    60.09
+   ],
+   "target_mm": [
+    192.3,
+    394.6,
+    60.2
+   ],
+   "error_mm": 0.11,
+   "moved_mm": 0.16,
+   "tilt_deg": 0.038,
+   "initial_penetration_mm": 0.0,
+   "pass_": true
+  },
+  {
+   "beaker": "water",
+   "station": "rack_3",
+   "final_mm": [
+    108.5,
+    574.4,
+    60.09
+   ],
+   "target_mm": [
+    108.5,
+    574.4,
+    60.2
+   ],
+   "error_mm": 0.108,
+   "moved_mm": 0.158,
+   "tilt_deg": 0.0,
+   "initial_penetration_mm": 0.0,
+   "pass_": true
+  }
+ ],
+ "r_bearing_cross_check": [
+  {
+   "arm": "pourer",
+   "station": "rack 1",
+   "r_mm": 290.1,
+   "bearing_deg": -45.0,
+   "recorded_r": 290,
+   "recorded_bearing": -45,
+   "dr": 0.1,
+   "dbearing": 0.0
+  },
+  {
+   "arm": "pourer",
+   "station": "rack 2",
+   "r_mm": 290.0,
+   "bearing_deg": -65.0,
+   "recorded_r": 290,
+   "recorded_bearing": -65,
+   "dr": -0.0,
+   "dbearing": 0.0
+  },
+  {
+   "arm": "pourer",
+   "station": "rack 3",
+   "r_mm": 290.0,
+   "bearing_deg": -85.0,
+   "recorded_r": 290,
+   "recorded_bearing": -85,
+   "dr": 0.0,
+   "dbearing": 0.0
+  },
+  {
+   "arm": "pourer",
+   "station": "scale",
+   "r_mm": 294.4,
+   "bearing_deg": 49.1,
+   "recorded_r": 294.4,
+   "recorded_bearing": 47,
+   "dr": 0.0,
+   "dbearing": 2.1
+  },
+  {
+   "arm": "pourer",
+   "station": "funnel",
+   "r_mm": 322.0,
+   "bearing_deg": 9.4,
+   "recorded_r": 322.0,
+   "recorded_bearing": 9,
+   "dr": 0.0,
+   "dbearing": 0.4
+  },
+  {
+   "arm": "transfer",
+   "station": "carousel pick",
+   "r_mm": 191.2,
+   "bearing_deg": 46.8,
+   "recorded_r": 191.1,
+   "recorded_bearing": 48,
+   "dr": 0.1,
+   "dbearing": -1.2
+  },
+  {
+   "arm": "transfer",
+   "station": "scale",
+   "r_mm": 193.3,
+   "bearing_deg": 4.5,
+   "recorded_r": 193.3,
+   "recorded_bearing": -5,
+   "dr": -0.0,
+   "dbearing": 9.5
+  },
+  {
+   "arm": "-",
+   "station": "carousel_pick vs centre",
+   "r_mm": 84.04,
+   "bearing_deg": 220.61,
+   "recorded_r": 84.0,
+   "recorded_bearing": null,
+   "dr": 0.04,
+   "dbearing": null
+  },
+  {
+   "arm": "-",
+   "station": "carousel_auger vs centre",
+   "r_mm": 83.96,
+   "bearing_deg": 40.65,
+   "recorded_r": 84.0,
+   "recorded_bearing": null,
+   "dr": -0.04,
+   "dbearing": null
+  }
+ ],
+ "cad_mesh_fits": [
+  {
+   "part": "RK-03 reagent rack",
+   "file": "RK-03_reagent_rack.stl",
+   "body": "world",
+   "yaw_deg": 2.8273734808609753e-07,
+   "t": [
+    192.29999939998774,
+    394.5999992012835,
+    0.0
+   ],
+   "verified": "fit: 3 cup floors to update13_final rack_stands + floor Z",
+   "residual_mm": 2.398858007977328e-06,
+   "note": "cup floor r 28.26 at local Z 60.2"
+  },
+  {
+   "part": "TT-04 v4 beaker ring",
+   "file": "TT-04_beaker-ring-v4-4x100mL_qty1.stl",
+   "body": "carousel",
+   "yaw_deg": 18.105325832605825,
+   "t": [
+    -0.016734985655944,
+    0.0018549595239392147,
+    58.6
+   ],
+   "verified": "fit: 4 pocket bores to the r84 pockets + floor Z",
+   "residual_mm": 0.12335734710567181,
+   "note": "body frame = carousel deck at angle 0; bore r 30.34, locating ribs r 28.25"
+  },
+  {
+   "part": "TT-02 carousel deck",
+   "file": "TT-02_carousel-deck_qty1.stl",
+   "body": "carousel",
+   "yaw_deg": 0.0,
+   "t": [
+    0.0,
+    0.0,
+    51.6
+   ],
+   "verified": "concentric with the carousel axis (symmetric part); Z = ring base - 7",
+   "residual_mm": null,
+   "note": ""
+  },
+  {
+   "part": "WS-02 v3 scale pan",
+   "file": "WS-02_scale-pan-v3-100mL_qty1.stl",
+   "body": "scale_pan",
+   "yaw_deg": 0.0,
+   "t": [
+    -0.05037419498978579,
+    0.0,
+    57.7
+   ],
+   "verified": "ring centre and floor Z: floor lands on the update13_final beaker bottom Z 63.7",
+   "residual_mm": 0.0,
+   "note": "locating ring r 30.16; one feature, so yaw is free (part is symmetric)"
+  },
+  {
+   "part": "ST-11 stage sled",
+   "file": "ST-11_stage-sled_qty1_SUPPORTS.stl",
+   "body": "sled",
+   "yaw_deg": 0.0,
+   "t": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "verified": "part frame = tools/cad/stage_b.py origin (450, 282, 0); catch-well ring centre found at local (0.01, 0.04)",
+   "residual_mm": 0.03821961484705944,
+   "note": "sled body origin is the funnel axis at WORK"
+  },
+  {
+   "part": "ST-12 servo bridge",
+   "file": "ST-12_servo-bridge_qty1.stl",
+   "body": "world",
+   "yaw_deg": 0.0,
+   "t": [
+    450.0,
+    65.0,
+    20.0
+   ],
+   "verified": "part frame = tools/cad/stage_b.py Part origin (explicit world coordinates)",
+   "residual_mm": null,
+   "note": ""
+  },
+  {
+   "part": "ST-13 crank",
+   "file": "ST-13_crank_qty1.stl",
+   "body": "crank",
+   "yaw_deg": 0.0,
+   "t": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "verified": "part frame = tools/cad/stage_b.py Part origin (explicit world coordinates)",
+   "residual_mm": null,
+   "note": ""
+  },
+  {
+   "part": "ST-14 connecting rod",
+   "file": "ST-14_connecting-rod_qty1.stl",
+   "body": "rod",
+   "yaw_deg": 0.0,
+   "t": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "verified": "part frame = tools/cad/stage_b.py Part origin (explicit world coordinates)",
+   "residual_mm": null,
+   "note": ""
+  },
+  {
+   "part": "ST-07 catch well",
+   "file": "ST-07_catch-well_qty1.stl",
+   "body": "sled",
+   "yaw_deg": 0.0,
+   "t": [
+    0.0,
+    0.0,
+    9.0
+   ],
+   "verified": "concentric in the ST-11 locating ring (symmetric part); Z = sled plate top",
+   "residual_mm": null,
+   "note": ""
+  },
+  {
+   "part": "ST-05 flask collar",
+   "file": "ST-05_flask-collar_qty1.stl",
+   "body": "sled",
+   "yaw_deg": 0.0,
+   "t": [
+    0.0,
+    0.0,
+    11.0
+   ],
+   "verified": "concentric, on the catch-well floor (assumed 2 mm)",
+   "residual_mm": null,
+   "note": ""
+  },
+  {
+   "part": "TT-01 v2 turntable base",
+   "file": "TT-01_turntable-base-v2_qty1.stl",
+   "body": "world",
+   "yaw_deg": 220.6,
+   "t": [
+    807.9,
+    523.5,
+    0.0
+   ],
+   "verified": "assumed: local origin on the carousel axis, rotated with the unit by update13_final carousel.rotation_deg",
+   "residual_mm": null,
+   "note": "orientation not independently verified"
+  }
+ ],
+ "fidelity": [
+  {
+   "part": "table",
+   "visual": "procedural",
+   "collision": "box",
+   "source": "bench_params.toml world.table_xy (assumed extent)",
+   "note": ""
+  },
+  {
+   "part": "frame rails (X-front, X-back, Y-left, Y-right, E6, S1, S2)",
+   "visual": "procedural",
+   "collision": "box per rail",
+   "source": "update13_final X_rails + demo_process 2.2 + tools/cad/stage_a.py",
+   "note": "solid 20x20 boxes, no T-slots; E5 omitted (placement not recorded)"
+  },
+  {
+   "part": "scale WS-01 base, load cell",
+   "visual": "procedural",
+   "collision": "box",
+   "source": "update13_final scale.mount (saddle X 547-664) + WS-01 STL extent",
+   "note": ""
+  },
+  {
+   "part": "scale pan WS-02 v3",
+   "visual": "procedural",
+   "collision": "cylinder floor + 20-box locating ring",
+   "source": "update13_final scale.pan, WS-02 STL extent",
+   "note": ""
+  },
+  {
+   "part": "load cell signal",
+   "visual": "analytic",
+   "collision": "-",
+   "source": "slide-joint flexure (k, zeta) + HX711 noise/quantisation",
+   "note": "see benchsim.backends.sim"
+  },
+  {
+   "part": "carousel TT-01/TT-02/TT-04 v4",
+   "visual": "procedural",
+   "collision": "cylinders + 20-box pocket walls",
+   "source": "update13_final carousel + layout_final.py pocket walls r28.3-30.3",
+   "note": "deck on a hinge with a position servo"
+  },
+  {
+   "part": "auger PS-01 post + DH-01 head",
+   "visual": "procedural",
+   "collision": "box",
+   "source": "outlet over update13_final carousel.auger at Z 169.5 (demo_process step 5)",
+   "note": "post/head placement radial from the pocket, not from CAD; screw not modelled"
+  },
+  {
+   "part": "auger dosing",
+   "visual": "analytic",
+   "collision": "-",
+   "source": "g/rev x revolutions with CV, stall rule (electrical.md 6)",
+   "note": ""
+  },
+  {
+   "part": "reagent rack RK-03",
+   "visual": "procedural",
+   "collision": "cup posts + 20-box cup walls + webs + spine",
+   "source": "update13_final rack_stands + rack_beaker_bottom_z",
+   "note": "cup walls 22 mm tall around the beaker; spine on the Y-left west face"
+  },
+  {
+   "part": "stage ST-11 sled, ST-13 crank, ST-14 rod",
+   "visual": "procedural",
+   "collision": "sled plate box; crank/rod no collision",
+   "source": "tools/cad/stage_b.py (crank r50 at (450,77), rod 80)",
+   "note": "closed slider-crank: hinge + hinge + connect equality + slide"
+  },
+  {
+   "part": "flask 250 mL, ST-05 collar, ST-07 catch well",
+   "visual": "procedural",
+   "collision": "convex frustum hull (flask)",
+   "source": "assumed Erlenmeyer dims; ST-05/ST-07 STL extents",
+   "note": ""
+  },
+  {
+   "part": "funnel",
+   "visual": "procedural",
+   "collision": "convex frustum hull",
+   "source": "update13_final funnel (rim Z 233); 100 mm rim assumed",
+   "note": "solid hull: conservative for clearance below the rim"
+  },
+  {
+   "part": "foam column",
+   "visual": "analytic",
+   "collision": "-",
+   "source": "benchsim.chem.foam: induction + logistic growth from reagent masses",
+   "note": ""
+  },
+  {
+   "part": "beakers EISCO 100 mL PP (56 x 74)",
+   "visual": "procedural",
+   "collision": "floor cylinder + 20-box hollow wall",
+   "source": "demo_process 3 + DUMMY-BEAKER STL",
+   "note": "free bodies; liquid weight applied as an external force by the chemistry model"
+  },
+  {
+   "part": "liquid in vessels",
+   "visual": "analytic",
+   "collision": "-",
+   "source": "benchsim.chem.liquid: tilted-cylinder volume, weir flow, ballistic stream",
+   "note": ""
+  },
+  {
+   "part": "SO-101 arms (2x)",
+   "visual": "upstream-mesh",
+   "collision": "upstream link meshes (convex hulls)",
+   "source": "TheRobotStudio/SO-ARM100 5f6d2b876a53 so101_new_calib.xml",
+   "note": "stock jaw meshes removed; actuators as upstream (kp 998, 3.35 N m)"
+  },
+  {
+   "part": "fin-ray gripper GR-01 body, GR-02 jaw, GR-03 fingers",
+   "visual": "cad-mesh",
+   "collision": "GR-01/GR-02 convex hulls + one 4 mm box per finger contact face",
+   "source": "exports/prints_v2 GR-0x STLs (assembly coordinates, arm A as built) placed by the CAD as-built fit",
+   "note": "moving finger = GR-03 mirrored about the 43 mm bisector and rotated (gripper_design.to_moving_q0)"
+  },
+  {
+   "part": "RK-03 reagent rack",
+   "visual": "cad-mesh",
+   "collision": "procedural (see the matching procedural row)",
+   "source": "RK-03_reagent_rack.stl",
+   "note": "fit: 3 cup floors to update13_final rack_stands + floor Z; residual 0.000 mm"
+  },
+  {
+   "part": "TT-04 v4 beaker ring",
+   "visual": "cad-mesh",
+   "collision": "procedural (see the matching procedural row)",
+   "source": "TT-04_beaker-ring-v4-4x100mL_qty1.stl",
+   "note": "fit: 4 pocket bores to the r84 pockets + floor Z; residual 0.123 mm"
+  },
+  {
+   "part": "TT-02 carousel deck",
+   "visual": "cad-mesh",
+   "collision": "procedural (see the matching procedural row)",
+   "source": "TT-02_carousel-deck_qty1.stl",
+   "note": "concentric with the carousel axis (symmetric part); Z = ring base - 7"
+  },
+  {
+   "part": "WS-02 v3 scale pan",
+   "visual": "cad-mesh",
+   "collision": "procedural (see the matching procedural row)",
+   "source": "WS-02_scale-pan-v3-100mL_qty1.stl",
+   "note": "ring centre and floor Z: floor lands on the update13_final beaker bottom Z 63.7; residual 0.000 mm"
+  },
+  {
+   "part": "ST-11 stage sled",
+   "visual": "cad-mesh",
+   "collision": "procedural (see the matching procedural row)",
+   "source": "ST-11_stage-sled_qty1_SUPPORTS.stl",
+   "note": "part frame = tools/cad/stage_b.py origin (450, 282, 0); catch-well ring centre found at local (0.01, 0.04); residual 0.038 mm"
+  },
+  {
+   "part": "ST-12 servo bridge",
+   "visual": "cad-mesh",
+   "collision": "procedural (see the matching procedural row)",
+   "source": "ST-12_servo-bridge_qty1.stl",
+   "note": "part frame = tools/cad/stage_b.py Part origin (explicit world coordinates)"
+  },
+  {
+   "part": "ST-13 crank",
+   "visual": "cad-mesh",
+   "collision": "procedural (see the matching procedural row)",
+   "source": "ST-13_crank_qty1.stl",
+   "note": "part frame = tools/cad/stage_b.py Part origin (explicit world coordinates)"
+  },
+  {
+   "part": "ST-14 connecting rod",
+   "visual": "cad-mesh",
+   "collision": "procedural (see the matching procedural row)",
+   "source": "ST-14_connecting-rod_qty1.stl",
+   "note": "part frame = tools/cad/stage_b.py Part origin (explicit world coordinates)"
+  },
+  {
+   "part": "ST-07 catch well",
+   "visual": "cad-mesh",
+   "collision": "procedural (see the matching procedural row)",
+   "source": "ST-07_catch-well_qty1.stl",
+   "note": "concentric in the ST-11 locating ring (symmetric part); Z = sled plate top"
+  },
+  {
+   "part": "ST-05 flask collar",
+   "visual": "cad-mesh",
+   "collision": "procedural (see the matching procedural row)",
+   "source": "ST-05_flask-collar_qty1.stl",
+   "note": "concentric, on the catch-well floor (assumed 2 mm)"
+  },
+  {
+   "part": "TT-01 v2 turntable base",
+   "visual": "cad-mesh",
+   "collision": "procedural (see the matching procedural row)",
+   "source": "TT-01_turntable-base-v2_qty1.stl",
+   "note": "assumed: local origin on the carousel axis, rotated with the unit by update13_final carousel.rotation_deg"
+  },
+  {
+   "part": "cameras",
+   "visual": "analytic",
+   "collision": "-",
+   "source": "no documented viewpoint; poses assumed in scene.cameras",
+   "note": ""
+  }
+ ]
+}

@@ -1,0 +1,2872 @@
+{
+ "phase": "6 pour",
+ "verdict": "pour trials: 10/10 within +-2 g (mean -0.28 g, sd 0.06 g, max |e| 0.38 g, 17.1 s mean per pour); spill shown: True; PASS",
+ "acceptance": {
+  "trials": 10,
+  "within_tol": 10,
+  "tol_g": 2.0,
+  "need": 9,
+  "pass_trials": true,
+  "spill_demonstrated": true,
+  "errors": [],
+  "pass": true
+ },
+ "stats": {
+  "mean_error_g": -0.281,
+  "std_error_g": 0.056,
+  "max_abs_error_g": 0.383,
+  "time_mean_s": 17.05,
+  "time_max_s": 18.8,
+  "controller_vs_true_max_g": 0.041,
+  "after_cut_mean_g": 0.153,
+  "cut_law_mean_g": 0.462,
+  "spill_margin_min_g": 5.631,
+  "tilt_lag_max_deg": 0.38,
+  "wall_s": 34.6
+ },
+ "trials": [
+  {
+   "label": "trial 01",
+   "seed": 1,
+   "fill_ml": 48.0,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "OK",
+   "reason": "",
+   "final_true_g": 38.751,
+   "error_g": -0.249,
+   "controller_settled_g": 38.745,
+   "scale_after_untilt_g": 38.736,
+   "time_s": 18.8,
+   "theta_first_deg": 67.98,
+   "v_first_ml": 48.78,
+   "v_first_true_theta_deg": 64.9,
+   "theta_cut_deg": 83.25,
+   "q_cut_g_s": 1.066,
+   "m_cut_g": 38.554,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 83.25,
+   "spill_margin_g": 7.161,
+   "spilled_g": 0.003,
+   "spilled_during_pour_g": 0.0024,
+   "left_in_source_g": 11.165,
+   "landing": {
+    "mass_weighted_mm": 9.86,
+    "max_mm": 26.25,
+    "min_mm": 6.22
+   },
+   "manifold": {
+    "max_joint_deg_per_deg": 2.88,
+    "at_theta_deg": 83.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -7.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 33.15,
+   "wall_s": 4.2,
+   "setup": [
+    "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
+    "dev filled with 48.0 mL developer (49.92 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": -0.017
+    },
+    {
+     "t": 9.7,
+     "state": "FLOW",
+     "theta": 67.98,
+     "m": 0.286,
+     "v_first_ml": 48.78
+    },
+    {
+     "t": 17.1,
+     "state": "CUT",
+     "theta": 78.25,
+     "m": 38.554,
+     "why": "cut",
+     "theta_cut": 83.25,
+     "q": 1.066,
+     "delta": 5.0
+    },
+    {
+     "t": 17.275,
+     "state": "DRIP",
+     "theta": 68.25,
+     "m": 38.764
+    },
+    {
+     "t": 18.775,
+     "state": "SETTLE",
+     "theta": 68.25,
+     "m": 38.713
+    },
+    {
+     "t": 18.8,
+     "settled": true,
+     "m": 38.745,
+     "sigma": 0.06609448022311337,
+     "q": -0.105
+    },
+    {
+     "t": 18.8,
+     "state": "DONE",
+     "theta": 68.25,
+     "m": 38.719,
+     "outcome": "OK"
+    }
+   ],
+   "tracking": {
+    "max_err_g_s": 1.932,
+    "mean_err_g_s": 0.641,
+    "n": 236
+   },
+   "mass_balance_g": -0.00032,
+   "tilt_lag_max_deg": 0.38,
+   "trace_csv": "reports/pour_traces/trial_01.csv"
+  },
+  {
+   "label": "trial 02",
+   "seed": 2,
+   "fill_ml": 51.5,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "OK",
+   "reason": "",
+   "final_true_g": 38.617,
+   "error_g": -0.383,
+   "controller_settled_g": 38.625,
+   "scale_after_untilt_g": 38.641,
+   "time_s": 18.35,
+   "theta_first_deg": 66.7,
+   "v_first_ml": 52.21,
+   "v_first_true_theta_deg": 63.68,
+   "theta_cut_deg": 81.21,
+   "q_cut_g_s": 1.245,
+   "m_cut_g": 38.525,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 81.21,
+   "spill_margin_g": 6.638,
+   "spilled_g": 0.001,
+   "spilled_during_pour_g": 0.0004,
+   "left_in_source_g": 14.941,
+   "landing": {
+    "mass_weighted_mm": 9.24,
+    "max_mm": 25.14,
+    "min_mm": 5.61
+   },
+   "manifold": {
+    "max_joint_deg_per_deg": 1.73,
+    "at_theta_deg": 81.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -7.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 32.67,
+   "wall_s": 4.2,
+   "setup": [
+    "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
+    "dev filled with 51.5 mL developer (53.56 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": -0.006
+    },
+    {
+     "t": 9.275,
+     "state": "FLOW",
+     "theta": 66.7,
+     "m": 0.33,
+     "v_first_ml": 52.21
+    },
+    {
+     "t": 16.65,
+     "state": "CUT",
+     "theta": 76.21,
+     "m": 38.525,
+     "why": "cut",
+     "theta_cut": 81.21,
+     "q": 1.245,
+     "delta": 5.0
+    },
+    {
+     "t": 16.825,
+     "state": "DRIP",
+     "theta": 66.21,
+     "m": 38.646
+    },
+    {
+     "t": 18.325,
+     "state": "SETTLE",
+     "theta": 66.21,
+     "m": 38.613
+    },
+    {
+     "t": 18.35,
+     "settled": true,
+     "m": 38.625,
+     "sigma": 0.06346655571067378,
+     "q": -0.007
+    },
+    {
+     "t": 18.35,
+     "state": "DONE",
+     "theta": 66.21,
+     "m": 38.624,
+     "outcome": "OK"
+    }
+   ],
+   "tracking": {
+    "max_err_g_s": 1.963,
+    "mean_err_g_s": 0.648,
+    "n": 235
+   },
+   "mass_balance_g": -0.000337,
+   "tilt_lag_max_deg": 0.37,
+   "trace_csv": "reports/pour_traces/trial_02.csv"
+  },
+  {
+   "label": "trial 03",
+   "seed": 3,
+   "fill_ml": 55.0,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "OK",
+   "reason": "",
+   "final_true_g": 38.695,
+   "error_g": -0.305,
+   "controller_settled_g": 38.689,
+   "scale_after_untilt_g": 38.761,
+   "time_s": 18.0,
+   "theta_first_deg": 65.5,
+   "v_first_ml": 55.53,
+   "v_first_true_theta_deg": 62.48,
+   "theta_cut_deg": 79.46,
+   "q_cut_g_s": 1.004,
+   "m_cut_g": 38.552,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 79.46,
+   "spill_margin_g": 6.725,
+   "spilled_g": 0.001,
+   "spilled_during_pour_g": 0.0,
+   "left_in_source_g": 18.504,
+   "landing": {
+    "mass_weighted_mm": 8.61,
+    "max_mm": 24.36,
+    "min_mm": 4.81
+   },
+   "manifold": {
+    "max_joint_deg_per_deg": 1.15,
+    "at_theta_deg": 79.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -7.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 32.27,
+   "wall_s": 4.1,
+   "setup": [
+    "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
+    "dev filled with 55.0 mL developer (57.20 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": -0.014
+    },
+    {
+     "t": 8.875,
+     "state": "FLOW",
+     "theta": 65.5,
+     "m": 0.3,
+     "v_first_ml": 55.53
+    },
+    {
+     "t": 16.3,
+     "state": "CUT",
+     "theta": 74.46,
+     "m": 38.552,
+     "why": "cut",
+     "theta_cut": 79.46,
+     "q": 1.004,
+     "delta": 5.0
+    },
+    {
+     "t": 16.475,
+     "state": "DRIP",
+     "theta": 64.46,
+     "m": 38.696
+    },
+    {
+     "t": 17.975,
+     "state": "SETTLE",
+     "theta": 64.46,
+     "m": 38.7
+    },
+    {
+     "t": 18.0,
+     "settled": true,
+     "m": 38.689,
+     "sigma": 0.06984086798376016,
+     "q": 0.013
+    },
+    {
+     "t": 18.0,
+     "state": "DONE",
+     "theta": 64.46,
+     "m": 38.692,
+     "outcome": "OK"
+    }
+   ],
+   "tracking": {
+    "max_err_g_s": 1.871,
+    "mean_err_g_s": 0.638,
+    "n": 237
+   },
+   "mass_balance_g": -0.000356,
+   "tilt_lag_max_deg": 0.37,
+   "trace_csv": "reports/pour_traces/trial_03.csv"
+  },
+  {
+   "label": "trial 04",
+   "seed": 4,
+   "fill_ml": 58.5,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "OK",
+   "reason": "",
+   "final_true_g": 38.801,
+   "error_g": -0.199,
+   "controller_settled_g": 38.76,
+   "scale_after_untilt_g": 38.748,
+   "time_s": 17.625,
+   "theta_first_deg": 64.38,
+   "v_first_ml": 58.71,
+   "v_first_true_theta_deg": 61.31,
+   "theta_cut_deg": 77.85,
+   "q_cut_g_s": 0.978,
+   "m_cut_g": 38.564,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 77.85,
+   "spill_margin_g": 6.558,
+   "spilled_g": 0.001,
+   "spilled_during_pour_g": 0,
+   "left_in_source_g": 22.038,
+   "landing": {
+    "mass_weighted_mm": 7.95,
+    "max_mm": 23.61,
+    "min_mm": 4.03
+   },
+   "manifold": {
+    "max_joint_deg_per_deg": 1.02,
+    "at_theta_deg": 57.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -7.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 31.87,
+   "wall_s": 4.0,
+   "setup": [
+    "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
+    "dev filled with 58.5 mL developer (60.84 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": -0.025
+    },
+    {
+     "t": 8.5,
+     "state": "FLOW",
+     "theta": 64.38,
+     "m": 0.298,
+     "v_first_ml": 58.71
+    },
+    {
+     "t": 15.925,
+     "state": "CUT",
+     "theta": 72.85,
+     "m": 38.564,
+     "why": "cut",
+     "theta_cut": 77.85,
+     "q": 0.978,
+     "delta": 5.0
+    },
+    {
+     "t": 16.1,
+     "state": "DRIP",
+     "theta": 62.85,
+     "m": 38.79
+    },
+    {
+     "t": 17.6,
+     "state": "SETTLE",
+     "theta": 62.85,
+     "m": 38.751
+    },
+    {
+     "t": 17.625,
+     "settled": true,
+     "m": 38.76,
+     "sigma": 0.0646742437516091,
+     "q": -0.043
+    },
+    {
+     "t": 17.625,
+     "state": "DONE",
+     "theta": 62.85,
+     "m": 38.75,
+     "outcome": "OK"
+    }
+   ],
+   "tracking": {
+    "max_err_g_s": 1.971,
+    "mean_err_g_s": 0.635,
+    "n": 237
+   },
+   "mass_balance_g": -0.000277,
+   "tilt_lag_max_deg": 0.36,
+   "trace_csv": "reports/pour_traces/trial_04.csv"
+  },
+  {
+   "label": "trial 05",
+   "seed": 5,
+   "fill_ml": 62.0,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "OK",
+   "reason": "",
+   "final_true_g": 38.683,
+   "error_g": -0.317,
+   "controller_settled_g": 38.679,
+   "scale_after_untilt_g": 38.712,
+   "time_s": 17.2,
+   "theta_first_deg": 63.33,
+   "v_first_ml": 61.73,
+   "v_first_true_theta_deg": 60.15,
+   "theta_cut_deg": 76.19,
+   "q_cut_g_s": 1.102,
+   "m_cut_g": 38.544,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 76.29,
+   "spill_margin_g": 6.686,
+   "spilled_g": 0.001,
+   "spilled_during_pour_g": 0,
+   "left_in_source_g": 25.796,
+   "landing": {
+    "mass_weighted_mm": 7.27,
+    "max_mm": 22.87,
+    "min_mm": 3.33
+   },
+   "manifold": {
+    "max_joint_deg_per_deg": 1.02,
+    "at_theta_deg": 57.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -7.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 31.42,
+   "wall_s": 4.0,
+   "setup": [
+    "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
+    "dev filled with 62.0 mL developer (64.48 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": 0.047
+    },
+    {
+     "t": 8.15,
+     "state": "FLOW",
+     "theta": 63.33,
+     "m": 0.368,
+     "v_first_ml": 61.73
+    },
+    {
+     "t": 15.5,
+     "state": "CUT",
+     "theta": 71.19,
+     "m": 38.544,
+     "why": "cut",
+     "theta_cut": 76.19,
+     "q": 1.102,
+     "delta": 5.0
+    },
+    {
+     "t": 15.675,
+     "state": "DRIP",
+     "theta": 61.19,
+     "m": 38.706
+    },
+    {
+     "t": 17.175,
+     "state": "SETTLE",
+     "theta": 61.19,
+     "m": 38.706
+    },
+    {
+     "t": 17.2,
+     "settled": true,
+     "m": 38.679,
+     "sigma": 0.06760289597465997,
+     "q": 0.016
+    },
+    {
+     "t": 17.2,
+     "state": "DONE",
+     "theta": 61.19,
+     "m": 38.683,
+     "outcome": "OK"
+    }
+   ],
+   "tracking": {
+    "max_err_g_s": 1.88,
+    "mean_err_g_s": 0.635,
+    "n": 234
+   },
+   "mass_balance_g": -0.000335,
+   "tilt_lag_max_deg": 0.36,
+   "trace_csv": "reports/pour_traces/trial_05.csv"
+  },
+  {
+   "label": "trial 06",
+   "seed": 6,
+   "fill_ml": 65.5,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "OK",
+   "reason": "",
+   "final_true_g": 38.768,
+   "error_g": -0.232,
+   "controller_settled_g": 38.744,
+   "scale_after_untilt_g": 38.729,
+   "time_s": 16.875,
+   "theta_first_deg": 62.05,
+   "v_first_ml": 65.48,
+   "v_first_true_theta_deg": 59.01,
+   "theta_cut_deg": 74.7,
+   "q_cut_g_s": 1.075,
+   "m_cut_g": 38.558,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 74.83,
+   "spill_margin_g": 6.208,
+   "spilled_g": 0.001,
+   "spilled_during_pour_g": 0,
+   "left_in_source_g": 29.351,
+   "landing": {
+    "mass_weighted_mm": 6.6,
+    "max_mm": 22.09,
+    "min_mm": 2.64
+   },
+   "manifold": {
+    "max_joint_deg_per_deg": 1.02,
+    "at_theta_deg": 57.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -7.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 31.07,
+   "wall_s": 4.0,
+   "setup": [
+    "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
+    "dev filled with 65.5 mL developer (68.12 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": -0.06
+    },
+    {
+     "t": 7.725,
+     "state": "FLOW",
+     "theta": 62.05,
+     "m": 0.288,
+     "v_first_ml": 65.48
+    },
+    {
+     "t": 15.175,
+     "state": "CUT",
+     "theta": 69.7,
+     "m": 38.558,
+     "why": "cut",
+     "theta_cut": 74.7,
+     "q": 1.075,
+     "delta": 5.0
+    },
+    {
+     "t": 15.35,
+     "state": "DRIP",
+     "theta": 59.7,
+     "m": 38.767
+    },
+    {
+     "t": 16.85,
+     "state": "SETTLE",
+     "theta": 59.7,
+     "m": 38.75
+    },
+    {
+     "t": 16.875,
+     "settled": true,
+     "m": 38.744,
+     "sigma": 0.06500266232684301,
+     "q": 0.067
+    },
+    {
+     "t": 16.875,
+     "state": "DONE",
+     "theta": 59.7,
+     "m": 38.76,
+     "outcome": "OK"
+    }
+   ],
+   "tracking": {
+    "max_err_g_s": 2.086,
+    "mean_err_g_s": 0.634,
+    "n": 238
+   },
+   "mass_balance_g": -0.000293,
+   "tilt_lag_max_deg": 0.37,
+   "trace_csv": "reports/pour_traces/trial_06.csv"
+  },
+  {
+   "label": "trial 07",
+   "seed": 7,
+   "fill_ml": 69.0,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "OK",
+   "reason": "",
+   "final_true_g": 38.672,
+   "error_g": -0.328,
+   "controller_settled_g": 38.666,
+   "scale_after_untilt_g": 38.677,
+   "time_s": 16.425,
+   "theta_first_deg": 60.93,
+   "v_first_ml": 68.85,
+   "v_first_true_theta_deg": 57.88,
+   "theta_cut_deg": 73.18,
+   "q_cut_g_s": 1.163,
+   "m_cut_g": 38.539,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 73.42,
+   "spill_margin_g": 6.382,
+   "spilled_g": 0.001,
+   "spilled_during_pour_g": 0,
+   "left_in_source_g": 33.087,
+   "landing": {
+    "mass_weighted_mm": 5.85,
+    "max_mm": 21.23,
+    "min_mm": 1.73
+   },
+   "manifold": {
+    "max_joint_deg_per_deg": 1.02,
+    "at_theta_deg": 57.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -7.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 30.6,
+   "wall_s": 3.9,
+   "setup": [
+    "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
+    "dev filled with 69.0 mL developer (71.76 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": 0.021
+    },
+    {
+     "t": 7.35,
+     "state": "FLOW",
+     "theta": 60.93,
+     "m": 0.354,
+     "v_first_ml": 68.85
+    },
+    {
+     "t": 14.725,
+     "state": "CUT",
+     "theta": 68.18,
+     "m": 38.539,
+     "why": "cut",
+     "theta_cut": 73.18,
+     "q": 1.163,
+     "delta": 5.0
+    },
+    {
+     "t": 14.9,
+     "state": "DRIP",
+     "theta": 58.18,
+     "m": 38.687
+    },
+    {
+     "t": 16.4,
+     "state": "SETTLE",
+     "theta": 58.18,
+     "m": 38.626
+    },
+    {
+     "t": 16.425,
+     "settled": true,
+     "m": 38.666,
+     "sigma": 0.07885649593283994,
+     "q": -0.125
+    },
+    {
+     "t": 16.425,
+     "state": "DONE",
+     "theta": 58.18,
+     "m": 38.635,
+     "outcome": "OK"
+    }
+   ],
+   "tracking": {
+    "max_err_g_s": 1.977,
+    "mean_err_g_s": 0.61,
+    "n": 235
+   },
+   "mass_balance_g": -0.000255,
+   "tilt_lag_max_deg": 0.36,
+   "trace_csv": "reports/pour_traces/trial_07.csv"
+  },
+  {
+   "label": "trial 08",
+   "seed": 8,
+   "fill_ml": 72.5,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "OK",
+   "reason": "",
+   "final_true_g": 38.771,
+   "error_g": -0.229,
+   "controller_settled_g": 38.742,
+   "scale_after_untilt_g": 38.762,
+   "time_s": 16.15,
+   "theta_first_deg": 59.88,
+   "v_first_ml": 72.04,
+   "v_first_true_theta_deg": 56.76,
+   "theta_cut_deg": 71.85,
+   "q_cut_g_s": 1.014,
+   "m_cut_g": 38.578,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 72.09,
+   "spill_margin_g": 6.469,
+   "spilled_g": 0.001,
+   "spilled_during_pour_g": 0,
+   "left_in_source_g": 36.628,
+   "landing": {
+    "mass_weighted_mm": 5.14,
+    "max_mm": 20.44,
+    "min_mm": 0.94
+   },
+   "manifold": {
+    "max_joint_deg_per_deg": 1.02,
+    "at_theta_deg": 57.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -9.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 30.3,
+   "wall_s": 4.0,
+   "setup": [
+    "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
+    "dev filled with 72.5 mL developer (75.40 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": 0.006
+    },
+    {
+     "t": 7.0,
+     "state": "FLOW",
+     "theta": 59.88,
+     "m": 0.313,
+     "v_first_ml": 72.04
+    },
+    {
+     "t": 14.45,
+     "state": "CUT",
+     "theta": 66.85,
+     "m": 38.578,
+     "why": "cut",
+     "theta_cut": 71.85,
+     "q": 1.014,
+     "delta": 5.0
+    },
+    {
+     "t": 14.625,
+     "state": "DRIP",
+     "theta": 56.85,
+     "m": 38.758
+    },
+    {
+     "t": 16.125,
+     "state": "SETTLE",
+     "theta": 56.85,
+     "m": 38.749
+    },
+    {
+     "t": 16.15,
+     "settled": true,
+     "m": 38.742,
+     "sigma": 0.07215097729926988,
+     "q": 0.022
+    },
+    {
+     "t": 16.15,
+     "state": "DONE",
+     "theta": 56.85,
+     "m": 38.748,
+     "outcome": "OK"
+    }
+   ],
+   "tracking": {
+    "max_err_g_s": 2.104,
+    "mean_err_g_s": 0.632,
+    "n": 238
+   },
+   "mass_balance_g": -0.000313,
+   "tilt_lag_max_deg": 0.35,
+   "trace_csv": "reports/pour_traces/trial_08.csv"
+  },
+  {
+   "label": "trial 09",
+   "seed": 9,
+   "fill_ml": 76.0,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "OK",
+   "reason": "",
+   "final_true_g": 38.736,
+   "error_g": -0.264,
+   "controller_settled_g": 38.718,
+   "scale_after_untilt_g": 38.672,
+   "time_s": 15.75,
+   "theta_first_deg": 58.68,
+   "v_first_ml": 75.73,
+   "v_first_true_theta_deg": 55.63,
+   "theta_cut_deg": 70.43,
+   "q_cut_g_s": 1.095,
+   "m_cut_g": 38.567,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 70.76,
+   "spill_margin_g": 6.003,
+   "spilled_g": 0.001,
+   "spilled_during_pour_g": 0,
+   "left_in_source_g": 40.302,
+   "landing": {
+    "mass_weighted_mm": 4.37,
+    "max_mm": 19.55,
+    "min_mm": 0.13
+   },
+   "manifold": {
+    "max_joint_deg_per_deg": 1.02,
+    "at_theta_deg": 57.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -9.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 29.87,
+   "wall_s": 3.9,
+   "setup": [
+    "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
+    "dev filled with 76.0 mL developer (79.04 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": -0.044
+    },
+    {
+     "t": 6.6,
+     "state": "FLOW",
+     "theta": 58.68,
+     "m": 0.314,
+     "v_first_ml": 75.73
+    },
+    {
+     "t": 14.05,
+     "state": "CUT",
+     "theta": 65.43,
+     "m": 38.567,
+     "why": "cut",
+     "theta_cut": 70.43,
+     "q": 1.095,
+     "delta": 5.0
+    },
+    {
+     "t": 14.225,
+     "state": "DRIP",
+     "theta": 55.43,
+     "m": 38.721
+    },
+    {
+     "t": 15.725,
+     "state": "SETTLE",
+     "theta": 55.43,
+     "m": 38.68
+    },
+    {
+     "t": 15.75,
+     "settled": true,
+     "m": 38.718,
+     "sigma": 0.06368101206366696,
+     "q": -0.167
+    },
+    {
+     "t": 15.75,
+     "state": "DONE",
+     "theta": 55.43,
+     "m": 38.676,
+     "outcome": "OK"
+    }
+   ],
+   "tracking": {
+    "max_err_g_s": 1.805,
+    "mean_err_g_s": 0.601,
+    "n": 238
+   },
+   "mass_balance_g": -0.000276,
+   "tilt_lag_max_deg": 0.35,
+   "trace_csv": "reports/pour_traces/trial_09.csv"
+  },
+  {
+   "label": "trial 10",
+   "seed": 10,
+   "fill_ml": 80.0,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "OK",
+   "reason": "",
+   "final_true_g": 38.692,
+   "error_g": -0.308,
+   "controller_settled_g": 38.707,
+   "scale_after_untilt_g": 38.723,
+   "time_s": 15.3,
+   "theta_first_deg": 57.25,
+   "v_first_ml": 80.16,
+   "v_first_true_theta_deg": 54.34,
+   "theta_cut_deg": 68.9,
+   "q_cut_g_s": 1.064,
+   "m_cut_g": 38.564,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 69.34,
+   "spill_margin_g": 5.631,
+   "spilled_g": 0.001,
+   "spilled_during_pour_g": 0,
+   "left_in_source_g": 44.507,
+   "landing": {
+    "mass_weighted_mm": 3.66,
+    "max_mm": 18.55,
+    "min_mm": 0.1
+   },
+   "manifold": {
+    "max_joint_deg_per_deg": 1.02,
+    "at_theta_deg": 57.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -9.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 29.4,
+   "wall_s": 3.9,
+   "setup": [
+    "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
+    "dev filled with 80.0 mL developer (83.20 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": -0.043
+    },
+    {
+     "t": 6.125,
+     "state": "FLOW",
+     "theta": 57.25,
+     "m": 0.263,
+     "v_first_ml": 80.16
+    },
+    {
+     "t": 13.6,
+     "state": "CUT",
+     "theta": 63.9,
+     "m": 38.564,
+     "why": "cut",
+     "theta_cut": 68.9,
+     "q": 1.064,
+     "delta": 5.0
+    },
+    {
+     "t": 13.775,
+     "state": "DRIP",
+     "theta": 53.9,
+     "m": 38.717
+    },
+    {
+     "t": 15.275,
+     "state": "SETTLE",
+     "theta": 53.9,
+     "m": 38.685
+    },
+    {
+     "t": 15.3,
+     "settled": true,
+     "m": 38.707,
+     "sigma": 0.07218516064205886,
+     "q": -0.077
+    },
+    {
+     "t": 15.3,
+     "state": "DONE",
+     "theta": 53.9,
+     "m": 38.688,
+     "outcome": "OK"
+    }
+   ],
+   "tracking": {
+    "max_err_g_s": 1.925,
+    "mean_err_g_s": 0.598,
+    "n": 239
+   },
+   "mass_balance_g": -0.000249,
+   "tilt_lag_max_deg": 0.34,
+   "trace_csv": "reports/pour_traces/trial_10.csv"
+  }
+ ],
+ "low_fill": {
+  "label": "low fill 40 mL",
+  "seed": 21,
+  "fill_ml": 40.0,
+  "target_g": 39.0,
+  "tol_g": 2.0,
+  "outcome": "PAUSE_NO_FLOW",
+  "reason": "no first drop by theta 69.1 (V_table 46.0 mL): refill developer, or the stream misses the receiver",
+  "final_true_g": 0.02,
+  "error_g": -38.98,
+  "controller_settled_g": -0.004,
+  "scale_after_untilt_g": -0.025,
+  "time_s": 11.775,
+  "theta_first_deg": null,
+  "v_first_ml": null,
+  "v_first_true_theta_deg": 67.82,
+  "theta_cut_deg": 69.1,
+  "q_cut_g_s": 0.081,
+  "m_cut_g": 0.011,
+  "cuts": 1,
+  "topup_pulses": 0,
+  "max_theta_deg": 69.1,
+  "spill_margin_g": null,
+  "spilled_g": 0.0,
+  "spilled_during_pour_g": 0,
+  "left_in_source_g": 41.579,
+  "landing": {
+   "mass_weighted_mm": 10.68,
+   "max_mm": 19.89,
+   "min_mm": 9.06
+  },
+  "manifold": {
+   "max_joint_deg_per_deg": 1.02,
+   "at_theta_deg": 57.0
+  },
+  "grip_h_mm": 44.0,
+  "grasp": [
+   {
+    "outcome": "grasped",
+    "jaw_deg": 8.26,
+    "expected_deg": 7.72,
+    "load_permille": -7.0,
+    "detail": "jaw stopped 0.54 deg from the expected contact angle"
+   }
+  ],
+  "prepour_sim_s": 11.1,
+  "sim_s": 25.9,
+  "wall_s": 3.2,
+  "setup": [
+   "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
+   "dev filled with 40.0 mL developer (41.60 g) in the Ledger"
+  ],
+  "events": [
+   {
+    "t": 0.0,
+    "state": "FAST",
+    "theta": 0.0,
+    "m": null
+   },
+   {
+    "t": 0.35,
+    "state": "RAMP",
+    "theta": 40.0,
+    "m": -0.028
+   },
+   {
+    "t": 10.075,
+    "state": "CUT",
+    "theta": 64.1,
+    "m": 0.011,
+    "why": "NO_FLOW",
+    "theta_cut": 69.1,
+    "q": 0.081,
+    "delta": 5.0
+   },
+   {
+    "t": 10.25,
+    "state": "DRIP",
+    "theta": 54.1,
+    "m": 0.005
+   },
+   {
+    "t": 11.75,
+    "state": "SETTLE",
+    "theta": 54.1,
+    "m": -0.007
+   },
+   {
+    "t": 11.775,
+    "settled": true,
+    "m": -0.004,
+    "sigma": 0.06738136333471244,
+    "q": -0.078
+   },
+   {
+    "t": 11.775,
+    "state": "PAUSE",
+    "theta": 54.1,
+    "m": -0.023,
+    "outcome": "PAUSE_NO_FLOW"
+   }
+  ],
+  "tracking": null,
+  "mass_balance_g": -0.000288,
+  "tilt_lag_max_deg": null,
+  "trace_csv": "reports/pour_traces/low_fill_40_mL.csv"
+ },
+ "spills": {
+  "spill A: receiver 35 mm across the pour direction": {
+   "label": "spill A: receiver 35 mm across the pour direction",
+   "seed": 31,
+   "fill_ml": 70.0,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "PAUSE_NO_FLOW",
+   "reason": "no first drop by theta 69.1 (V_table 46.0 mL): refill developer, or the stream misses the receiver",
+   "final_true_g": 0.0,
+   "error_g": -39.0,
+   "controller_settled_g": 0.011,
+   "scale_after_untilt_g": 0.01,
+   "time_s": 11.775,
+   "theta_first_deg": null,
+   "v_first_ml": null,
+   "v_first_true_theta_deg": 57.56,
+   "theta_cut_deg": 69.1,
+   "q_cut_g_s": 0.053,
+   "m_cut_g": 0.028,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 69.1,
+   "spill_margin_g": null,
+   "spilled_g": 16.514,
+   "spilled_during_pour_g": 16.5082,
+   "left_in_source_g": 56.286,
+   "landing": null,
+   "manifold": {
+    "max_joint_deg_per_deg": 1.02,
+    "at_theta_deg": 57.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -7.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 25.9,
+   "wall_s": 3.4,
+   "setup": [
+    "scale pan shifted by (-20.2, 28.6) mm from its update13_final position",
+    "P1 teleported to scale_pan at (599.8, 435.6, 63.8) mm",
+    "dev filled with 70.0 mL developer (72.80 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": 0.018
+    },
+    {
+     "t": 10.075,
+     "state": "CUT",
+     "theta": 64.1,
+     "m": 0.028,
+     "why": "NO_FLOW",
+     "theta_cut": 69.1,
+     "q": 0.053,
+     "delta": 5.0
+    },
+    {
+     "t": 10.25,
+     "state": "DRIP",
+     "theta": 54.1,
+     "m": -0.005
+    },
+    {
+     "t": 11.75,
+     "state": "SETTLE",
+     "theta": 54.1,
+     "m": 0.023
+    },
+    {
+     "t": 11.775,
+     "settled": true,
+     "m": 0.011,
+     "sigma": 0.06938046295445603,
+     "q": 0.013
+    },
+    {
+     "t": 11.775,
+     "state": "PAUSE",
+     "theta": 54.1,
+     "m": 0.014,
+     "outcome": "PAUSE_NO_FLOW"
+    }
+   ],
+   "tracking": null,
+   "mass_balance_g": -0.000803,
+   "tilt_lag_max_deg": null,
+   "trace_csv": "reports/pour_traces/spill_A.csv"
+  },
+  "spill B: receiver 31 mm diagonal (22 toward the pourer, 22 across)": {
+   "label": "spill B: receiver 31 mm diagonal (22 toward the pourer, 22 across)",
+   "seed": 31,
+   "fill_ml": 70.0,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "PAUSE_SPILL",
+   "reason": "mass deficit: the tilt implies 51.4 g has left the beaker, the scale shows 8.7 g",
+   "final_true_g": 10.256,
+   "error_g": -28.744,
+   "controller_settled_g": 10.262,
+   "scale_after_untilt_g": 10.274,
+   "time_s": 13.8,
+   "theta_first_deg": 66.33,
+   "v_first_ml": 53.24,
+   "v_first_true_theta_deg": 57.56,
+   "theta_cut_deg": 85.5,
+   "q_cut_g_s": 6.497,
+   "m_cut_g": 8.68,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 85.5,
+   "spill_margin_g": -14.549,
+   "spilled_g": 40.535,
+   "spilled_during_pour_g": 40.5334,
+   "left_in_source_g": 22.008,
+   "landing": {
+    "mass_weighted_mm": 27.75,
+    "max_mm": 29.2,
+    "min_mm": 22.03
+   },
+   "manifold": {
+    "max_joint_deg_per_deg": 5.68,
+    "at_theta_deg": 85.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -7.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 28.17,
+   "wall_s": 3.5,
+   "setup": [
+    "scale pan shifted by (-30.7, 5.2) mm from its update13_final position",
+    "P1 teleported to scale_pan at (589.3, 412.2, 63.8) mm",
+    "dev filled with 70.0 mL developer (72.80 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": 0.016
+    },
+    {
+     "t": 9.15,
+     "state": "FLOW",
+     "theta": 66.33,
+     "m": 0.752,
+     "v_first_ml": 53.24
+    },
+    {
+     "t": 12.15,
+     "state": "CUT",
+     "theta": 77.5,
+     "m": 8.68,
+     "why": "SPILL",
+     "theta_cut": 85.5,
+     "q": 6.497,
+     "delta": 8.0
+    },
+    {
+     "t": 12.275,
+     "state": "DRIP",
+     "theta": 70.5,
+     "m": 9.743
+    },
+    {
+     "t": 13.775,
+     "state": "SETTLE",
+     "theta": 70.5,
+     "m": 10.234
+    },
+    {
+     "t": 13.8,
+     "settled": true,
+     "m": 10.262,
+     "sigma": 0.06456133187559204,
+     "q": -0.09
+    },
+    {
+     "t": 13.8,
+     "state": "PAUSE",
+     "theta": 70.5,
+     "m": 10.24,
+     "outcome": "PAUSE_SPILL"
+    }
+   ],
+   "tracking": {
+    "max_err_g_s": 6.418,
+    "mean_err_g_s": 4.603,
+    "n": 60
+   },
+   "mass_balance_g": -0.000262,
+   "tilt_lag_max_deg": 0.38,
+   "trace_csv": "reports/pour_traces/spill_B.csv"
+  },
+  "spill B without the spill check": {
+   "label": "spill B without the spill check",
+   "seed": 31,
+   "fill_ml": 70.0,
+   "target_g": 39.0,
+   "tol_g": 2.0,
+   "outcome": "PAUSE_LOW_REAGENT",
+   "reason": "manifold end 105 deg reached at 28.7 g",
+   "final_true_g": 28.684,
+   "error_g": -10.316,
+   "controller_settled_g": 28.66,
+   "scale_after_untilt_g": 28.679,
+   "time_s": 17.9,
+   "theta_first_deg": 66.33,
+   "v_first_ml": 53.24,
+   "v_first_true_theta_deg": 57.56,
+   "theta_cut_deg": 105.0,
+   "q_cut_g_s": -0.065,
+   "m_cut_g": 28.674,
+   "cuts": 1,
+   "topup_pulses": 0,
+   "max_theta_deg": 105.0,
+   "spill_margin_g": null,
+   "spilled_g": 43.7,
+   "spilled_during_pour_g": 43.6996,
+   "left_in_source_g": 0.416,
+   "landing": {
+    "mass_weighted_mm": 25.46,
+    "max_mm": 29.79,
+    "min_mm": 22.11
+   },
+   "manifold": {
+    "max_joint_deg_per_deg": 17.2,
+    "at_theta_deg": 89.0
+   },
+   "grip_h_mm": 44.0,
+   "grasp": [
+    {
+     "outcome": "grasped",
+     "jaw_deg": 8.26,
+     "expected_deg": 7.72,
+     "load_permille": -7.0,
+     "detail": "jaw stopped 0.54 deg from the expected contact angle"
+    }
+   ],
+   "prepour_sim_s": 11.1,
+   "sim_s": 32.6,
+   "wall_s": 4.0,
+   "setup": [
+    "scale pan shifted by (-30.7, 5.2) mm from its update13_final position",
+    "P1 teleported to scale_pan at (589.3, 412.2, 63.8) mm",
+    "dev filled with 70.0 mL developer (72.80 g) in the Ledger"
+   ],
+   "events": [
+    {
+     "t": 0.0,
+     "state": "FAST",
+     "theta": 0.0,
+     "m": null
+    },
+    {
+     "t": 0.35,
+     "state": "RAMP",
+     "theta": 40.0,
+     "m": 0.016
+    },
+    {
+     "t": 9.15,
+     "state": "FLOW",
+     "theta": 66.33,
+     "m": 0.752,
+     "v_first_ml": 53.24
+    },
+    {
+     "t": 16.2,
+     "state": "CUT",
+     "theta": 100.0,
+     "m": 28.674,
+     "why": "LOW_REAGENT",
+     "theta_cut": 105.0,
+     "q": -0.065,
+     "delta": 5.0
+    },
+    {
+     "t": 16.375,
+     "state": "DRIP",
+     "theta": 90.0,
+     "m": 28.695
+    },
+    {
+     "t": 17.875,
+     "state": "SETTLE",
+     "theta": 90.0,
+     "m": 28.659
+    },
+    {
+     "t": 17.9,
+     "settled": true,
+     "m": 28.66,
+     "sigma": 0.07567403174590451,
+     "q": 0.01
+    },
+    {
+     "t": 17.9,
+     "state": "PAUSE",
+     "theta": 90.0,
+     "m": 28.662,
+     "outcome": "PAUSE_LOW_REAGENT"
+    }
+   ],
+   "tracking": {
+    "max_err_g_s": 8.21,
+    "mean_err_g_s": 2.773,
+    "n": 222
+   },
+   "mass_balance_g": -0.000248,
+   "tilt_lag_max_deg": 0.42,
+   "trace_csv": "reports/pour_traces/spill_B_without_the_spill_check.csv"
+  }
+ },
+ "funnel": {
+  "label": "funnel pour",
+  "content_g": 39.0,
+  "delivered_to_flask_g": 38.584,
+  "left_in_P1_g": 0.416,
+  "spilled_g": 0,
+  "in_flight_g": 0.0,
+  "landing": {
+   "mass_weighted_mm": 9.92,
+   "max_mm": 33.95,
+   "min_mm": 5.33
+  },
+  "landing_limit_mm": 40.0,
+  "funnel_rim_radius_mm": 50.0,
+  "lip_above_rim_mm": 65.0,
+  "grip_h_mm": 33.0,
+  "profile_time_s": 11.5,
+  "grasp": [
+   {
+    "outcome": "grasped",
+    "jaw_deg": 8.26,
+    "expected_deg": 7.72,
+    "load_permille": -5.0,
+    "detail": "jaw stopped 0.54 deg from the expected contact angle"
+   }
+  ],
+  "manifold": {
+   "max_joint_deg_per_deg": 17.03,
+   "at_theta_deg": 88.0
+  },
+  "ramp_tilt_lag": {
+   "max_deg": 6.45,
+   "at_theta_cmd": 101.75
+  },
+  "setup": [
+   "P1 teleported to scale_pan at (620.0, 407.0, 63.8) mm",
+   "P1 holds 39.0 g developer in the Ledger (the scale pour result)"
+  ],
+  "sim_s": 22.98,
+  "wall_s": 2.8,
+  "landing_theta_range": [
+   71.3,
+   105.0
+  ],
+  "tilt_lag_max_deg": null,
+  "trace_csv": "reports/pour_traces/funnel_pour.csv"
+ },
+ "calibration": {
+  "pours": [
+   {
+    "fill_ml": 60.0,
+    "theta_first_deg": 63.85,
+    "theta_true_deg": 60.81,
+    "detection_lag_deg": 3.04,
+    "v_table_ml": 51.01,
+    "offset_ml": 8.99,
+    "outcome": "OK",
+    "error_g": -0.271
+   },
+   {
+    "fill_ml": 70.0,
+    "theta_first_deg": 60.55,
+    "theta_true_deg": 57.56,
+    "detection_lag_deg": 2.99,
+    "v_table_ml": 60.79,
+    "offset_ml": 9.21,
+    "outcome": "OK",
+    "error_g": -0.375
+   },
+   {
+    "fill_ml": 80.0,
+    "theta_first_deg": 57.4,
+    "theta_true_deg": 54.34,
+    "detection_lag_deg": 3.06,
+    "v_table_ml": 70.49,
+    "offset_ml": 9.51,
+    "outcome": "OK",
+    "error_g": -0.27
+   }
+  ],
+  "fill_offset_ml": 9.24
+ },
+ "cut_law_refit": {
+  "a_g": 0.4581,
+  "b_s": -0.2823,
+  "n": 10,
+  "rms_g": 0.0205
+ },
+ "synthetic_tracking": [
+  {
+   "kp": 0.15,
+   "ki": 0.3,
+   "cases": 72,
+   "within_1g_s": 37,
+   "worst_g_s": 4.573,
+   "median_g_s": 0.863
+  },
+  {
+   "kp": 0.15,
+   "ki": 1.5,
+   "cases": 72,
+   "within_1g_s": 72,
+   "worst_g_s": 0.877,
+   "median_g_s": 0.233
+  }
+ ],
+ "synthetic_tracking_cases": [
+  {
+   "kp": 0.15,
+   "ki": 0.3,
+   "cases": 72,
+   "within_1g_s": 37,
+   "worst_g_s": 4.573,
+   "median_g_s": 0.863,
+   "by_case": [
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 0.448
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 0.496
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 0.454
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 0.541
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 0.537
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 0.516
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.554
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 0.63
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 0.682
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 0.559
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 0.421
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 0.474
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 0.591
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 0.56
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 0.61
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.738
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 0.656
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 0.641
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 0.416
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 0.428
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 0.338
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 0.314
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 0.257
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 0.217
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.248
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 0.262
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 0.237
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 0.327
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 0.359
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 0.292
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 0.171
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 0.298
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 0.225
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.252
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 0.177
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 0.312
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 1.635
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 1.707
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 1.853
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 1.36
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 1.468
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 1.529
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 1.142
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 1.069
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 1.123
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 1.612
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 1.685
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 1.752
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 1.369
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 1.364
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 1.326
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.988
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 1.142
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 1.134
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 4.427
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 4.573
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 4.474
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 3.891
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 4.021
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 3.991
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 3.582
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 3.451
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 3.343
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 4.344
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 4.551
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 4.475
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 3.796
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 3.835
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 3.925
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 3.312
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 3.266
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 3.271
+    }
+   ]
+  },
+  {
+   "kp": 0.15,
+   "ki": 1.5,
+   "cases": 72,
+   "within_1g_s": 72,
+   "worst_g_s": 0.877,
+   "median_g_s": 0.233,
+   "by_case": [
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 0.209
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 0.187
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 0.196
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 0.194
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 0.251
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 0.15
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.224
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 0.198
+    },
+    {
+     "q_set": 1.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 0.222
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 0.254
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 0.153
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 0.172
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 0.161
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 0.185
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 0.231
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.175
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 0.225
+    },
+    {
+     "q_set": 1.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 0.209
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 0.237
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 0.297
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 0.23
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 0.297
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 0.251
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 0.192
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.23
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 0.226
+    },
+    {
+     "q_set": 2.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 0.226
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 0.17
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 0.238
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 0.213
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 0.186
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 0.303
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 0.226
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.244
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 0.153
+    },
+    {
+     "q_set": 2.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 0.318
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 0.187
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 0.24
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 0.245
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 0.262
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 0.231
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 0.269
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.273
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 0.234
+    },
+    {
+     "q_set": 4.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 0.189
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 0.189
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 0.17
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 0.225
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 0.288
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 0.207
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 0.189
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.252
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 0.229
+    },
+    {
+     "q_set": 4.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 0.208
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 0.471
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 0.33
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 0.317
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 0.306
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 0.412
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 0.363
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.877
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 0.663
+    },
+    {
+     "q_set": 8.0,
+     "fill": 55.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 0.622
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.0,
+     "max_err": 0.256
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 0.5,
+     "max_err": 0.327
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 10.0,
+     "hold": 1.0,
+     "max_err": 0.261
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.0,
+     "max_err": 0.335
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 0.5,
+     "max_err": 0.418
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 14.0,
+     "hold": 1.0,
+     "max_err": 0.381
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.0,
+     "max_err": 0.703
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 0.5,
+     "max_err": 0.644
+    },
+    {
+     "q_set": 8.0,
+     "fill": 80.0,
+     "lip_w": 20.0,
+     "hold": 1.0,
+     "max_err": 0.646
+    }
+   ]
+  }
+ ],
+ "config": {
+  "liquid": {
+   "cd": 0.62,
+   "lip_width_mm": 14.0,
+   "hold_head_mm": 0.5,
+   "exit_velocity_coeff": 1.0,
+   "transport_delay_s": 0.03,
+   "jet_radius_mm": 3.0,
+   "impact_force": true,
+   "funnel_delay_s": 0.8,
+   "residual_film_ml": 0.4,
+   "drip_ml": 0.1,
+   "drip_tau_s": 0.5
+  },
+  "pour": {
+   "control_dt_s": 0.025,
+   "fit_window_s": 0.5,
+   "outlier_sigma": 5.0,
+   "outlier_sigma_floor_g": 0.07,
+   "outlier_reset_n": 4,
+   "theta_start_deg": 40.0,
+   "theta_max_deg": 105.0,
+   "fast_rate_deg_s": 120.0,
+   "ramp_rate_deg_s": 3.0,
+   "first_drop_q_g_s": 0.5,
+   "first_drop_n": 3,
+   "first_drop_dm_g": 0.3,
+   "kp_deg_per_gs": 0.15,
+   "ki_deg_per_s_per_gs": 1.5,
+   "max_rate_deg_s": 10.0,
+   "q_gain_per_s": 0.6,
+   "q_min_g_s": 1.0,
+   "q_ceiling_g_s": 8.0,
+   "cut_a_g": 0.3,
+   "cut_b_s": 0.15,
+   "untilt_fast_deg": 5.0,
+   "untilt_fast_big_deg": 8.0,
+   "untilt_big_q_g_s": 5.0,
+   "untilt_rate_deg_s": 60.0,
+   "untilt_total_deg": 15.0,
+   "drip_hold_s": 1.5,
+   "settle_window_s": 0.5,
+   "settle_timeout_s": 5.0,
+   "settle_sigma_g": 0.15,
+   "settle_flow_g_s": 0.25,
+   "topup_back_deg": 3.0,
+   "topup_ramp_deg_s": 10.0,
+   "topup_step_deg": 0.5,
+   "topup_period_s": 0.6,
+   "topup_flow_g_s": 0.3,
+   "max_topup_pulses": 6,
+   "max_pour_s": 45.0,
+   "spill_check": true,
+   "spill_allow_g": 8.0,
+   "spill_allow_s": 1.5,
+   "spill_ratio": 0.6,
+   "spill_hold_s": 1.0,
+   "spill_arm_s": 2.0,
+   "funnel_theta_deg": 105.0,
+   "funnel_rate_deg_s": 10.0,
+   "funnel_hold_s": 3.0,
+   "developer": {
+    "low_fill_ml": 46.0,
+    "fill_offset_ml": 9.2
+   },
+   "water": {
+    "low_fill_ml": 36.0,
+    "fill_offset_ml": 9.2
+   }
+  }
+ },
+ "notes": [
+  "analytic liquid model, not CFD (benchsim/chem/liquid.py)",
+  "P1 is teleported from its carousel pocket onto the scale pan before each pour (the phase-5 transfer is not re-run here)",
+  "errors are against the Ledger mass in P1 after untilt (truth); the controller reads the simulated HX711 stream only"
+ ]
+}

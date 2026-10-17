@@ -1,0 +1,495 @@
+{
+ "schema": "benchsim.runlog/1",
+ "run_id": "sample_run",
+ "mode": "sim",
+ "started_utc": "2026-10-17T04:52:29Z",
+ "finished_utc": "2026-10-17T04:52:30Z",
+ "config": {
+  "layout_source": "tools/layout/layout_final.json:update13_final",
+  "params_sha256": "b6e7db99e1943d27a9af155c83e448064b07af1aa4a1fc4c4fd0db3aef81b9e9",
+  "so101_revision": "5f6d2b876a53a4872e405b991dd925556c9e38a4",
+  "seed": 7
+ },
+ "protocol": {
+  "source": "preset",
+  "text": "Make elephant toothpaste: 39 g of 12 % peroxide developer, one 7 g packet of yeast, 30 g warm water on the yeast, wait a minute, then erupt.",
+  "steps": [
+   {
+    "type": "TRANSFER",
+    "params": {
+     "beaker": "P1",
+     "src": "carousel_pick",
+     "dst": "scale_pan"
+    },
+    "label": "1 P1 carousel -> scale"
+   },
+   {
+    "type": "POUR_TO_SCALE",
+    "params": {
+     "reagent": "developer",
+     "beaker": "P1",
+     "target_g": 39.0,
+     "tol_g": 2.0,
+     "relative": false
+    },
+    "label": "2 developer onto P1"
+   },
+   {
+    "type": "POUR_TO_FUNNEL",
+    "params": {
+     "beaker": "P1"
+    },
+    "label": "3 P1 -> funnel"
+   },
+   {
+    "type": "TRANSFER",
+    "params": {
+     "beaker": "P1",
+     "src": "scale_pan",
+     "dst": "carousel_pick"
+    },
+    "label": "4 P1 -> carousel"
+   },
+   {
+    "type": "DOSE_YEAST",
+    "params": {
+     "beaker": "P2",
+     "target_g": 7.0,
+     "tol_g": 0.7,
+     "max_topups": 2
+    },
+    "label": "5 yeast dose into P2"
+   },
+   {
+    "type": "TRANSFER",
+    "params": {
+     "beaker": "P2",
+     "src": "carousel_pick",
+     "dst": "scale_pan"
+    },
+    "label": "6 P2 -> scale"
+   },
+   {
+    "type": "VERIFY_MASS",
+    "params": {
+     "beaker": "P2",
+     "target_g": 7.0,
+     "tol_g": 0.7
+    },
+    "label": "6 verify yeast"
+   },
+   {
+    "type": "POUR_TO_SCALE",
+    "params": {
+     "reagent": "water",
+     "beaker": "P2",
+     "target_g": 30.0,
+     "tol_g": 2.0,
+     "relative": true
+    },
+    "label": "7 water onto P2"
+   },
+   {
+    "type": "WAIT",
+    "params": {
+     "seconds": 60.0,
+     "reason": "yeast activation"
+    },
+    "label": "7 activate"
+   },
+   {
+    "type": "POUR_TO_FUNNEL",
+    "params": {
+     "beaker": "P2"
+    },
+    "label": "8 P2 -> funnel (reaction starts)"
+   },
+   {
+    "type": "TRANSFER",
+    "params": {
+     "beaker": "P2",
+     "src": "scale_pan",
+     "dst": "carousel_pick"
+    },
+    "label": "9 P2 -> carousel"
+   },
+   {
+    "type": "STAGE",
+    "params": {
+     "position": "ERUPT"
+    },
+    "label": "10 ERUPT"
+   }
+  ],
+  "validation": {
+   "ok": true,
+   "problems": []
+  },
+  "approved_by": "sample operator",
+  "approved_utc": "2026-10-17T04:52:29Z"
+ },
+ "steps": [
+  {
+   "index": 1,
+   "type": "TRANSFER",
+   "label": "1 P1 carousel -> scale",
+   "params": {
+    "beaker": "P1",
+    "src": "carousel_pick",
+    "dst": "scale_pan"
+   },
+   "status": "passed",
+   "reason": "",
+   "t_start": 0.0,
+   "t_end": 14.0,
+   "target": {},
+   "measured": {
+    "tare_g": 0.0
+   },
+   "faults": [],
+   "frames": [
+    "frames/pick_check_P1.png",
+    "frames/P1_on_scale.png"
+   ]
+  },
+  {
+   "index": 2,
+   "type": "POUR_TO_SCALE",
+   "label": "2 developer onto P1",
+   "params": {
+    "reagent": "developer",
+    "beaker": "P1",
+    "target_g": 39.0,
+    "tol_g": 2.0,
+    "relative": false
+   },
+   "status": "passed",
+   "reason": "",
+   "t_start": 14.0,
+   "t_end": 41.5,
+   "target": {
+    "mass_g": 39.0,
+    "tol_g": 2.0
+   },
+   "measured": {
+    "mass_g": 38.71
+   },
+   "faults": [],
+   "frames": []
+  },
+  {
+   "index": 3,
+   "type": "POUR_TO_FUNNEL",
+   "label": "3 P1 -> funnel",
+   "params": {
+    "beaker": "P1"
+   },
+   "status": "passed",
+   "reason": "",
+   "t_start": 41.5,
+   "t_end": 63.0,
+   "target": {},
+   "measured": {
+    "residual_g": 0.42
+   },
+   "faults": [],
+   "frames": []
+  },
+  {
+   "index": 4,
+   "type": "TRANSFER",
+   "label": "4 P1 -> carousel",
+   "params": {
+    "beaker": "P1",
+    "src": "scale_pan",
+    "dst": "carousel_pick"
+   },
+   "status": "passed",
+   "reason": "",
+   "t_start": 63.0,
+   "t_end": 77.0,
+   "target": {},
+   "measured": {},
+   "faults": [],
+   "frames": []
+  },
+  {
+   "index": 5,
+   "type": "DOSE_YEAST",
+   "label": "5 yeast dose into P2",
+   "params": {
+    "beaker": "P2",
+    "target_g": 7.0,
+    "tol_g": 0.7,
+    "max_topups": 2
+   },
+   "status": "passed",
+   "reason": "",
+   "t_start": 77.0,
+   "t_end": 104.0,
+   "target": {
+    "mass_g": 7.0,
+    "tol_g": 0.7
+   },
+   "measured": {
+    "revs": 8.2,
+    "est_mass_g": 6.97,
+    "topups": 0
+   },
+   "faults": [],
+   "frames": []
+  },
+  {
+   "index": 6,
+   "type": "TRANSFER",
+   "label": "6 P2 -> scale",
+   "params": {
+    "beaker": "P2",
+    "src": "carousel_pick",
+    "dst": "scale_pan"
+   },
+   "status": "passed",
+   "reason": "",
+   "t_start": 104.0,
+   "t_end": 118.0,
+   "target": {},
+   "measured": {},
+   "faults": [],
+   "frames": []
+  },
+  {
+   "index": 7,
+   "type": "VERIFY_MASS",
+   "label": "6 verify yeast",
+   "params": {
+    "beaker": "P2",
+    "target_g": 7.0,
+    "tol_g": 0.7
+   },
+   "status": "passed",
+   "reason": "",
+   "t_start": 118.0,
+   "t_end": 119.5,
+   "target": {
+    "mass_g": 7.0,
+    "tol_g": 0.7
+   },
+   "measured": {
+    "mass_g": 6.94
+   },
+   "faults": [],
+   "frames": []
+  },
+  {
+   "index": 8,
+   "type": "POUR_TO_SCALE",
+   "label": "7 water onto P2",
+   "params": {
+    "reagent": "water",
+    "beaker": "P2",
+    "target_g": 30.0,
+    "tol_g": 2.0,
+    "relative": true
+   },
+   "status": "passed",
+   "reason": "",
+   "t_start": 119.5,
+   "t_end": 146.0,
+   "target": {
+    "mass_g": 30.0,
+    "tol_g": 2.0
+   },
+   "measured": {
+    "mass_g": 30.42
+   },
+   "faults": [],
+   "frames": []
+  },
+  {
+   "index": 9,
+   "type": "WAIT",
+   "label": "7 activate",
+   "params": {
+    "seconds": 60.0,
+    "reason": "yeast activation"
+   },
+   "status": "passed",
+   "reason": "",
+   "t_start": 146.0,
+   "t_end": 206.0,
+   "target": {
+    "seconds": 60.0
+   },
+   "measured": {
+    "seconds": 60.0
+   },
+   "faults": [],
+   "frames": []
+  },
+  {
+   "index": 10,
+   "type": "POUR_TO_FUNNEL",
+   "label": "8 P2 -> funnel (reaction starts)",
+   "params": {
+    "beaker": "P2"
+   },
+   "status": "passed",
+   "reason": "",
+   "t_start": 206.0,
+   "t_end": 228.0,
+   "target": {},
+   "measured": {
+    "residual_g": 0.31,
+    "spilled_g": 0.3
+   },
+   "faults": [],
+   "frames": [
+    "frames/flask_step8.png"
+   ]
+  },
+  {
+   "index": 11,
+   "type": "TRANSFER",
+   "label": "9 P2 -> carousel",
+   "params": {
+    "beaker": "P2",
+    "src": "scale_pan",
+    "dst": "carousel_pick"
+   },
+   "status": "failed",
+   "reason": "grasp miss: jaw closed 4.1 deg past the contact angle (limit 2.5)",
+   "t_start": 228.0,
+   "t_end": 236.5,
+   "target": {},
+   "measured": {
+    "jaw_past_contact_deg": 4.1
+   },
+   "faults": [
+    {
+     "t": 237.2,
+     "code": "ESTOP",
+     "detail": "operator"
+    }
+   ],
+   "frames": []
+  },
+  {
+   "index": 12,
+   "type": "STAGE",
+   "label": "10 ERUPT",
+   "params": {
+    "position": "ERUPT"
+   },
+   "status": "skipped",
+   "reason": "not run: step 11 failed and the operator pressed the e-stop",
+   "t_start": null,
+   "t_end": null,
+   "target": {},
+   "measured": {},
+   "faults": [],
+   "frames": []
+  }
+ ],
+ "faults": [
+  {
+   "t": 237.2,
+   "code": "ESTOP",
+   "detail": "operator pressed the e-stop after the grasp miss"
+  }
+ ],
+ "events": [
+  {
+   "t": 1.2,
+   "kind": "attach",
+   "arm": "transfer",
+   "beaker": "P1"
+  },
+  {
+   "t": 12.9,
+   "kind": "detach",
+   "arm": "transfer",
+   "beaker": "P1"
+  },
+  {
+   "t": 13.2,
+   "kind": "mega_cmd",
+   "cmd": {
+    "cmd": "TARE",
+    "seq": 1
+   }
+  },
+  {
+   "t": 78.0,
+   "kind": "mega_cmd",
+   "cmd": {
+    "cmd": "TT",
+    "deg": 180,
+    "ms": 8000,
+    "seq": 4
+   }
+  },
+  {
+   "t": 91.3,
+   "kind": "auger_stall",
+   "n": 1,
+   "rev": 4.1
+  },
+  {
+   "t": 97.6,
+   "kind": "mega_done",
+   "cmd": "AUG",
+   "rev": 8.2,
+   "stalls": 1
+  },
+  {
+   "t": 236.4,
+   "kind": "grasp_miss",
+   "arm": "transfer",
+   "beaker": "P2"
+  },
+  {
+   "t": 237.2,
+   "kind": "fault",
+   "code": "ESTOP"
+  }
+ ],
+ "traces": {
+  "scale_csv": "scale.csv",
+  "joints_csv": null,
+  "pour_traces": []
+ },
+ "frames": [
+  {
+   "t": 0.4,
+   "camera": "bench_cam",
+   "path": "frames/pick_check_P1.png",
+   "label": "pick pocket: P1 present"
+  },
+  {
+   "t": 13.6,
+   "camera": "bench_cam",
+   "path": "frames/P1_on_scale.png",
+   "label": "P1 on the scale before tare"
+  },
+  {
+   "t": 205.0,
+   "camera": "foam_cam",
+   "path": "frames/flask_step8.png",
+   "label": "flask after the P2 pour"
+  }
+ ],
+ "video": null,
+ "summary": {
+  "passed": 10,
+  "failed": 1,
+  "skipped": 1,
+  "masses": {
+   "developer_g": 38.71,
+   "yeast_g": 6.94,
+   "water_g": 30.42,
+   "flask_g_est": 91.3
+  },
+  "spilled_g": 0.3,
+  "foam_peak_mm": null
+ }
+}

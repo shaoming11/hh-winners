@@ -1,0 +1,250 @@
+{
+ "schema": "benchsim.ai_pipeline/1",
+ "generated_utc": "2026-10-17T04:57:52Z",
+ "text_file": "benchsim/ai/examples/elephant_toothpaste.txt",
+ "llm": {
+  "model": "claude-opus-5-5",
+  "status": "not called: no ANTHROPIC_API_KEY or ANTHROPIC_AUTH_TOKEN in the environment",
+  "last_reply": null
+ },
+ "approved": true,
+ "text": "Elephant toothpaste, the standard bench demo. The flask already holds the dish soap and food colouring.\n\n1. Put the empty beaker P1 on the scale and pour 39 g of the 12 % hydrogen peroxide developer into it (within 2 g).\n2. Pour P1 into the flask through the funnel, then put P1 back in the carousel.\n3. Dose one packet of instant yeast, about 7 g (within 0.7 g, at most two top-ups), into P2 with the auger.\n4. Bring P2 to the scale and check the yeast weight.\n5. Add 30 g of warm water on top of the yeast (within 2 g) and let it activate for 60 seconds.\n6. Pour the yeast slurry into the flask, put P2 back in the carousel, then move the stage to ERUPT.\n",
+ "proposal": {
+  "source": "preset",
+  "steps": [
+   {
+    "type": "TRANSFER",
+    "params": {
+     "beaker": "P1",
+     "src": "carousel_pick",
+     "dst": "scale_pan"
+    },
+    "label": "1 P1 carousel -> scale"
+   },
+   {
+    "type": "POUR_TO_SCALE",
+    "params": {
+     "reagent": "developer",
+     "beaker": "P1",
+     "target_g": 39.0,
+     "tol_g": 2.0,
+     "relative": false
+    },
+    "label": "2 developer onto P1"
+   },
+   {
+    "type": "POUR_TO_FUNNEL",
+    "params": {
+     "beaker": "P1"
+    },
+    "label": "3 P1 -> funnel"
+   },
+   {
+    "type": "TRANSFER",
+    "params": {
+     "beaker": "P1",
+     "src": "scale_pan",
+     "dst": "carousel_pick"
+    },
+    "label": "4 P1 -> carousel"
+   },
+   {
+    "type": "DOSE_YEAST",
+    "params": {
+     "beaker": "P2",
+     "target_g": 7.0,
+     "tol_g": 0.7,
+     "max_topups": 2
+    },
+    "label": "5 yeast dose into P2"
+   },
+   {
+    "type": "TRANSFER",
+    "params": {
+     "beaker": "P2",
+     "src": "carousel_pick",
+     "dst": "scale_pan"
+    },
+    "label": "6 P2 -> scale"
+   },
+   {
+    "type": "VERIFY_MASS",
+    "params": {
+     "beaker": "P2",
+     "target_g": 7.0,
+     "tol_g": 0.7
+    },
+    "label": "6 verify yeast"
+   },
+   {
+    "type": "POUR_TO_SCALE",
+    "params": {
+     "reagent": "water",
+     "beaker": "P2",
+     "target_g": 30.0,
+     "tol_g": 2.0,
+     "relative": true
+    },
+    "label": "7 water onto P2"
+   },
+   {
+    "type": "WAIT",
+    "params": {
+     "seconds": 60.0,
+     "reason": "yeast activation"
+    },
+    "label": "7 activate"
+   },
+   {
+    "type": "POUR_TO_FUNNEL",
+    "params": {
+     "beaker": "P2"
+    },
+    "label": "8 P2 -> funnel (reaction starts)"
+   },
+   {
+    "type": "TRANSFER",
+    "params": {
+     "beaker": "P2",
+     "src": "scale_pan",
+     "dst": "carousel_pick"
+    },
+    "label": "9 P2 -> carousel"
+   },
+   {
+    "type": "STAGE",
+    "params": {
+     "position": "ERUPT"
+    },
+    "label": "10 ERUPT"
+   }
+  ],
+  "notes": "preset demo protocol",
+  "model": "claude-opus-5-5",
+  "raw": null,
+  "rejected": [],
+  "fallback_reason": "language model unavailable: no ANTHROPIC_API_KEY or ANTHROPIC_AUTH_TOKEN in the environment"
+ },
+ "steps": [
+  {
+   "type": "TRANSFER",
+   "params": {
+    "beaker": "P1",
+    "src": "carousel_pick",
+    "dst": "scale_pan"
+   },
+   "label": "1 P1 carousel -> scale"
+  },
+  {
+   "type": "POUR_TO_SCALE",
+   "params": {
+    "reagent": "developer",
+    "beaker": "P1",
+    "target_g": 39.0,
+    "tol_g": 2.0,
+    "relative": false
+   },
+   "label": "2 developer onto P1"
+  },
+  {
+   "type": "POUR_TO_FUNNEL",
+   "params": {
+    "beaker": "P1"
+   },
+   "label": "3 P1 -> funnel"
+  },
+  {
+   "type": "TRANSFER",
+   "params": {
+    "beaker": "P1",
+    "src": "scale_pan",
+    "dst": "carousel_pick"
+   },
+   "label": "4 P1 -> carousel"
+  },
+  {
+   "type": "DOSE_YEAST",
+   "params": {
+    "beaker": "P2",
+    "target_g": 7.0,
+    "tol_g": 0.7,
+    "max_topups": 2
+   },
+   "label": "5 yeast dose into P2"
+  },
+  {
+   "type": "TRANSFER",
+   "params": {
+    "beaker": "P2",
+    "src": "carousel_pick",
+    "dst": "scale_pan"
+   },
+   "label": "6 P2 -> scale"
+  },
+  {
+   "type": "VERIFY_MASS",
+   "params": {
+    "beaker": "P2",
+    "target_g": 7.0,
+    "tol_g": 0.7
+   },
+   "label": "6 verify yeast"
+  },
+  {
+   "type": "POUR_TO_SCALE",
+   "params": {
+    "reagent": "water",
+    "beaker": "P2",
+    "target_g": 30.0,
+    "tol_g": 2.0,
+    "relative": true
+   },
+   "label": "7 water onto P2"
+  },
+  {
+   "type": "WAIT",
+   "params": {
+    "seconds": 60.0,
+    "reason": "yeast activation"
+   },
+   "label": "7 activate"
+  },
+  {
+   "type": "POUR_TO_FUNNEL",
+   "params": {
+    "beaker": "P2"
+   },
+   "label": "8 P2 -> funnel (reaction starts)"
+  },
+  {
+   "type": "TRANSFER",
+   "params": {
+    "beaker": "P2",
+    "src": "scale_pan",
+    "dst": "carousel_pick"
+   },
+   "label": "9 P2 -> carousel"
+  },
+  {
+   "type": "STAGE",
+   "params": {
+    "position": "ERUPT"
+   },
+   "label": "10 ERUPT"
+  }
+ ],
+ "validation": {
+  "ok": true,
+  "problems": []
+ },
+ "approval": {
+  "approved": true,
+  "approved_by": "example run (--approve)",
+  "operator": "example run (--approve)",
+  "reason": "pre-approved with --approve; validation passed",
+  "approver": "command line --approve",
+  "plan_sha256": "0e62c7f158946fcdf69214f5fa86649e85280178cb555c4af69ee209b3706423",
+  "utc": "2026-10-17T04:57:52Z",
+  "validation_ok": true
+ }
+}

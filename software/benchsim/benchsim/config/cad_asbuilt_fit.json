@@ -1,0 +1,107 @@
+{
+ "q0_deg": [
+  0.0,
+  -89.095,
+  89.994,
+  -0.641,
+  2.902
+ ],
+ "base_z": 22.42,
+ "pan_xy": [
+  330.0,
+  525.7
+ ],
+ "residuals": [
+  {
+   "joint": "shoulder_pan",
+   "line_dist_mm": 0.0,
+   "axis_angle_deg": 0.0,
+   "mj_dir": [
+    0.0,
+    0.0,
+    -1.0
+   ],
+   "cad_dir": [
+    0.0,
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "joint": "shoulder_lift",
+   "line_dist_mm": 1.07,
+   "axis_angle_deg": 0.0,
+   "mj_dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "cad_dir": [
+    1.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "joint": "elbow_flex",
+   "line_dist_mm": 0.73,
+   "axis_angle_deg": 0.0,
+   "mj_dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "cad_dir": [
+    1.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "joint": "wrist_flex",
+   "line_dist_mm": 0.19,
+   "axis_angle_deg": 0.97,
+   "mj_dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "cad_dir": [
+    0.9999,
+    0.0,
+    0.017
+   ]
+  },
+  {
+   "joint": "wrist_roll",
+   "line_dist_mm": 7.39,
+   "axis_angle_deg": 0.26,
+   "mj_dir": [
+    -0.0,
+    1.0,
+    0.0045
+   ],
+   "cad_dir": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  {
+   "joint": "gripper",
+   "line_dist_mm": 0.71,
+   "axis_angle_deg": 0.11,
+   "mj_dir": [
+    -1.0,
+    -0.0,
+    0.002
+   ],
+   "cad_dir": [
+    1.0,
+    0.0,
+    0.0
+   ]
+  }
+ ],
+ "fit_cost": 28.79450758645824
+}
