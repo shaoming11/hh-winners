@@ -5,6 +5,26 @@ The electrical tests E1–E10 are those of [`docs/electrical.md` §10](../../../
 host side and the arm checks A1–A5. Record every measured value where the table says (bench_params.toml `[mega]`,
 the firmware defaults, or your calibration JSON), then rerun `hw-check`.
 
+## Guided ladder (`python -m benchsim.hwtest`)
+
+One command walks the bring-up as rungs and stops at the first failure; nothing moves before L3, and every L3 move
+waits for the operator to type `MOVE`. It uses only the real backend below (dry run for L1/L2).
+
+```bash
+.venv/bin/python -m benchsim.hwtest --mega PORT                                   # L0-L2, Mega and scale
+.venv/bin/python -m benchsim.hwtest --pourer PORT --calibration CAL --record-reference --upto L2   # once, arm in rest pose
+.venv/bin/python -m benchsim.hwtest --mega M --pourer A --transfer B --calibration CAL --upto L3     # every session
+```
+
+| Rung | Checks | Moves |
+|---|---|---|
+| L0 | `hw-check`, ports present, calibration placeholders and fingerprints flagged | no |
+| L1 | Mega PING, scale stream (constant readings = HX711 not clocked), arm identity, joints inside the calibrated limits, loads at rest | no (dry run) |
+| L2 | each arm resting in its folded rest pose against a reference recorded with `--record-reference`; > 3 deg on any joint fails (a re-seated horn moves a joint a whole spline tooth) | no (dry run) |
+| L3 | each arm joint 5 deg and back at 10 % speed, torque off at the end even on failure; carousel 5 deg and back, stage 0-5-0 deg, auger 0.5 rev | yes, after `MOVE` |
+
+Reports go to `reports/hwtest/<time>.json` (not committed).
+
 ## Rules
 
 - **The default is simulation.** Nothing in benchsim touches hardware unless asked. A command that can drive the
