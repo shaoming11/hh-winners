@@ -81,7 +81,7 @@ function renderChem(s) {
   $('foam').innerHTML = bits.join('');
 }
 
-const CAM = { auto: 'Auto', overview: 'Overview', bench_cam: 'Close-up', top: 'Top', foam_cam: 'Flask' };
+const CAM = { auto: 'Auto', overview: 'Overview', bench_cam: 'Close-up', top: 'Top', foam_cam: 'Flask', pour_cam: 'Pour', funnel_cam: 'Funnel', erupt_cam: 'Eruption' };
 let camKey = '';
 function renderCams(s) {
   const v = s.probes && s.probes.video;

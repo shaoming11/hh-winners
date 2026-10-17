@@ -415,11 +415,19 @@ class Builder:
         st = self.st
         cam('foam_cam', [700, 120, 260], [450, st['funnel']['xy'][1] - 97.3, 230], 40)
         cam('bench_cam', [900, 250, 420], [680, 440, 70], 50)
+        def orbit(name, target, dist, azimuth, elevation, fovy=45):    # dashboard close-ups, placed like a free camera
+            a, e = math.radians(azimuth), math.radians(elevation); f = np.array([math.cos(e) * math.cos(a), math.cos(e) * math.sin(a), math.sin(e)])
+            cam(name, np.asarray(target, float) - dist * f, target, fovy)
+        sc = st['scale_pan']['xy']; fu = st['funnel']['xy']
+        orbit('pour_cam', [sc[0], sc[1], st['scale_pan']['z'] + 60], 330, 200, -18)
+        orbit('funnel_cam', [fu[0], fu[1], st['funnel']['z'] - 60], 470, 140, -6)
+        orbit('erupt_cam', [450, fu[1] - 97.3, 190], 600, 150, -12)
         self.fid.add('cameras', 'analytic', '-', 'no documented viewpoint; poses assumed in scene.cameras')
 
     def build(self):
         self.world(); self.frame(); self.scale(); self.carousel(); self.auger(); self.rack(); self.stage()
         self.beakers(); self.arms(); self.grasp_welds(); self.cad_meshes(); self.cameras()
+        from .fx.look import assets; assets(self.spec)          # room textures for the camera look (unused by the model itself)
         self.spec.compiler.autolimits = True
         model = self.spec.compile()
         return model

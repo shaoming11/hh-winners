@@ -1,0 +1,160 @@
+{
+ "schema": "benchsim.runlog/1",
+ "run_id": "20261017T054647Z-sim",
+ "mode": "sim",
+ "started_utc": "2026-10-17T05:46:47Z",
+ "finished_utc": "2026-10-17T05:46:55Z",
+ "config": {
+  "layout_source": "tools/layout/layout_final.json:update13_final",
+  "params_sha256": "f6cec6dedc96ab639d7358b41b1d82e8735c18112e582e65d055ce82b688b342",
+  "so101_revision": "5f6d2b876a53a4872e405b991dd925556c9e38a4",
+  "seed": 0
+ },
+ "protocol": {
+  "source": "preset",
+  "text": null,
+  "steps": [
+   {
+    "type": "TRANSFER",
+    "params": {
+     "beaker": "P1",
+     "src": "carousel_pick",
+     "dst": "scale_pan"
+    },
+    "label": "1 P1 carousel -> scale"
+   },
+   {
+    "type": "VERIFY_MASS",
+    "params": {
+     "beaker": "P1",
+     "target_g": 0.0,
+     "tol_g": 0.5
+    },
+    "label": "2 P1 is empty"
+   },
+   {
+    "type": "TRANSFER",
+    "params": {
+     "beaker": "P1",
+     "src": "scale_pan",
+     "dst": "carousel_pick"
+    },
+    "label": "3 P1 -> carousel"
+   }
+  ],
+  "validation": {
+   "ok": true,
+   "problems": []
+  },
+  "approved_by": "operator (sim)",
+  "approved_utc": "2026-10-17T05:46:49Z"
+ },
+ "steps": [
+  {
+   "index": 1,
+   "type": "TRANSFER",
+   "label": "1 P1 carousel -> scale",
+   "params": {
+    "beaker": "P1",
+    "src": "carousel_pick",
+    "dst": "scale_pan"
+   },
+   "status": "failed",
+   "reason": "safe stop: operator stop (dashboard)",
+   "t_start": 0.095,
+   "t_end": 6.423,
+   "target": {},
+   "measured": {},
+   "faults": []
+  },
+  {
+   "index": 2,
+   "type": "VERIFY_MASS",
+   "label": "2 P1 is empty",
+   "params": {
+    "beaker": "P1",
+    "target_g": 0.0,
+    "tol_g": 0.5
+   },
+   "status": "skipped",
+   "reason": "not run: safe stop: operator stop (dashboard)",
+   "t_start": null,
+   "t_end": null,
+   "target": {},
+   "measured": {},
+   "faults": []
+  },
+  {
+   "index": 3,
+   "type": "TRANSFER",
+   "label": "3 P1 -> carousel",
+   "params": {
+    "beaker": "P1",
+    "src": "scale_pan",
+    "dst": "carousel_pick"
+   },
+   "status": "skipped",
+   "reason": "not run: safe stop: operator stop (dashboard)",
+   "t_start": null,
+   "t_end": null,
+   "target": {},
+   "measured": {},
+   "faults": []
+  }
+ ],
+ "faults": [],
+ "events": [
+  {
+   "t": 0.095,
+   "kind": "step_start",
+   "index": 1,
+   "type": "TRANSFER",
+   "label": "1 P1 carousel -> scale"
+  },
+  {
+   "t": 4.515,
+   "kind": "grasp",
+   "arm": "transfer",
+   "outcome": "grasped",
+   "jaw_deg": 23.12,
+   "expected_deg": 22.94
+  },
+  {
+   "t": 6.411,
+   "kind": "stop_requested",
+   "reason": "operator stop (dashboard)"
+  },
+  {
+   "t": 6.423,
+   "kind": "safe_stop",
+   "reason": "operator stop (dashboard)"
+  },
+  {
+   "t": 6.424,
+   "kind": "stop_requested",
+   "reason": "operator stop (dashboard)"
+  },
+  {
+   "t": 6.428,
+   "kind": "safe_stop_hold",
+   "arm": "pourer",
+   "torque": true,
+   "jaw_deg": 21.71
+  },
+  {
+   "t": 6.428,
+   "kind": "safe_stop_hold",
+   "arm": "transfer",
+   "torque": true,
+   "jaw_deg": 23.12
+  }
+ ],
+ "traces": {},
+ "frames": [],
+ "video": null,
+ "summary": {
+  "passed": 0,
+  "failed": 1,
+  "skipped": 2
+ }
+}
