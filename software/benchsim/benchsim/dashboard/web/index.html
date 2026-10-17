@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wet Lab Bench Live</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">Wet Lab Bench <span class="muted">· live</span></div>
+  <span id="mode" class="badge">SIM</span>
+  <span id="state" class="pill">connecting…</span>
+  <span id="clock" class="metric">t = –</span>
+  <span id="rtf" class="metric muted"></span>
+  <span class="grow"></span>
+  <span id="toast" class="muted"></span>
+  <button id="btn-start" data-cmd="start">Start</button>
+  <button id="btn-stop" data-cmd="stop" class="danger">Stop</button>
+  <button id="btn-reset" data-cmd="reset">Reset</button>
+  <button id="btn-theme" title="Light / dark" aria-label="Toggle light or dark theme">◐</button>
+</header>
+
+<main class="grid">
+  <section class="left">
+    <div class="stage">
+      <img id="video" alt="Simulated bench camera">
+      <div id="novideo" class="novideo">no camera stream</div>
+      <div id="banner" class="banner" hidden></div>
+      <div id="armtag" class="armtag" hidden></div>
+      <div id="cams" class="cams" role="group" aria-label="Camera"></div>
+      <div class="caption">
+        <div id="cap-step" class="cap-step"></div>
+        <div id="cap-title" class="cap-title">Waiting for the bench…</div>
+        <div id="cap-meter" class="meter" hidden>
+          <div class="meter-track"><div id="cap-band" class="meter-band"></div><div id="cap-fill" class="meter-fill"></div><div id="cap-target" class="meter-target"></div></div>
+          <div id="cap-meter-text" class="meter-text"></div>
+        </div>
+      </div>
+    </div>
+    <ol id="timeline" class="timeline"></ol>
+    <div id="runner" class="muted small"></div>
+  </section>
+
+  <section class="right">
+    <article class="card" id="card-now">
+      <h2>Now</h2>
+      <div id="now-title" class="now-title">–</div>
+      <p id="now-detail" class="secondary"></p>
+      <div id="now-science" class="science" hidden></div>
+      <dl id="now-facts" class="facts"></dl>
+    </article>
+    <article class="card" id="card-chem">
+      <h2>Chemistry</h2>
+      <div id="chem" class="secondary small">Vessel contents appear once the full demo runner is attached.</div>
+    </article>
+    <article class="card" id="card-twin">
+      <h2>Twin: commanded vs measured</h2>
+      <div id="twin" class="secondary small">–</div>
+      <p class="muted small caveat">Servo encoders report where each servo believes it is. A tracking error shows here.
+        A wrong zero offset does not, because commanded and measured agree while the real arm is off; the grasp and scale checks catch that.</p>
+    </article>
+    <article class="card" id="card-wire">
+      <h2>Wire <span class="muted small">laptop ⇄ Mega (JSON lines) · laptop → arm servo buses</span></h2>
+      <div id="wire" class="wire"></div>
+      <div class="wire-legend muted small">→ sent · ← received. <span class="note">sampled</span> lines stand for streams: arm goals go out at 50 Hz and scale samples come in at 80 Hz, shown about once per 0.5 s and 1 s.</div>
+    </article>
+    <article class="card" id="card-errors">
+      <h2>Errors &amp; checks</h2>
+      <ul id="errors" class="errors"><li class="muted">none</li></ul>
+    </article>
+  </section>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>
