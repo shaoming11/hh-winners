@@ -40,6 +40,15 @@ def cmd_render(a):
         print(r.save_png(data, out / ('scene_%s.png' % cam), cam))
 
 
+def cmd_hw_check(a):
+    from .backends import real
+    rows = real.offline_checks(calibration_path=a.calibration)
+    if a.json: open(a.json, 'w').write(json.dumps(rows, indent=1))
+    n = {k: sum(r['status'] == k for r in rows) for k in ('PASS', 'FAIL', 'SKIP')}
+    print('hw-check: %s (%d passed, %d failed, %d skipped; no port opened)' % ('FAIL' if n['FAIL'] else 'PASS', n['PASS'], n['FAIL'], n['SKIP']))
+    if n['FAIL']: sys.exit(1)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog='python -m benchsim')
     sub = p.add_subparsers(dest='cmd', required=True)
@@ -48,6 +57,9 @@ def main(argv=None):
     sub.add_parser('view', help='open the interactive MuJoCo viewer with both arms parked').set_defaults(f=cmd_view)
     r = sub.add_parser('render', help='render PNGs of the parked bench'); r.add_argument('--cameras', default='overview,top,bench_cam,foam_cam')
     r.set_defaults(f=cmd_render)
+    h = sub.add_parser('hw-check', help='offline hardware checks (imports, calibration schema, firmware host test, protocol parity); opens no port')
+    h.add_argument('--calibration', help='hardware calibration JSON (default: benchsim/config/hardware_calibration.example.json)')
+    h.add_argument('--json', help='also write the check rows to this file'); h.set_defaults(f=cmd_hw_check)
     a = p.parse_args(argv); a.f(a)
 
 

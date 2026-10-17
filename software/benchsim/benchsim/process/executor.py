@@ -26,12 +26,16 @@ class Executor:
     def expected_contact(self, grasp):
         return math.radians(self.g['contact_deg_td'] if grasp.startswith('grasp_td') else self.g['contact_deg_side'])
 
-    def run(self, arm_name, segs, scale_station=None, label=''):
-        """run all segments; scale_station: 'src' | 'dst' | None tells which end sits on the scale"""
+    def run(self, arm_name, segs, scale_station=None, label='', start_holding=None):
+        """run all segments; scale_station: 'src' | 'dst' | None tells which end sits on the scale.
+        start_holding: grasp site name when the arm already holds a beaker (continuing a task after a pour)"""
         arm = self.arms[arm_name]; rec = dict(task=label, arm=arm_name, segments=[], grasps=[], scale=[])
         for other, a in self.arms.items():
             if other != arm_name: assert_parked(a, self.park)
         expected = None; picked = False
+        if start_holding:
+            expected = self.expected_contact(start_holding); picked = True; rec['_m_before'] = None
+            hold_q6 = expected - math.radians(self.g['squeeze_deg'])
         for k, sg in enumerate(segs):
             t0 = self.clock.now()
             try:

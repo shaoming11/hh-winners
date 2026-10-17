@@ -8,6 +8,31 @@ and foam are analytical models, not CFD.
 The original CAD planner in `software/tools/planner/` and `tools/layout/` is left untouched as the comparison
 implementation. Nothing here reads `~/fusion_bridge` or `~/so101`.
 
+## Status at a glance
+
+Reproduce every number below with one command (about 7 min; `--quick` takes about 4):
+
+```bash
+.venv/bin/python -m benchsim.reproduce
+```
+
+| Gate | Result (simulation) | Evidence |
+|---|---|---|
+| Layout | 13 station centres within 0.09 mm of update13_final; beakers settle within 0.11 mm, no penetration. Independent check: RK-03 STL fits the rack pockets to 0.000 mm, TT-04 to 0.12 mm | `reports/layout_report.md` |
+| Kinematics | 8 arm steps planned natively, contact-free (≤ 0.5 mm), free-motion clearance ≥ 3.1 mm. **6 pick/place rows miss the 10° rule**: the pourer side grasps at rack 1 (9.0–9.7°) and the scale (7.5–8.1°) | `reports/kinematics_report.md` |
+| CAD path mapping | **Approximate, not calibrated**: station endpoints 3.4–10.4 mm off; wrist-flex zero uncertain by about 1.7°. Recorded-path playback pending | `reports/kinematics_report.md` §1–2 |
+| Interfaces | 25/25: arm moves, stall detection, carousel, stage, tare, auger, 80 Hz stream, BADCMD/RANGE/BUSY/STATE/ESTOP, watchdog, jam, HX711 silent | `reports/exercise_report.json` |
+| Grasping | carousel→scale and rack→scale pass (held slip ≤ 0.01 mm, tilt ≤ 0.13°); a deliberate miss is detected from the jaw angle | `reports/grasp_demo/` |
+| Pouring | 10/10 within ±2 g (mean −0.28 g, SD 0.06 g); spills shown; funnel pour 38.6/39 g, landing ≤ 34 mm | `reports/pour_report.md` |
+| Auger, carousel, stage, foam | 10 doses of 7 g within ±0.7 g; stage 97.306 mm at 150°; 1.68 L O2; foam camera sees the column grow | `reports/mechanisms_report.md` |
+| Full demo | 12/12 step rows passed; developer 38.71 g, yeast 6.85 g (1 top-up), water +29.77 g, spill 0.002 g | `reports/demo_run/` (video, run log, notebook) |
+| Safe stop during a pour | beaker upright 1.2 s after the stop, still held, torque on | `reports/demo_safe_stop/` |
+| Language layer | text → vocabulary steps → validator → approval → simulation → notebook (preset fallback, no API key here) | `reports/demo_ai_protocol/`, `reports/ai_pipeline_example.json` |
+| Hardware handoff | real backend, firmware core (371 host checks) and bring-up guide; offline `hw-check` passes, no port opened | `docs/bringup.md`, `../../firmware/mega/` |
+
+Not claimed: a calibrated CAD-to-SO-101 trajectory mapping, a hardware digital twin, CFD, measured chemistry,
+or any run on real hardware.
+
 ## Setup
 
 Requires Python 3.11–3.13 and [uv](https://docs.astral.sh/uv/) (plain `pip` also works).
@@ -117,6 +142,130 @@ mjpython -m benchsim view                    # (macOS) interactive viewer; the d
 - **Evidence.** Carousel→scale grasps at 23.12° (expected 22.94°): the held beaker slips 0.01 mm and tilts 0.08°,
   and the scale rises 18.0 g on place. Rack→scale (pourer, GRIP_H 48) grasps at 8.09° (expected 7.72°) and the
   scale rises 19.3 g. With P1 removed, the jaw closes to 16.96°: a miss, so the step fails and the arm backs out.
+
+## Liquid, pouring, auger, stage and foam (phases 6–7)
+
+```bash
+.venv/bin/python -m benchsim.pour_trials          # 10 closed-loop pours, spill cases, funnel pour -> reports/pour_report.md
+.venv/bin/python -m benchsim.verify_mechanisms    # auger doses, carousel, stage, foam + camera -> reports/mechanisms_report.md
+```
+
+These are analytic models, not CFD. All coefficients are in `bench_params.toml` under `[liquid] [pour] [auger_model] [foam]`,
+and the ones marked *assumed* have no measurement behind them.
+- **Liquid** (`chem/liquid.py`): a tilted-cylinder volume and lip head for the held beaker, weir flow over the lip,
+  stream delay plus ballistic landing, and material that misses the receiver opening goes to the spill tally. The
+  liquid weight is applied to the beaker bodies, so the MuJoCo scale flexure and the HX711 model read it.
+- **Pour controller** (`process/pour.py`, no MuJoCo): architecture §5. A line-fit flow estimate, feed-forward plus PI
+  on flow, the cut law `a + b·q̂`, two-stage untilt, drip hold and bounded top-ups. Ki is 1.5 rather than the doc's
+  0.3, because 0.3 failed the doc's own ±1 g/s tracking criterion on the synthetic plant. In simulation: **10/10
+  pours within ±2 g (mean −0.28 g, SD 0.06 g, worst 0.38 g)**. Offsetting the receiver by 31–35 mm gives measured
+  spills of 16.5 g and 40.5 g and a pause. The funnel pour delivers 38.58 of 39 g, landing at most 34 mm off-axis
+  against the 40 mm limit.
+- **Auger** (`chem/auger.py`, `mechanisms.py`): g/rev with a per-revolution spread; yeast lands in the beaker under the
+  outlet; first pass at 85 %, scale check, at most 2 top-ups; stall rule, jam and hopper-empty faults. 10 doses of
+  7 g: all within ±0.7 g, with a −0.18 g mean bias that comes from the assumed `recover_dispenses = false`.
+- **Stage**: the MuJoCo slider-crank matches the analytic `s(θ)` within 0.0001 mm and gives **97.306 mm at 150°**.
+- **Foam** (`chem/foam.py`): induction delay plus first-order H2O2 decomposition, with soap trapping O2 as foam.
+  39 g of 12 % developer gives 1.68 L of O2 (demo_process: about 1.7 L). The foam column geom grows on the sled,
+  and the `foam_cam` pixel count of foam colour rises 2362 → 30869.
+
+## Full demo, run log and notebook (phases 8–9)
+
+```bash
+.venv/bin/python -m benchsim.demo_run                                   # 10-step demo -> runs/<id>/ (video, run_log.json, notebook)
+.venv/bin/python -m benchsim.demo_run --stop-during-pour --no-video     # safe stop in the middle of the developer pour
+.venv/bin/python -m benchsim.demo_run --protocol-text benchsim/ai/examples/elephant_toothpaste.txt --approve --no-video
+.venv/bin/python -m benchsim.ai --text benchsim/ai/examples/elephant_toothpaste.txt   # proposal + validation + approval only
+.venv/bin/python -m benchsim.collect_evidence runs/<id> demo_run        # copy a run into reports/
+```
+
+- **Sequencer** (`process/sequencer.py`, `process/skills.py`). Explicit states, per-step timeouts, and stop requests
+  honoured at safe points. On safe stop the Mega gets STOP, a pouring arm untilts, both arms hold with torque on,
+  and a gripper holding a beaker is never opened.
+- **Evidence run** (`reports/demo_run/`: `demo.mp4`, `run_log.json`, `notebook.md/.html`, scale, joint and pour traces,
+  camera frames). All 12 step rows passed:
+  - developer 38.71 g (−0.29)
+  - yeast 6.85 g (−0.15) after 1 top-up
+  - water +29.77 g (−0.23)
+  - funnel pours left 0.46 g and 0.39 g in the beakers
+  - spill 0.002 g, ERUPT reached
+  - 344 s of sim time in 107 s wall with video; the run is deterministic
+- **Safe stop during the pour** (`reports/demo_safe_stop/`). The beaker is upright 1.2 s after the stop, the pourer
+  still holds it with torque on, and 0.03 g spills. Every later step is skipped with the reason.
+- **Language layer** (`benchsim/ai/`). Protocol text is turned into steps from the fixed vocabulary only, then the
+  deterministic validator (`process/steps.validate`) checks them and the operator must approve (type `approve`, or
+  pass `--approve` on the command line). It never produces actuator commands. Without an API key it falls back to
+  the preset; `reports/demo_ai_protocol/` is that path run through simulation and the notebook.
+- **Process finding** (it depends on assumed foam parameters). In the documented order, step 9 (P2 back to the
+  carousel) comes before ERUPT. With the assumed kinetics (2 s induction, about 8 s half-life) the foam reaches the
+  flask neck 4.3 s after the slurry hits the peroxide, while the stage reaches ERUPT 35 s later, so the eruption
+  happens at WORK. `--erupt-before-return` swaps steps 9 and 10, but the pourer's own return still takes about
+  20 s. The real induction time needs measuring before relying on an eruption at the audience position.
+
+## Hardware handoff (phase 10)
+
+```bash
+.venv/bin/python -m benchsim hw-check        # offline: imports, calibration schema, firmware host test, protocol parity; opens no port
+```
+
+- `benchsim/backends/real.py` provides `make_real_bench(...)`, reached only through `make_bench('real', allow_hardware=True)`.
+  `--real` alone is refused. Live output needs `--real --i-understand-this-moves-hardware`, and `--dry-run` reads
+  without writing. Arms use LeRobot's Feetech bus (imported lazily), with radians ↔ ticks mapping from
+  `config/hardware_calibration.example.json` (schema `benchsim.hardware_calibration/1`). The Mega uses
+  `SerialTransport` at 250000 baud, opened with `dtr=False, rts=False`. Torque and goal writes are disabled until
+  the caller turns dry-run off.
+- `firmware/mega/wlb_mega/` is the Arduino Mega 2560 sketch: pins per `docs/electrical.md` §4, Timer4 50 Hz PWM
+  with D6/D7/D8 low at boot, HX711 at 80 SPS, auger feedback with the stall rule, e-stop latch, 500 ms watchdog and
+  the same JSON-lines protocol. `protocol_core.cpp` builds on the host: 371 checks pass under ASan/UBSan, including
+  CRC and validation parity with `benchsim.protocol`. Differences from SimMega are listed in `firmware/mega/README.md`.
+- `docs/bringup.md` maps the electrical bring-up tests E1–E10 to exact commands and pass criteria.
+- Not done: no avr-gcc or arduino-cli build here, no hardware attached, and the LeRobot adapter has only been
+  checked against a stub API.
+
+## Fidelity
+
+| Part | Visual | Collision / model |
+|---|---|---|
+| SO-101 arms (2) | upstream meshes, TheRobotStudio/SO-ARM100 `5f6d2b8` | upstream link hulls; upstream position actuators (3.35 N·m) |
+| Fin-ray gripper GR-01/02/03 | **CAD meshes**, exported in assembly coordinates, placed by the as-built fit | GR-01/02 hulls + one 4 mm box per finger face; weld grasp (see phase 5) |
+| RK-03 rack, TT-04 ring, WS-02 pan, ST-11 sled | **CAD meshes**, placed by feature fits (0.000–0.12 mm) | procedural cups, pocket bore + rib band, pan ring, sled plate |
+| TT-02 deck, TT-01 base, ST-05 collar, ST-07 catch well, ST-12/13/14 stage parts | **CAD meshes**, placed from CAD part frames or by concentric assumption (labelled) | procedural; the crank-rod-sled is a closed MuJoCo chain |
+| Frame rails, scale base, auger post and head, flask, funnel, beakers | **procedural** | boxes, convex frustum hulls, 20-box hollow beaker walls |
+| Load cell + HX711 | – | **analytic**: slide-joint flexure, 80 SPS, counts, noise, quantisation |
+| Liquid, auger dose, foam | – | **analytic** (`chem/`), not CFD or granular simulation |
+
+The full table, with sources and placement residuals, is in `reports/layout_report.md`.
+
+## Assumptions, calibration needs, failure cases
+
+**Calibration needed on the bench**, before the simulator's numbers mean anything for hardware:
+1. The CAD→SO-101 joint mapping, or new taught poses. Endpoints are 3.4–10.4 mm off and the wrist-flex zero is
+   uncertain by about 1.7°.
+2. The pourer side-grasp picks at rack 1 and the scale miss the 10° rule in the MJCF model (best 9.0° and 7.5°;
+   the planner reported 11.6° and 10.4° on its CAD model). Verify on the bench with JG-04 and JG-06 first, as
+   demo_process §8 says.
+3. Gripper contact angles: side 7.72° (design) and top-down 22.94° (from simulation), plus the 0.6 N·m torque
+   limit and the 3° / 2.5° classification thresholds.
+4. Scale: counts per gram, noise, flexure stiffness. Auger: g/rev, its spread, and whether the yeast in a
+   reverse quarter-turn is recovered (that assumption causes the −0.18 g dose bias).
+5. Pour: the cut law `a`/`b`, the fill offset (9.2 mL, from simulation), the lip-flow coefficient and the stream
+   delay. Ki 1.5 replaces the doc's 0.3.
+6. Foam: induction time and rate. These decide whether the eruption happens at ERUPT (see the process finding above).
+7. Hardware: camera pose and intrinsics, Mega pulse calibration (E8/E10), arm tick zeros (`docs/bringup.md`).
+
+**Modelling assumptions.** A held beaker is a weld, not compliant TPU contact. Liquid weight is an external force
+on the beaker, with no slosh or viscosity. P2's tare is taken equal to P1's. Long waits fast-forward with physics
+frozen. Flask, funnel and table dimensions are assumed. There is no documented camera viewpoint.
+
+**Known failure cases and limits.**
+- Recorded CAD paths collide by 3–14 mm at approaches and picks if replayed. That includes the planner's top-down
+  frame, which puts the beaker inside the fixed finger.
+- A top-down lift above about +55 mm is out of reach (wrist flex), so the transfer arm carries at +20 mm.
+- With the assumed foam kinetics, the documented step order erupts at WORK.
+- The pour manifolds need up to 17° of joint motion per degree of tilt at θ 85–96°, so the funnel pour lags by
+  up to 6.5°.
+- Spilled liquid is not weighed even if it lands on the pan.
+- SimMega and the firmware differ in auger stall counting and TT/ST stall detection (see `firmware/mega/README.md`).
 
 ## Conventions
 

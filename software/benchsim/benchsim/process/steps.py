@@ -66,7 +66,8 @@ def validate(steps, initial=None):
     for i, st in enumerate(steps):
         p = st.params; tag = 'step %d (%s)' % (i + 1, st.type)
         if st.type not in STEP_TYPES: problems.append('%s: unknown step type' % tag); continue
-        if stage == 'ERUPT': problems.append('%s: nothing may run after ERUPT' % tag)
+        if stage == 'ERUPT' and not (st.type == 'TRANSFER' and p.get('dst') == 'carousel_pick'):
+            problems.append('%s: only returning a beaker to the carousel may run after ERUPT' % tag)
         def need(*keys):
             miss = [k for k in keys if k not in p]
             if miss: problems.append('%s: missing %s' % (tag, ', '.join(miss)))

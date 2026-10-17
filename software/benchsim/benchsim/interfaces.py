@@ -82,8 +82,10 @@ class MegaClient:
             self._keepalive(); self.clock.sleep(poll)
 
     def command(self, cmd, timeout=2.0, **args):
-        """send and wait for ack/ok (raises MegaError on err)"""
-        return self.wait(self.send(cmd, **args), timeout=timeout)
+        """send and wait for ack/ok (raises MegaError on err). A successful CLR also clears the host's fault list."""
+        r = self.wait(self.send(cmd, **args), timeout=timeout)
+        if cmd == 'CLR' and r.get('ok'): self.faults.clear()
+        return r
 
     def motion(self, cmd, done_timeout, heartbeat=0.1, on_tick=None, **args):
         """send a TT/ST/AUG, wait for ack, then for done (heartbeats keep the comm watchdog alive)"""

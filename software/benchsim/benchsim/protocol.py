@@ -16,7 +16,9 @@ Host -> Mega commands (``cmd`` plus a host sequence number ``seq``):
     CAL  {"counts_per_g": k}          scale calibration                           (ok)
     STREAM {"on": bool}               start / stop the 80 Hz scale sample stream  (ok)
     STOP                              stop the auger, hold both servos where they are (ok; always accepted)
-    CLR                               clear latched faults; ESTOP only once the e-stop is released (ok | err STATE)
+    CLR  [{"home": true}]             clear latched faults; ESTOP only once the e-stop is released (ok | err STATE).
+                                      The firmware also needs home:true to accept TT/ST after a lost position
+                                      (interrupted move or blank EEPROM); SimMega ignores the key
     HB                                heartbeat for the 500 ms comm watchdog      (no reply)
 
 Mega -> host:
