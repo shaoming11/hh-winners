@@ -1,0 +1,162 @@
+{
+ "additionalProperties": false,
+ "properties": {
+  "id": {
+   "title": "Id",
+   "type": "string"
+  },
+  "name": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Name"
+  },
+  "role": {
+   "anyOf": [
+    {
+     "enum": [
+      "operator",
+      "student",
+      "guest",
+      "observer"
+     ],
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Role"
+  },
+  "channel": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Channel"
+  },
+  "preferred_channel": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Preferred Channel"
+  },
+  "space_id": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Space Id"
+  },
+  "subscribed": {
+   "anyOf": [
+    {
+     "type": "boolean"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "description": "legacy: True == notify_on all",
+   "title": "Subscribed"
+  },
+  "notify_on": {
+   "anyOf": [
+    {
+     "items": {
+      "enum": [
+       "critical",
+       "warning",
+       "run_complete",
+       "approvals",
+       "all"
+      ],
+      "type": "string"
+     },
+     "type": "array"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Notify On"
+  },
+  "quiet_hours": {
+   "anyOf": [
+    {
+     "additionalProperties": true,
+     "type": "object"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "description": "{'start':'23:00','end':'08:00','tz':'America/New_York'}; criticals still go through",
+   "title": "Quiet Hours"
+  },
+  "notes": {
+   "items": {
+    "additionalProperties": true,
+    "type": "object"
+   },
+   "title": "Notes",
+   "type": "array"
+  },
+  "first_seen": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "First Seen"
+  },
+  "last_seen": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Last Seen"
+  }
+ },
+ "required": [
+  "id"
+ ],
+ "title": "Person",
+ "type": "object",
+ "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

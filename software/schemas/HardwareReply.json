@@ -1,0 +1,66 @@
+{
+ "additionalProperties": false,
+ "properties": {
+  "v": {
+   "default": "0.1.0",
+   "title": "V",
+   "type": "string"
+  },
+  "id": {
+   "title": "Id",
+   "type": "string"
+  },
+  "ok": {
+   "title": "Ok",
+   "type": "boolean"
+  },
+  "err": {
+   "anyOf": [
+    {
+     "enum": [
+      "RANGE",
+      "BUSY",
+      "STATE",
+      "UNKNOWN",
+      "ESTOP",
+      "REJECTED",
+      "NOT_CONNECTED",
+      "NEEDS_APPROVAL",
+      "VALIDATION",
+      "TIMEOUT",
+      "INTERNAL",
+      "EXPIRED"
+     ],
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "title": "Err"
+  },
+  "message": {
+   "default": "",
+   "title": "Message",
+   "type": "string"
+  },
+  "data": {
+   "additionalProperties": true,
+   "description": "cmd-specific payload (status, weight, request_id, run_id)",
+   "title": "Data",
+   "type": "object"
+  },
+  "ts": {
+   "title": "Ts",
+   "type": "string"
+  }
+ },
+ "required": [
+  "id",
+  "ok"
+ ],
+ "title": "HardwareReply",
+ "type": "object",
+ "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

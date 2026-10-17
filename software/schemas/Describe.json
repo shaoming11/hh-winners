@@ -1,0 +1,45 @@
+{
+ "additionalProperties": false,
+ "description": "Prose-ready facts for a chat reply (same wording as the frontend's status line).",
+ "properties": {
+  "headline": {
+   "description": "one sentence: what the bench is doing",
+   "title": "Headline",
+   "type": "string"
+  },
+  "detail": {
+   "default": "",
+   "description": "one or two sentences: doses so far, what is waiting on whom",
+   "title": "Detail",
+   "type": "string"
+  },
+  "needs_human": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "description": "one sentence if a person has to do something, else null",
+   "title": "Needs Human"
+  },
+  "ts": {
+   "title": "Ts",
+   "type": "string"
+  },
+  "last_event_id": {
+   "default": 0,
+   "title": "Last Event Id",
+   "type": "integer"
+  }
+ },
+ "required": [
+  "headline"
+ ],
+ "title": "Describe",
+ "type": "object",
+ "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

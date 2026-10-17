@@ -1,0 +1,1042 @@
+{
+ "$defs": {
+  "ApprovalCmd": {
+   "additionalProperties": false,
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "approval",
+     "default": "approval",
+     "title": "Kind",
+     "type": "string"
+    },
+    "request_id": {
+     "title": "Request Id",
+     "type": "string"
+    },
+    "decision": {
+     "enum": [
+      "approve",
+      "reject"
+     ],
+     "title": "Decision",
+     "type": "string"
+    },
+    "by": {
+     "title": "By",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "request_id",
+    "decision",
+    "by"
+   ],
+   "title": "ApprovalCmd",
+   "type": "object"
+  },
+  "ArmGoalsCmd": {
+   "additionalProperties": false,
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "arm_goals",
+     "default": "arm_goals",
+     "title": "Kind",
+     "type": "string"
+    },
+    "role": {
+     "enum": [
+      "pourer",
+      "transfer"
+     ],
+     "title": "Role",
+     "type": "string"
+    },
+    "goals": {
+     "additionalProperties": {
+      "type": "number"
+     },
+     "description": "joint -> degrees; subset of JOINTS",
+     "title": "Goals",
+     "type": "object"
+    },
+    "duration_s": {
+     "default": 2.0,
+     "description": "interpolation time",
+     "exclusiveMinimum": 0,
+     "maximum": 30,
+     "title": "Duration S",
+     "type": "number"
+    }
+   },
+   "required": [
+    "id",
+    "role",
+    "goals"
+   ],
+   "title": "ArmGoalsCmd",
+   "type": "object"
+  },
+  "ArmStationCmd": {
+   "additionalProperties": false,
+   "description": "Move an arm to a pre-planned, collision-checked station pose (no free IK from outside).",
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "arm_station",
+     "default": "arm_station",
+     "title": "Kind",
+     "type": "string"
+    },
+    "role": {
+     "enum": [
+      "pourer",
+      "transfer"
+     ],
+     "title": "Role",
+     "type": "string"
+    },
+    "station": {
+     "enum": [
+      "carousel_pick",
+      "scale",
+      "funnel",
+      "rack_developer",
+      "rack_water",
+      "park"
+     ],
+     "title": "Station",
+     "type": "string"
+    },
+    "phase": {
+     "default": "carry",
+     "enum": [
+      "approach",
+      "grasp",
+      "carry"
+     ],
+     "title": "Phase",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "role",
+    "station"
+   ],
+   "title": "ArmStationCmd",
+   "type": "object"
+  },
+  "ArmTorqueCmd": {
+   "additionalProperties": false,
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "arm_torque",
+     "default": "arm_torque",
+     "title": "Kind",
+     "type": "string"
+    },
+    "role": {
+     "enum": [
+      "pourer",
+      "transfer"
+     ],
+     "title": "Role",
+     "type": "string"
+    },
+    "on": {
+     "title": "On",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "id",
+    "role",
+    "on"
+   ],
+   "title": "ArmTorqueCmd",
+   "type": "object"
+  },
+  "AugerCmd": {
+   "additionalProperties": false,
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "auger",
+     "default": "auger",
+     "title": "Kind",
+     "type": "string"
+    },
+    "rev": {
+     "description": "revolutions; negative = reverse (anti-jam)",
+     "maximum": 50,
+     "minimum": -50,
+     "title": "Rev",
+     "type": "number"
+    }
+   },
+   "required": [
+    "id",
+    "rev"
+   ],
+   "title": "AugerCmd",
+   "type": "object"
+  },
+  "CarouselCmd": {
+   "additionalProperties": false,
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "carousel",
+     "default": "carousel",
+     "title": "Kind",
+     "type": "string"
+    },
+    "deg": {
+     "description": "absolute deck angle; +90 = P2 under the auger",
+     "maximum": 720,
+     "minimum": -720,
+     "title": "Deg",
+     "type": "number"
+    },
+    "ms": {
+     "default": 4000,
+     "maximum": 60000,
+     "minimum": 500,
+     "title": "Ms",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "id",
+    "deg"
+   ],
+   "title": "CarouselCmd",
+   "type": "object"
+  },
+  "GripperCmd": {
+   "additionalProperties": false,
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "gripper",
+     "default": "gripper",
+     "title": "Kind",
+     "type": "string"
+    },
+    "role": {
+     "enum": [
+      "pourer",
+      "transfer"
+     ],
+     "title": "Role",
+     "type": "string"
+    },
+    "action": {
+     "enum": [
+      "open",
+      "close"
+     ],
+     "title": "Action",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "role",
+    "action"
+   ],
+   "title": "GripperCmd",
+   "type": "object"
+  },
+  "MegaSimpleCmd": {
+   "additionalProperties": false,
+   "description": "the parameterless commands of the benchsim/firmware protocol (benchsim.protocol).\nWeight and mechanism positions are not asked for: they arrive on the sample stream and in\nExperimentState.",
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "mega",
+     "default": "mega",
+     "title": "Kind",
+     "type": "string"
+    },
+    "cmd": {
+     "enum": [
+      "ping",
+      "stop",
+      "clr",
+      "hb"
+     ],
+     "title": "Cmd",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "cmd"
+   ],
+   "title": "MegaSimpleCmd",
+   "type": "object"
+  },
+  "Plan": {
+   "additionalProperties": false,
+   "properties": {
+    "title": {
+     "title": "Title",
+     "type": "string"
+    },
+    "steps": {
+     "items": {
+      "$ref": "#/$defs/PlanStep"
+     },
+     "title": "Steps",
+     "type": "array"
+    },
+    "source": {
+     "default": "manual",
+     "enum": [
+      "llm",
+      "preset",
+      "manual",
+      "agent"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "notes": {
+     "default": "",
+     "title": "Notes",
+     "type": "string"
+    }
+   },
+   "required": [
+    "title",
+    "steps"
+   ],
+   "title": "Plan",
+   "type": "object"
+  },
+  "PlanStep": {
+   "additionalProperties": false,
+   "description": "One step of benchsim.process.steps.  `params` is checked by `steps.validate`, the only\ngate before execution - it is deliberately an open dict here so the two never drift.",
+   "properties": {
+    "type": {
+     "enum": [
+      "TRANSFER",
+      "POUR_TO_SCALE",
+      "POUR_TO_FUNNEL",
+      "CAROUSEL",
+      "DOSE_YEAST",
+      "VERIFY_MASS",
+      "WAIT",
+      "STAGE"
+     ],
+     "title": "Type",
+     "type": "string"
+    },
+    "params": {
+     "additionalProperties": true,
+     "description": "per-type params; see benchsim.process.steps",
+     "title": "Params",
+     "type": "object"
+    },
+    "label": {
+     "default": "",
+     "title": "Label",
+     "type": "string"
+    }
+   },
+   "required": [
+    "type"
+   ],
+   "title": "PlanStep",
+   "type": "object"
+  },
+  "Recipe": {
+   "additionalProperties": false,
+   "properties": {
+    "developer_g": {
+     "default": 39.0,
+     "title": "Developer G",
+     "type": "number"
+    },
+    "yeast_g": {
+     "default": 7.0,
+     "title": "Yeast G",
+     "type": "number"
+    },
+    "water_g": {
+     "default": 30.0,
+     "title": "Water G",
+     "type": "number"
+    },
+    "activate_s": {
+     "default": 60.0,
+     "title": "Activate S",
+     "type": "number"
+    }
+   },
+   "title": "Recipe",
+   "type": "object"
+  },
+  "RunControlCmd": {
+   "additionalProperties": false,
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "run_control",
+     "default": "run_control",
+     "title": "Kind",
+     "type": "string"
+    },
+    "action": {
+     "enum": [
+      "pause",
+      "resume",
+      "safe_stop",
+      "abort",
+      "reset"
+     ],
+     "title": "Action",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "action"
+   ],
+   "title": "RunControlCmd",
+   "type": "object"
+  },
+  "RunPlanCmd": {
+   "additionalProperties": false,
+   "description": "Validate a plan, request operator approval (unless pre-approved), then run it.",
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "run_plan",
+     "default": "run_plan",
+     "title": "Kind",
+     "type": "string"
+    },
+    "plan": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Plan"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "omit to run the preset with `recipe`"
+    },
+    "recipe": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Recipe"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "protocol_text": {
+     "default": "",
+     "description": "the plain-English protocol the plan came from",
+     "title": "Protocol Text",
+     "type": "string"
+    },
+    "operator": {
+     "default": "",
+     "title": "Operator",
+     "type": "string"
+    },
+    "speed": {
+     "default": 1.0,
+     "exclusiveMinimum": 0,
+     "maximum": 1.0,
+     "title": "Speed",
+     "type": "number"
+    },
+    "only": {
+     "anyOf": [
+      {
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "step-name prefixes to run, e.g. ['1','2']",
+     "title": "Only"
+    },
+    "approved": {
+     "default": false,
+     "description": "true = skip the approval gate (operator at the bench)",
+     "title": "Approved",
+     "type": "boolean"
+    },
+    "requested_by": {
+     "default": "",
+     "description": "who asked for this run (chat handle / name); the approver goes in `operator`",
+     "title": "Requested By",
+     "type": "string"
+    },
+    "idempotency_key": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "e.g. the chat message id; a repeat returns the first reply instead of a second request",
+     "title": "Idempotency Key"
+    }
+   },
+   "required": [
+    "id"
+   ],
+   "title": "RunPlanCmd",
+   "type": "object"
+  },
+  "StageCmd": {
+   "additionalProperties": false,
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "stage",
+     "default": "stage",
+     "title": "Kind",
+     "type": "string"
+    },
+    "position": {
+     "anyOf": [
+      {
+       "enum": [
+        "WORK",
+        "ERUPT"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "named position (preferred)",
+     "title": "Position"
+    },
+    "deg": {
+     "anyOf": [
+      {
+       "maximum": 150,
+       "minimum": 0,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "raw crank angle if no position",
+     "title": "Deg"
+    },
+    "ms": {
+     "default": 2500,
+     "maximum": 20000,
+     "minimum": 1500,
+     "title": "Ms",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "id"
+   ],
+   "title": "StageCmd",
+   "type": "object"
+  },
+  "StreamCmd": {
+   "additionalProperties": false,
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "stream",
+     "default": "stream",
+     "title": "Kind",
+     "type": "string"
+    },
+    "on": {
+     "title": "On",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "id",
+    "on"
+   ],
+   "title": "StreamCmd",
+   "type": "object"
+  },
+  "TareCmd": {
+   "additionalProperties": false,
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "tare",
+     "default": "tare",
+     "title": "Kind",
+     "type": "string"
+    },
+    "seconds": {
+     "default": 0.5,
+     "exclusiveMinimum": 0,
+     "maximum": 5,
+     "title": "Seconds",
+     "type": "number"
+    }
+   },
+   "required": [
+    "id"
+   ],
+   "title": "TareCmd",
+   "type": "object"
+  }
+ },
+ "discriminator": {
+  "mapping": {
+   "approval": "#/$defs/ApprovalCmd",
+   "arm_goals": "#/$defs/ArmGoalsCmd",
+   "arm_station": "#/$defs/ArmStationCmd",
+   "arm_torque": "#/$defs/ArmTorqueCmd",
+   "auger": "#/$defs/AugerCmd",
+   "carousel": "#/$defs/CarouselCmd",
+   "gripper": "#/$defs/GripperCmd",
+   "mega": "#/$defs/MegaSimpleCmd",
+   "run_control": "#/$defs/RunControlCmd",
+   "run_plan": "#/$defs/RunPlanCmd",
+   "stage": "#/$defs/StageCmd",
+   "stream": "#/$defs/StreamCmd",
+   "tare": "#/$defs/TareCmd"
+  },
+  "propertyName": "kind"
+ },
+ "oneOf": [
+  {
+   "$ref": "#/$defs/CarouselCmd"
+  },
+  {
+   "$ref": "#/$defs/StageCmd"
+  },
+  {
+   "$ref": "#/$defs/AugerCmd"
+  },
+  {
+   "$ref": "#/$defs/MegaSimpleCmd"
+  },
+  {
+   "$ref": "#/$defs/StreamCmd"
+  },
+  {
+   "$ref": "#/$defs/TareCmd"
+  },
+  {
+   "$ref": "#/$defs/ArmGoalsCmd"
+  },
+  {
+   "$ref": "#/$defs/ArmTorqueCmd"
+  },
+  {
+   "$ref": "#/$defs/GripperCmd"
+  },
+  {
+   "$ref": "#/$defs/ArmStationCmd"
+  },
+  {
+   "$ref": "#/$defs/RunPlanCmd"
+  },
+  {
+   "$ref": "#/$defs/RunControlCmd"
+  },
+  {
+   "$ref": "#/$defs/ApprovalCmd"
+  }
+ ],
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "HardwareCommand"
+}
