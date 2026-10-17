@@ -8,17 +8,17 @@
 </head>
 <body>
 <header class="bar">
-  <div class="brand">Wet Lab Bench <span class="muted">· live</span></div>
+  <div class="brand">Wet Lab Bench <span id="brand-mode" class="muted">· live</span></div>
   <span id="mode" class="badge">SIM</span>
   <span id="state" class="pill">connecting…</span>
   <span id="clock" class="metric">t = –</span>
-  <span id="rtf" class="metric muted"></span>
+  <span id="rtf" class="metric muted live-only"></span>
   <span class="grow"></span>
   <span id="speeds" class="speeds" role="group" aria-label="Playback speed"></span>
   <span id="toast" class="muted"></span>
-  <button id="btn-start" data-cmd="start">Start</button>
-  <button id="btn-stop" data-cmd="stop" class="danger">Stop</button>
-  <button id="btn-reset" data-cmd="reset">Reset</button>
+  <button class="live-only" id="btn-start" data-cmd="start">Start</button>
+  <button id="btn-stop" data-cmd="stop" class="danger live-only">Stop</button>
+  <button class="live-only" id="btn-reset" data-cmd="reset">Reset</button>
   <button id="btn-theme" title="Light / dark" aria-label="Toggle light or dark theme">◐</button>
 </header>
 
@@ -29,7 +29,7 @@
       <div id="novideo" class="novideo">no camera stream</div>
       <div id="banner" class="banner" hidden></div>
       <div id="armtag" class="armtag" hidden></div>
-      <div id="cams" class="cams" role="group" aria-label="Camera"></div>
+      <div id="cams" class="cams live-only" role="group" aria-label="Camera"></div>
       <div class="caption">
         <div id="cap-step" class="cap-step"></div>
         <div id="cap-title" class="cap-title">Waiting for the bench…</div>

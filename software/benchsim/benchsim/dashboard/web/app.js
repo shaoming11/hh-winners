@@ -11,6 +11,7 @@ const ARM = { pourer: 'Pourer arm (west)', transfer: 'Transfer arm (east)' };
 
 let last = null;
 let wireSeen = 0;
+let replayVideo = null;   // the <video> element in replay mode
 
 // ------------------------------------------------------------------ connection
 function connect() {
@@ -40,12 +41,15 @@ function render(s) {
 const SPEEDS = [0.5, 1, 2, 4, 8];
 let speedKey = '';
 function renderSpeeds(s) {
-  const r = s.probes && s.probes.runner; const cur = r ? r.speed : null;
+  const r = s.probes && s.probes.runner; const cur = replayVideo ? replayVideo.playbackRate : (r ? r.speed : null);
   if (String(cur) === speedKey) return;
   speedKey = String(cur);
   $('speeds').innerHTML = SPEEDS.map((x) => '<button data-speed="' + x + '" class="' + (x === cur ? 'on' : '') + '" title="' + x + '× real time">' + x + '×</button>').join('');
 }
-$('speeds').addEventListener('click', (e) => { const b = e.target.closest('button[data-speed]'); if (b) command('speed/' + b.dataset.speed); });
+$('speeds').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-speed]'); if (!b) return;
+  if (replayVideo) { replayVideo.playbackRate = Number(b.dataset.speed); speedKey = ''; renderSpeeds(last); } else command('speed/' + b.dataset.speed);
+});
 
 // Chemistry: categorical slots in fixed order (validated: dataviz validator, both themes); text carries every value too
 const SPECIES = [['developer', 'H₂O₂ developer', '--s1'], ['yeast', 'yeast', '--s2'], ['water', 'water', '--s3'], ['soap', 'soap', '--s4'], ['dye', 'dye', '--s5']];
@@ -246,8 +250,47 @@ $('btn-theme').addEventListener('click', () => {
   try { localStorage.setItem('wlb-theme', root.dataset.theme); } catch (e) { /* storage unavailable */ }
 });
 try { const t = localStorage.getItem('wlb-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) { /* storage unavailable */ }
-const video = $('video');
-video.addEventListener('load', () => { $('novideo').hidden = true; });
-video.addEventListener('error', () => { $('novideo').hidden = false; });
-video.src = '/stream.mjpg';
-connect();
+// ------------------------------------------------------------------ replay (python -m benchsim.dashboard --replay RUN_DIR)
+const upto = (arr, t) => {   // index of the last item with .t <= t, or -1
+  let lo = 0, hi = arr.length - 1, ans = -1;
+  while (lo <= hi) { const m = (lo + hi) >> 1; if (arr[m].t <= t) { ans = m; lo = m + 1; } else hi = m - 1; }
+  return ans;
+};
+
+async function startReplay() {
+  let r;
+  try { r = await fetch('/replay/tape.json'); } catch (e) { return false; }
+  if (!r.ok) return false;
+  const tape = await r.json();
+  document.body.classList.add('replay'); $('brand-mode').textContent = '· replay';
+  const v = document.createElement('video');
+  v.src = '/replay/video.mp4'; v.controls = true; v.muted = true; v.playsInline = true;
+  $('video').replaceWith(v); $('novideo').hidden = true; replayVideo = v;
+  const ft = tape.frame_t; let lastKey = ''; let lastWire = -1;
+  const tick = () => {
+    const i = Math.max(0, Math.min(ft.length - 1, Math.floor(v.currentTime * tape.fps)));
+    const t = ft.length ? ft[i] : 0;
+    const si = Math.max(0, upto(tape.snaps, t)); const wi = upto(tape.wire, t); const ei = upto(tape.events, t);
+    const key = si + '|' + wi + '|' + ei + '|' + t.toFixed(1);
+    if (key !== lastKey && tape.snaps.length) {
+      if (wi < lastWire) { $('wire').innerHTML = ''; wireSeen = 0; }   // scrubbed backwards
+      lastKey = key; lastWire = wi;
+      last = Object.assign({}, tape.snaps[si], { t: t, wire: tape.wire.slice(Math.max(0, wi - 79), wi + 1),
+                                                 events: tape.events.slice(Math.max(0, ei - 39), ei + 1) });
+      render(last);
+      $('mode').textContent = 'REPLAY';
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+  return true;
+}
+
+startReplay().then((replaying) => {
+  if (replaying) return;
+  const img = $('video');
+  img.addEventListener('load', () => { $('novideo').hidden = true; });
+  img.addEventListener('error', () => { $('novideo').hidden = false; });
+  img.src = '/stream.mjpg';
+  connect();
+});

@@ -17,6 +17,7 @@ from ..layout import load_params
 from ..process import sequencer, skills
 from ..process import steps as S
 from .feed import Feed
+from .tape import Tape
 from .twin import Twin
 
 OUT = paths.RUNS / 'dashboard'
@@ -112,8 +113,9 @@ class Runner:
 
     SPEEDS = (0.5, 1.0, 2.0, 4.0, 8.0)
 
-    def __init__(self, hub, make_run=make_run, speed=1.0, video=None, out_root=OUT, seed=0):
+    def __init__(self, hub, make_run=make_run, speed=1.0, video=None, out_root=OUT, seed=0, record=True):
         self.hub = hub; self.make_run = make_run; self.speed = speed; self.video = video; self.out_root = out_root; self.seed = seed
+        self.record = record and video is not None; self.tape = None; self.last_tape = None
         self.cmds = queue.Queue(); self.stop_flag = False; self.phase = 'building'; self.result = None; self.run_obj = None
 
     # ------------------------------------------------------------------ called from HTTP threads
@@ -146,10 +148,15 @@ class Runner:
         if self.stop_flag and ctx.stop_reason is None: ctx.request_stop('operator stop (dashboard)')
 
     def _info(self):
-        return dict(name=self.run_obj.name, phase=self.phase, speed=self.speed, rtf=self.pacer.rtf, out=str(self.run_obj.rl.dir))
+        return dict(name=self.run_obj.name, phase=self.phase, speed=self.speed, rtf=self.pacer.rtf, out=str(self.run_obj.rl.dir),
+                    recording=self.tape is not None, replay=None if self.last_tape is None else str(self.last_tape.parent))
+
+    def _publish(self, snap):
+        self.hub.publish(snap)
+        if self.tape is not None: self.tape.snap(snap)
 
     def build(self):
-        self.phase = 'building'; self.stop_flag = False; self.result = None
+        self.phase = 'building'; self.stop_flag = False; self.result = None; self.last_tape = None
         r = self.run_obj = self.make_run(self.out_root, self.seed); bb = r.bb
         self.pacer = Pacer(bb.clock, self.speed)
         probes = dict(r.probes, runner=self._info)
@@ -157,7 +164,7 @@ class Runner:
             self.video.snapshot = lambda: self.feed.last
             probes['video'] = lambda: dict(camera=self.video.camera, shown=self.video.shown, cameras=self.video.cameras())
         twin = Twin(bb.world.m) if bb.world is not None else None
-        self.feed = Feed(bb, self.hub.publish, ledger=r.ledger, twin=twin, probes=probes).attach(r.seq)
+        self.feed = Feed(bb, self._publish, ledger=r.ledger, twin=twin, probes=probes).attach(r.seq)
         self.feed.plan(r.steps)
         r.seq.ctx.on_tick_hooks.append(self._stop_hook)
         if bb.world is not None:
@@ -166,12 +173,16 @@ class Runner:
         self.phase = 'ready'; self.feed.flush()
 
     def _start(self):
+        if self.record:
+            self.tape = self.video.tape = Tape(self.run_obj.rl.dir, self.video.fps)
         self.phase = 'running'; self.pacer.reset(); self.feed.flush()
         try:
             self.result = out = self.run_obj.run()
             self.run_obj.finish(out)
         finally:
             self.phase = 'finished'; self.feed.flush()
+            if self.tape is not None:
+                tape = self.tape; self.tape = self.video.tape = None; self.last_tape = tape.close(); self.feed.flush()
 
     def loop(self, max_idle_s=None):
         """serve commands until 'quit' (or max_idle_s without one, for tests)"""

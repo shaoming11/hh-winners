@@ -4,6 +4,7 @@ server only through ``Hub`` (latest snapshot JSON, latest JPEG, one Condition).
 
     GET  /                 index.html (web/)          GET /events        text/event-stream, one snapshot per message
     GET  /app.js, ...      other files in web/        GET /stream.mjpg   multipart/x-mixed-replace JPEG frames
+    GET  /replay/...       tape.json + video.mp4 (replay mode only; byte ranges supported)
     GET  /api/snapshot     latest snapshot JSON       POST /api/<cmd>    start | stop | reset | camera/<name>  ->  {"ok", "message"}
 """
 import http.server
@@ -70,7 +71,18 @@ def make_handler(hub, control, web=WEB, extra_files=None):
                 pass
 
         def _file(self, p):
-            self._send(200, p.read_bytes(), TYPES.get(p.suffix, 'application/octet-stream'))
+            """whole file, or one byte range (a <video> needs ranges to seek)"""
+            ctype = TYPES.get(p.suffix, 'application/octet-stream'); size = p.stat().st_size
+            rng = self.headers.get('Range', '')
+            if not rng.startswith('bytes='): return self._send(200, p.read_bytes(), ctype)
+            a, _, b = rng[6:].split(',')[0].partition('-')
+            start = int(a) if a else max(0, size - int(b)); end = min(size - 1, int(b)) if (a and b) else size - 1
+            if start >= size or start > end:
+                self.send_response(416); self.send_header('Content-Range', 'bytes */%d' % size); self.end_headers(); return
+            with open(p, 'rb') as f: f.seek(start); body = f.read(end - start + 1)
+            self.send_response(206); self.send_header('Content-Type', ctype); self.send_header('Accept-Ranges', 'bytes')
+            self.send_header('Content-Range', 'bytes %d-%d/%d' % (start, end, size)); self.send_header('Content-Length', str(len(body)))
+            self.end_headers(); self.wfile.write(body)
 
         def do_POST(self):
             if not self.path.startswith('/api/'): return self._send(404, b'not found', 'text/plain')

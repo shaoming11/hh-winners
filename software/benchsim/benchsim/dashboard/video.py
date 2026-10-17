@@ -27,6 +27,7 @@ class Video:
         """snapshot: callable -> the latest feed snapshot (for 'auto')"""
         self.hub = hub; self.camera = camera; self.fps = fps; self.size = (width, height); self.quality = quality
         self.snapshot = snapshot or (lambda: None); self.w = None; self.r = None; self.next_t = 0.0; self.shown = None
+        self.tape = None                                   # a dashboard.tape.Tape while a run is recorded
 
     def cameras(self):
         return [self.w.m.camera(i).name for i in range(self.w.m.ncam)] if self.w is not None else []
@@ -46,16 +47,17 @@ class Video:
 
     def hook(self, w):
         if w.time + 1e-9 < self.next_t: return
-        self.next_t = w.time + 1.0 / self.fps; self.push()
+        self.next_t = w.time + 1.0 / self.fps; rgb = self.push()
+        if self.tape is not None: self.tape.frame(rgb, w.time)
 
     def current(self):
         return auto_camera(self.snapshot()) if self.camera == 'auto' else self.camera
 
     def push(self):
         from PIL import Image
-        cam = self.current(); buf = io.BytesIO()
-        Image.fromarray(self.r.frame(self.w.d, cam)).save(buf, 'JPEG', quality=self.quality)
-        self.shown = cam; self.hub.frame(buf.getvalue())
+        cam = self.current(); buf = io.BytesIO(); rgb = self.r.frame(self.w.d, cam)
+        Image.fromarray(rgb).save(buf, 'JPEG', quality=self.quality)
+        self.shown = cam; self.hub.frame(buf.getvalue()); return rgb
 
     def idle(self):
         """between runs nothing moves; re-render only when the chosen camera changes"""

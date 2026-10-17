@@ -142,3 +142,23 @@ def test_full_demo_through_the_dashboard_runner(tmp_path):
     assert pours and all(p['scale_start_g'] is not None for p in pours)
     assert any('"cmd":"AUG"' in w['text'] for s in snaps for w in s['wire']) and any('"cmd":"ST"' in w['text'] for s in snaps for w in s['wire'])
     assert (r.run_obj.rl.dir / 'run_log.json').exists()
+
+
+def test_recorded_run_replays_with_byte_ranges(tmp_path):
+    from benchsim.dashboard import runner as R, server, tape as T, video as V
+    hub = server.Hub(); cam = V.Video(hub, fps=10.0, width=320, height=180)
+    r = R.Runner(hub, make_run=lambda o, s: R.make_run(o, s, dev=True), speed=0, video=cam, out_root=tmp_path)
+    r.build(); r.control('start'); r._start()
+    tape_p, video_p = T.load(r.run_obj.rl.dir)
+    d = json.loads(tape_p.read_text())
+    assert d['schema'] == T.SCHEMA and abs(len(d['frame_t']) - 10 * d['frame_t'][-1]) < 15
+    assert [s['steps'][0]['status'] for s in d['snaps']].count('running') >= 1 and d['snaps'][-1]['seq_state'] == 'DONE'
+    assert any('"cmd":"TARE"' in w['text'] for w in d['wire']) and json.loads(hub.snap)['probes']['runner']['replay']
+    srv = server.serve(server.Hub(), lambda c: (False, 'replay'), port=0, extra_files={'/replay/tape.json': tape_p, '/replay/video.mp4': video_p})
+    base = 'http://127.0.0.1:%d' % srv.server_address[1]
+    try:
+        resp = urllib.request.urlopen(urllib.request.Request(base + '/replay/video.mp4', headers={'Range': 'bytes=100-199'}))
+        assert resp.status == 206 and len(resp.read()) == 100 and resp.headers['Content-Range'].endswith('/%d' % video_p.stat().st_size)
+        assert json.loads(urllib.request.urlopen(base + '/replay/tape.json').read())['fps'] == 10.0
+    finally:
+        srv.shutdown()

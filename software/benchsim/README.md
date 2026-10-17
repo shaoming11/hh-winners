@@ -308,6 +308,7 @@ Known disagreements found so far (the JSON coordinates are authoritative):
 .venv/bin/python -m benchsim.dashboard --speed 2       # 2x real time (also switchable live: 0.5x to 8x)
 .venv/bin/python -m benchsim.dashboard --dev           # quick 3-step transfer protocol instead of the full demo
 .venv/bin/python -m benchsim.dashboard --host 0.0.0.0  # reachable from a second screen on the LAN
+.venv/bin/python -m benchsim.dashboard --replay runs/dashboard/<run_id>   # play back a recorded run, no simulation
 ```
 
 A browser page for the audience. It shows the sim camera with the current step drawn over it (auto camera: close-up
@@ -329,6 +330,11 @@ The page uses only the standard library and plain HTML/JS: no npm and no build s
 - **Full demo.** `runner.DemoRun` mirrors `demo_run.SimDemo.run`, whose Sequencer is built inside `run()` and so
   cannot be watched from outside. `tests/test_dashboard.py` runs it to DONE, which catches drift between the two. A
   2-line `on_sequencer` hook in `SimDemo.run` would remove the mirror.
+- **Record and replay (demo-day insurance).** Every run writes `dashboard.mp4` (the camera view the audience saw) and
+  `tape.json` (the overlay data) into its `runs/dashboard/<run_id>/` folder (`--no-record` turns this off). `--replay`
+  plays the video with the same overlay, synced to sim time, so scrubbing works both ways and the speed buttons set
+  the playback rate. If the live sim struggles on the demo laptop, replay a run recorded beforehand. At 8× the live sim
+  reaches about 3.3× on a recent Mac with rendering and recording on; the header shows the actual speed.
 - **Twin limit.** Commanded and measured angles both come from the servos' encoders. A tracking error (stall,
   collision, overload) shows in the Twin card; a wrong servo zero does not. The grasp jaw-angle and scale checks catch
   that physically.
