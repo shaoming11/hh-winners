@@ -1,0 +1,26 @@
+[project]
+name = "benchsim"
+version = "0.1.0"
+description = "MuJoCo simulation of the Wet Lab Bench (two SO-101 arms, scale, carousel, auger, stage)"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "mujoco==3.16.0",
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "imageio>=2.34",
+  "imageio-ffmpeg>=0.5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+hardware = ["pyserial>=3.5"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["benchsim*"]
+
+[tool.setuptools.package-data]
+benchsim = ["config/*.toml", "config/*.json"]

@@ -1,0 +1,148 @@
+# Wet Lab Bench simulator parameters. Units: millimetres, degrees, grams, seconds.
+# Station centres are NOT here: they come from tools/layout/layout_final.json key update13_final
+# (see benchsim/layout.py). This file holds the dimensions update13_final does not record, each with
+# its source. "assumed" means no project source was found; those values are listed in the README
+# assumptions table and need measurement on the bench.
+
+[world]
+# docs/demo_process.md 2.1: +X east, +Y north, table top Z 0
+table_xy = [-80.0, -80.0, 1000.0, 760.0]   # table top extent drawn in the scene (x0, y0, x1, y1), assumed
+timestep_s = 0.001
+
+[frame]
+section = 20.0                              # 2020 extrusion
+rail_top_z = 20.0                           # rails lie on the table (tools/cad/stage_b.py: riders on rail tops at Z 20)
+# name = [x0, y0, x1, y1]; source in the comment
+[frame.rails]
+Y_left  = [245.0, 290.0, 265.0, 690.0]      # demo_process 2.2: Y-left Y 290-690; tape X datum = west face X 245
+Y_right = [665.0, 270.0, 685.0, 670.0]      # demo_process 2.2: Y 270-670; X rails 400 long from X 265 -> X 665
+X_front = [265.0, 572.5, 665.0, 592.5]      # update13_final X_rails.front_centre_Y 582.5 (centre +-10)
+X_back  = [265.0, 642.3, 665.0, 662.3]      # update13_final X_rails.rear_centre_Y 652.3
+E6      = [265.0, 430.0, 665.0, 450.0]      # tools/cad/stage_a.py: X265-665, Y430-450
+S1      = [360.0, 30.0, 380.0, 430.0]       # tools/cad/stage_a.py: X360-380, Y30-430
+S2      = [520.0, 30.0, 540.0, 430.0]       # tools/cad/stage_a.py: X520-540, Y30-430
+
+[arm]
+# SO-101 base frame: upstream MJCF +X (arm forward at pan 0) points to world -Y (south), as in the CAD
+# as-built pose where the arm plane faces straight out of the base (tools/layout/urdf_limits.py: pan offset 0).
+base_yaw_deg = -90.0
+pan_axis_in_base = [38.8353, 0.0]           # upstream so101_new_calib.xml shoulder body x offset
+base_z = 22.4                               # rail top 20 + 2.4 (upstream base mesh sits 2.4 mm below its frame);
+                                            # the CAD as-built fit gives 22.5 (benchsim/cadmap.py)
+park_deg_cad = [30.0, 60.0, -150.0, 30.0, 0.0]   # tools/layout/anim_paths.json "park" (CAD convention)
+# STS3215 (LeRobot SO-101): speed and torque used to rate-limit and saturate joint goals
+max_speed_deg_s = 180.0                     # assumed conservative (no-load ~ 270 deg/s at 7.4 V)
+grip_force_limit_nm = 0.6                   # gripper closes to a torque limit (demo_process 3); assumed value
+
+[beaker]
+# EISCO 100 mL PP, 56 x 74 (demo_process 3, DUMMY-BEAKER STL 56x74); wall/floor from _beaker_wall/_floor STLs
+od = 56.0
+height = 74.0
+wall = 1.2
+floor = 1.2
+empty_mass_g = 18.0                         # assumed
+lip_radius = 28.0
+
+[scale]
+# WS-01 v4 on E6, WS-02 v3 pan (80 dia, 14 tall, 100 mL ring) -> exports/prints_v2 STL extents
+pan_od = 80.0
+pan_height = 14.0
+ring_id = 57.0                              # 100 mL locating ring, 0.5 mm radial clearance: assumed
+base_size = [117.0, 67.8, 45.0]             # WS-01 STL extent
+saddle_x = [547.0, 664.0]                   # update13_final scale.mount
+pan_mass_g = 45.0                           # assumed (PLA pan + screws)
+stiffness_n_per_m = 20000.0                 # 1 kg bar cell, ~0.5 mm at full scale: assumed flexure model
+damping_ratio = 0.25                        # assumed
+rate_hz = 80.0                              # electrical.md 5 (RATE mod)
+noise_g = 0.07                              # electrical.md 5: 0.05-0.1 g at 80 SPS
+counts_per_g = 420.0                        # HX711 at gain 128 with a 1 kg cell, typical: assumed
+quant_counts = 1                            # one count quantisation
+
+[carousel]
+# TT-04 v4 ring, 4 pockets at r 84 (update13_final + layout_final.py World: pocket walls r 28.3-30.3, Z 58.6-70.6)
+pitch_r = 84.0
+pocket_ids_deg = [220.6, 310.6, 40.6, 130.6]   # pocket angles at deck angle 0 (pick, +90, auger, +270); layout_final.py LAY
+pocket_inner_r = 28.3
+pocket_wall_r = 30.3
+ring_z = [58.6, 70.6]
+ring_od = 216.6                             # TT-04 v4 STL extent
+deck_od = 236.0                             # TT-02 STL extent
+deck_z = [51.6, 58.6]                       # 7 mm deck under the ring
+base_size = [151.3, 110.0, 43.0]            # TT-01 v2 STL extent
+# motion: docs/software_architecture.md 7.4 (historical) gives >= 2 s per 45 deg; same limit kept
+min_s_per_45deg = 2.0
+deck_range_deg = [-10.0, 280.0]             # M45CHW 270-deg servo travel plus trim: assumed
+timeout_extra_s = 2.0                       # architecture 4: commanded duration + 2 s
+
+[auger]
+# DH-01 v5 head on PS-01 v2 post; outlet 169.5 above the table (demo_process step 5)
+outlet_z = 169.5
+outlet_d = 10.0
+post_size = [40.0, 52.0, 160.0]             # PS-01 v2 STL extent
+head_size = [90.0, 131.0, 70.0]             # DH-01 v5 STL extent
+g_per_rev_nominal = 0.85                    # assumed until the electrical.md E8 calibration
+g_per_rev_cv = 0.06                         # rev-to-rev coefficient of variation: assumed
+rev_s = 1.2                                 # one revolution at the dosing pulse: assumed
+first_pass_frac = 0.85                      # electrical.md 6
+max_topups = 2                              # electrical.md 6
+reverse_rev = 0.25                          # electrical.md 6
+stall_window_s = 0.150                      # electrical.md 6: < 5 deg in 150 ms
+stall_min_deg = 5.0
+max_stalls = 3
+hopper_empty_g_per_10rev = 1.0
+max_revs = 50.0                             # architecture 7.4: > 50 rev -> RANGE
+dose_timeout_s = 60.0                       # architecture 4
+
+[stage]
+# tools/cad/stage_b.py: crank r 50 at (450, 77), rod 80; WORK = crank 0 deg (pin Y 207); demo_process 3: limit 150 deg
+crank_centre = [450.0, 77.0]
+crank_r = 50.0
+rod_l = 80.0
+work_deg = 0.0
+erupt_deg = 150.0
+expected_travel_mm = 97.3
+move_s = 2.5                                # demo_process step 10
+sled_plate_z = [3.0, 9.0]
+sled_size_xy = [138.0, 154.0]               # ST-11 plate X 381-519, Y 196-350 at WORK
+timeout_extra_s = 2.0
+
+[flask]
+# 250 mL Erlenmeyer (borosilicate, standard narrow neck): assumed nominal dimensions
+base_od = 85.0
+height = 145.0
+neck_od = 34.0
+neck_id = 28.0
+neck_h = 30.0
+collar = [126.0, 23.0]                      # ST-05 STL extent (od, h)
+catch_well = [130.0, 90.0]                  # ST-07 STL extent (od, h)
+soap_ml = 15.0                              # demo_process recipe
+
+[funnel]
+# REF-FUNNEL-EISCO4; rim Z 233 and axis from update13_final; 100 mm (4 in) rim assumed from the name
+rim_d = 100.0
+stem_od = 16.0
+cone_h = 70.0
+stem_h = 45.0
+
+[rack]
+# RK-03 one-piece rack; beaker bottom Z 60.2 from update13_final
+cup_wall = 2.4
+cup_h = 72.2                                # RK-03 STL height
+cup_inner_r = 28.6                          # 0.6 mm radial clearance: assumed
+
+[gripper]
+# fin-ray gripper; geometry from software/tools/planner/gripper_design.json and the GR-0x STLs in prints_v2
+# MuJoCo gripper joint = CAD q6 + offset. The offset is a modelling convention, not a hardware calibration.
+cad_to_mj_offset_deg = 55.0
+contact_tol_deg = 3.0                       # observed jaw angle within this of the expected contact angle = grasp
+miss_margin_deg = 2.5                       # observed jaw closing this far past the contact angle = miss
+
+[recipe]
+# demo_process 1: targets and design tolerances
+developer_g = 39.0
+developer_tol_g = 2.0
+yeast_g = 7.0
+yeast_tol_g = 0.7
+water_g = 30.0
+water_tol_g = 2.0
+activate_wait_s = 60.0
