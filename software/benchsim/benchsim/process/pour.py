@@ -99,9 +99,8 @@ class PourController:
         self.res = PourResult(target_g=self.target, tol_g=self.tol)
         self.state = None; self.theta = 0.0; self.t_state = 0.0; self.t0 = None
         self.n_drop = 0; self.m_base = None; self.integ = 0.0; self.theta_ff = 0.0; self.theta_cut = None
-        self.pulses = 0; self.t_pulse = 0.0; self.t_first = None; self.untilt_to = None; self.pause_code = None; self.deficit_since = None
+        self.pulses = 0; self.pulses_at_ramp = 0; self.t_pulse = 0.0; self.t_first = None; self.untilt_to = None; self.pause_code = None; self.deficit_since = None
         self.theta_pause = vtable.theta_crit_deg(c['low_fill_ml'] - c['fill_offset_ml'])
-        self._last_q_set = None
 
     # ---------------------------------------------------------------- helpers
     def _go(self, state, t, **ev):
@@ -198,7 +197,9 @@ class PourController:
                 if self.pause_code: self._finish(t, 'PAUSE_' + self.pause_code)
                 elif mean < self.target - self.tol:
                     if self.pulses >= c['max_topup_pulses']: self._finish(t, 'PAUSE_TOPUP_LIMIT'); self.res.reason = 'short after %d top-up pulses' % self.pulses
-                    else: self._go('TOPUP_RAMP', t, short_g=round(self.target - mean, 3))
+                    elif self._cut_due(mean, 0.0):                         # the cut law would stop any top-up at once (a >= shortfall)
+                        self._finish(t, 'PAUSE_TOPUP_LIMIT'); self.res.reason = 'short by %.2f g but the cut law holds at zero flow' % (self.target - mean)
+                    else: self.pulses_at_ramp = self.pulses; self._go('TOPUP_RAMP', t, short_g=round(self.target - mean, 3))
                 else: self._finish(t, 'OVERSHOOT' if mean > self.target + self.tol else 'OK')
         elif st == 'TOPUP_RAMP':
             goal = self.theta_cut - c['topup_back_deg']
@@ -206,7 +207,7 @@ class PourController:
             if self.theta >= goal - 1e-9: self.t_pulse = t; self._go('TOPUP_PULSE', t)
         elif st in ('TOPUP_PULSE', 'TOPUP_FLOW'):
             q_set = c['topup_flow_g_s']
-            if self._cut_due(m, q): self._start_cut(t, q, 'cut')
+            if (st == 'TOPUP_FLOW' or self.pulses > self.pulses_at_ramp) and self._cut_due(m, q): self._start_cut(t, q, 'cut')
             elif st == 'TOPUP_PULSE' and q > c['topup_flow_g_s']: self._go('TOPUP_FLOW', t, q=round(q, 3))
             elif st == 'TOPUP_FLOW' and q < c['topup_flow_g_s']: self.t_pulse = t; self._go('TOPUP_PULSE', t, q=round(q, 3))
             elif st == 'TOPUP_PULSE' and t - self.t_pulse >= c['topup_period_s']:
@@ -216,7 +217,6 @@ class PourController:
                     self.theta = min(self.theta + c['topup_step_deg'], c['theta_max_deg']); self.pulses += 1; self.t_pulse = t
                     self.res.events.append(dict(t=round(t - self.t0, 3), pulse=self.pulses, theta=round(self.theta, 2)))
         self.res.max_theta_deg = round(max(self.res.max_theta_deg or 0.0, self.theta), 2)
-        if q_set is not None: self._last_q_set = q_set
         self.res.trace.append((round(t - self.t0, 4), self.state, round(self.theta, 3), round(m, 4), round(q, 4), None if q_set is None else round(q_set, 3)))
         return self.theta
 

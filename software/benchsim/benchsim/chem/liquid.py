@@ -175,8 +175,10 @@ class LiquidModel:
     the receiver opening (beakers: inner radius at the rim; funnel: rim radius -> 'flask') or ``ledger.spill``.
 
     Register it after the Ledger so its impact force is added after the Ledger has written the weight forces.
-    Read-only views for reports: ``stream`` (latest per-source state), ``landings`` (one row per landed parcel batch,
-    decimated), ``flow_log`` (per-source totals)."""
+    Read-only views for reports: ``q_ml_s`` / ``head`` (current lip flow and head per beaker), ``stream`` (latest state of
+    each flowing source), ``landings`` (one row per landed parcel), ``totals`` (poured / caught / spilled grams) and
+    ``in_flight_g()``. Parcels in flight live here, not in the Ledger. SimWorld.idle freezes the model (no ``idle`` hook):
+    do not fast-forward while a beaker is pouring."""
 
     def __init__(self, world, ledger, cfg=None):
         if ledger not in world.plugins: raise ValueError('register the Ledger before the LiquidModel')
