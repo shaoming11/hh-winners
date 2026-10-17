@@ -309,10 +309,12 @@ Known disagreements found so far (the JSON coordinates are authoritative):
 .venv/bin/python -m benchsim.dashboard --dev           # quick 3-step transfer protocol instead of the full demo
 .venv/bin/python -m benchsim.dashboard --host 0.0.0.0  # reachable from a second screen on the LAN
 .venv/bin/python -m benchsim.dashboard --replay runs/dashboard/<run_id>   # play back a recorded run, no simulation
+.venv/bin/python -m benchsim.dashboard --plain         # bare MuJoCo scene, without the camera look below
 ```
 
 A browser page for the audience. It shows the sim camera with the current step drawn over it (auto camera: close-up
-for transfers and dosing, flask camera for the eruption) and a 12-step timeline. Four cards sit beside them:
+for transfers and dosing, pour and funnel close-ups for the pours, a wide eruption camera from the moment the foam
+leaves the neck) and a 12-step timeline. Four cards sit beside them:
 - **Now:** what is happening, the chemical and amount, the timeout, and the tightest verified gap.
 - **Chemistry:** contents of every vessel from the ledger, plus O₂ and the foam column.
 - **Twin:** where the plan puts each gripper vs where the servos say it is, in mm, against the step's clearance.
@@ -338,5 +340,15 @@ The page uses only the standard library and plain HTML/JS: no npm and no build s
 - **Twin limit.** Commanded and measured angles both come from the servos' encoders. A tracking error (stall,
   collision, overload) shows in the Twin card; a wrong servo zero does not. The grasp jaw-angle and scale checks catch
   that physically.
+- **Camera look (`benchsim.fx`).** The dashboard video and its replays are drawn with a look added at render time:
+  a lab room, glossy glass, liquids coloured by what the ledger says is in them, pour streams on the liquid model's
+  ballistic arc (thinning as they speed up, drops at a trickle, splash and ripples where they land), liquid running
+  through the funnel into the flask, yeast falling from the auger, and an elephant-toothpaste eruption sized by the
+  foam model: the column rises from the neck, topples back into the funnel once it reaches `column_max_mm`, fills the
+  cone, spills over the rim and piles up in the catch well, tinted by the dye in the flask. These geoms exist only in
+  each frame's scene copy, so the model, the physics and every reported number are unchanged, and the vision camera
+  and `verify_mechanisms` still render the plain scene. Marker sites (the grey balls) are hidden in every offscreen
+  render. `python -m benchsim.fx.preview` writes plain | fx stills of a pour, the funnel pour, a dose and the eruption
+  to `runs/fx_preview/` in a few seconds; drawing costs about 1-5 ms per frame.
 - **Real hardware.** Not wired yet. The feed and twin only use the `ArmBackend`/`MegaClient` interfaces, so a runner
   built on `make_bench('real', ...)` can attach the same `Feed`, with a twin built from `scene.build()`.
