@@ -13,7 +13,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
-hardware = ["pyserial>=3.5"]
+hardware = ["pyserial>=3.5", "lerobot[feetech]>=0.3"]     # lerobot is imported lazily, only by benchsim.backends.real
 ai = ["anthropic>=1.15"]                   # optional language layer (benchsim.ai); tested with 1.15.0
 
 [build-system]
