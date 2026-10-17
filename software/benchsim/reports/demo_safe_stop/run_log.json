@@ -1,12 +1,12 @@
 {
  "schema": "benchsim.runlog/1",
- "run_id": "20261017T052753Z-sim",
+ "run_id": "20261017T054106Z-sim",
  "mode": "sim",
- "started_utc": "2026-10-17T05:27:53Z",
- "finished_utc": "2026-10-17T05:27:58Z",
+ "started_utc": "2026-10-17T05:41:06Z",
+ "finished_utc": "2026-10-17T05:41:11Z",
  "config": {
   "layout_source": "tools/layout/layout_final.json:update13_final",
-  "params_sha256": "62c630552aa8327f6f60432fb84a5fbf45ce353076f6e634765750a02bea095a",
+  "params_sha256": "f6cec6dedc96ab639d7358b41b1d82e8735c18112e582e65d055ce82b688b342",
   "so101_revision": "5f6d2b876a53a4872e405b991dd925556c9e38a4",
   "seed": 0
  },
@@ -126,7 +126,7 @@
    "problems": []
   },
   "approved_by": "operator (sim, preset)",
-  "approved_utc": "2026-10-17T05:27:54Z"
+  "approved_utc": "2026-10-17T05:41:06Z"
  },
  "steps": [
   {
@@ -587,8 +587,25 @@
   },
   "notes": [],
   "sim_seconds": 48.89,
-  "wall_seconds": 4.2,
+  "wall_seconds": 4.7,
   "stop_during_pour_test": true,
+  "final_state": {
+   "held": {
+    "pourer": "dev"
+   },
+   "torque": {
+    "pourer": true,
+    "transfer": true
+   },
+   "beaker_tilt_deg": {
+    "P1": 0.05,
+    "P2": 0.06,
+    "dev": 0.39,
+    "water": 0.0
+   },
+   "foam_at_neck_s": null,
+   "erupt_done_s": null
+  },
   "assumptions": [
    "P2 tare taken equal to P1 (never weighed empty in the documented run)",
    "liquid, auger and foam parameters are analytic-model values from bench_params.toml (many assumed)",

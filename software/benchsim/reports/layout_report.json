@@ -561,7 +561,7 @@
   {
    "part": "carousel TT-01/TT-02/TT-04 v4",
    "visual": "procedural",
-   "collision": "cylinders + 20-box pocket walls",
+   "collision": "cylinders + 20-box pocket bore (r 30.6) + 3 mm rib band (r 28.3)",
    "source": "update13_final carousel + layout_final.py pocket walls r28.3-30.3",
    "note": "deck on a hinge with a position servo"
   },

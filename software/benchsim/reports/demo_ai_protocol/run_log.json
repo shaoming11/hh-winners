@@ -1,12 +1,12 @@
 {
  "schema": "benchsim.runlog/1",
- "run_id": "20261017T052814Z-sim",
+ "run_id": "20261017T054112Z-sim",
  "mode": "sim",
- "started_utc": "2026-10-17T05:28:14Z",
- "finished_utc": "2026-10-17T05:28:52Z",
+ "started_utc": "2026-10-17T05:41:12Z",
+ "finished_utc": "2026-10-17T05:41:51Z",
  "config": {
   "layout_source": "tools/layout/layout_final.json:update13_final",
-  "params_sha256": "62c630552aa8327f6f60432fb84a5fbf45ce353076f6e634765750a02bea095a",
+  "params_sha256": "f6cec6dedc96ab639d7358b41b1d82e8735c18112e582e65d055ce82b688b342",
   "so101_revision": "5f6d2b876a53a4872e405b991dd925556c9e38a4",
   "seed": 0
  },
@@ -126,7 +126,7 @@
    "problems": []
   },
   "approved_by": "command line",
-  "approved_utc": "2026-10-17T05:28:14Z",
+  "approved_utc": "2026-10-17T05:41:12Z",
   "approval": {
    "approved": true,
    "approved_by": "command line",
@@ -134,7 +134,7 @@
    "reason": "pre-approved with --approve; validation passed",
    "approver": "command line --approve",
    "plan_sha256": "0e62c7f158946fcdf69214f5fa86649e85280178cb555c4af69ee209b3706423",
-   "utc": "2026-10-17T05:28:13Z",
+   "utc": "2026-10-17T05:41:11Z",
    "validation_ok": true
   }
  },
@@ -1282,7 +1282,7 @@
    "top-up 1: 0.92 g short, 1.10 rev"
   ],
   "sim_seconds": 344.5,
-  "wall_seconds": 38.5,
+  "wall_seconds": 39.4,
   "stop_during_pour_test": false,
   "final_state": {
    "held": {},
