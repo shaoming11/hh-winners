@@ -1,0 +1,29 @@
+WET LAB BENCH - FINAL PRINT PLAN   (Central time, Wed Oct 14 -> Thu Oct 15)
+Hard stop: everything off the beds by 08:00 Thu. Plan finishes by 05:30 = 2.5 h margin.
+Times assume each printer started at ~15:10 and 10 min per plate change. If you started later, shift that printer's column.
+
+A1  (white PLA + TPU 95A)                          start  -> end
+  1  PS-01 auger post (2h11)                        15:10 -> 17:21
+  2  TPU 95A: GR-03 fin-ray fingers x4 (3h26)       17:31 -> 20:57   <- load TPU; TEST-FIT 1 finger on a GR-01 tongue
+  3  WS-01 v3 scale base + FX-01 joiner (2h08)      21:07 -> 23:15
+  4  CAL-01 x2 calibration blocks (2h43)            23:25 -> 02:08   DROPPABLE (only for arm calibration at the venue)
+
+H2D (white PLA)
+  1  GR-01 x2 + GR-02 x2 gripper bodies (5h05)      15:10 -> 20:15
+  2  DH-01 v4 auger head (2h37, tree supports)      20:25 -> 23:02
+  3  Stage set: ST-11 sled, ST-12 bridge,           23:12 -> 05:30   <- start before bed; runs overnight
+     ST-13 crank, ST-14 rod, ST-15 x2 (6h18)
+
+X2  (white PLA; slice these STLs yourself with the X2 profile, 15 % infill, 4 walls; times estimated)
+  1  TT-04 beaker ring (2h08)                       15:10 -> 17:18
+  2  TT-01 v2 turntable base (3h28)                 17:28 -> 20:56
+  3  DH-02 v3 auger screw x2 (1h47; 99 % infill,    21:06 -> 22:53
+     tree supports, stand on the flange)
+  4  WS-02 scale pan + ST-08 x6 spacers (0h44)      23:03 -> 23:47
+  5  RK-02 reagent rack (2h05)                      23:57 -> 02:02   <- may still change with the arm-reach layout fix;
+                                                                       I will tell you by ~19:00 if it does
+  6  CAL-02 calibration probe (1h12)                02:12 -> 03:24   DROPPABLE
+
+If something fails: reprint it on whichever printer is free next; drop CAL-01/CAL-02 first.
+Already printed and still valid: TT-02 deck, TT-03 horn spacer, ST-05 flask collar, ST-07 catch well, TC-01, TL-01.
+No longer used (do not reprint): ST-01, ST-02, ST-03, ST-04 tray, ST-09, AG-01, old DH-01/DH-02, old WS-01 v1/v2.
