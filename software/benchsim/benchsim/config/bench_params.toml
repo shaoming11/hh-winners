@@ -155,3 +155,19 @@ yeast_tol_g = 0.7
 water_g = 30.0
 water_tol_g = 2.0
 activate_wait_s = 60.0
+
+[vision]
+# Shared image checks (benchsim.vision), applied identically to sim renders and webcam frames. Calibrated on the sim
+# bench_cam render at 640 x 480 (numbers below); assumed for the webcam until measured with the real print colours
+# and lighting on the bench.
+roi_margin_px = 4                           # padding around a projected beaker ROI: assumed
+beaker_s_max = 0.25                         # HSV saturation below this ...
+beaker_v_min = 0.55                         # ... and value above this = clear/white PP wall: assumed
+beaker_min_frac = 0.495                     # sim pick pocket: 0.620 with P1, 0.371 empty (midpoint). Not for the
+                                            # white scale pan (0.660 vs 0.554): use the reference test there
+reference_diff_min = 8.0                    # mean |RGB difference| (0-255) to an empty-station frame. Sim: 45.5 pick,
+                                            # 29.3 scale with a beaker, 0 without; webcam noise allowance assumed
+foam_rgb = [245.0, 245.0, 240.0]            # undyed foam, near white: assumed
+foam_rgb_tol = 45.0                         # Euclidean RGB distance: assumed
+foam_row_min_frac = 0.3                     # a ROI row is foam when this fraction of it is foam-coloured: assumed
+foam_max_gap_rows = 2                       # gap tolerated inside the foam column: assumed
