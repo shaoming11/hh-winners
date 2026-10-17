@@ -17,6 +17,7 @@ from ..layout import load_params
 from ..process import sequencer, skills
 from ..process import steps as S
 from .feed import Feed
+from .twin import Twin
 
 OUT = paths.RUNS / 'dashboard'
 DEV_PROTOCOL = [S.Step('TRANSFER', dict(beaker='P1', src='carousel_pick', dst='scale_pan'), '1 P1 carousel -> scale'),
@@ -109,7 +110,8 @@ class Runner:
         if self.video is not None:
             self.video.snapshot = lambda: self.feed.last
             probes['video'] = lambda: dict(camera=self.video.camera, shown=self.video.shown, cameras=self.video.cameras())
-        self.feed = Feed(bb, self.hub.publish, ledger=r.ledger, probes=probes).attach(r.seq)
+        twin = Twin(bb.world.m) if bb.world is not None else None
+        self.feed = Feed(bb, self.hub.publish, ledger=r.ledger, twin=twin, probes=probes).attach(r.seq)
         self.feed.plan(r.steps)
         r.seq.ctx.on_tick_hooks.append(self._stop_hook)
         if bb.world is not None:

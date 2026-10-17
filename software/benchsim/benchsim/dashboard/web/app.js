@@ -33,7 +33,7 @@ function toast(msg) {
 
 // ------------------------------------------------------------------ render
 function render(s) {
-  renderBar(s); renderCams(s); renderTimeline(s); renderCaption(s); renderNow(s); renderWire(s); renderErrors(s);
+  renderBar(s); renderCams(s); renderTimeline(s); renderCaption(s); renderNow(s); renderTwin(s); renderWire(s); renderErrors(s);
 }
 
 const CAM = { auto: 'Auto', overview: 'Overview', bench_cam: 'Close-up', top: 'Top', foam_cam: 'Flask' };
@@ -128,6 +128,43 @@ function renderNow(s) {
   if (s.scale.g !== null) facts.push(['Scale', fmt(s.scale.g, 1) + ' g' + (s.scale.rate_hz ? ' · ' + s.scale.rate_hz + ' samples/s' : '')]);
   if (n.clearance) facts.push(['Tightest gap', n.clearance.mm + ' mm (' + n.clearance.between + ')']);
   $('now-facts').innerHTML = facts.map(([k, v]) => '<dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd>').join('');
+}
+
+const TIGHTEST_MM = 5.3;   // smallest verified clearance in the demo (held beaker vs funnel, demo_process 4)
+const JOINT = { shoulder_pan: 'pan', shoulder_lift: 'lift', elbow_flex: 'elbow', wrist_flex: 'w.flex', wrist_roll: 'w.roll' };
+const xyz = (p) => p ? p.map((v) => fmt(v, 1)).join(', ') : '–';
+
+function twinStatus(t, gap) {
+  if (t.error_mm === undefined) return ['idle', 'no command yet'];
+  if (!t.settled) return ['lag', 'moving: ' + fmt(t.error_mm, 1) + ' mm tracking lag'];
+  if (t.error_mm >= gap) return ['crit', '✕ ' + fmt(t.error_mm, 2) + ' mm: more than the ' + gap + ' mm gap'];
+  if (t.error_mm >= gap / 2) return ['warn', '! ' + fmt(t.error_mm, 2) + ' mm: over half the ' + gap + ' mm gap'];
+  return ['ok', '✓ ' + fmt(t.error_mm, 2) + ' mm off the plan'];
+}
+
+function renderTwin(s) {
+  const cur = s.current;
+  const html = Object.entries(s.arms || {}).map(([name, a]) => {
+    const t = a.twin || {};
+    const active = cur && cur.narration.arm === name;
+    const gap = active && cur.narration.clearance ? cur.narration.clearance.mm : TIGHTEST_MM;
+    const [cls, label] = twinStatus(t, gap);
+    const top = Math.max(gap * 1.5, t.error_mm || 0);
+    const pct = (v) => Math.max(0, Math.min(100, (v / top) * 100)) + '%';
+    const joints = t.joint_err_deg ? Object.entries(t.joint_err_deg).map(([j, v]) => '<span>' + JOINT[j] + ' ' + (v >= 0 ? '+' : '') + fmt(v, 1) + '°</span>').join('') : '';
+    const loads = (a.load_pm || []).slice(0, 5).map((v) => Math.abs(v) / 10);
+    const maxLoad = loads.length ? Math.max(...loads) : 0;
+    const maxJ = Object.keys(JOINT)[loads.indexOf(maxLoad)];
+    return '<div class="twin-arm' + (active ? ' active' : '') + '">' +
+      '<div class="twin-head"><b>' + esc(ARM[name] || name) + '</b>' + (a.holding ? ' <span class="muted">holding ' + esc(a.holding) + '</span>' : '') +
+      '<span class="twin-status ' + cls + '">' + esc(label) + '</span></div>' +
+      '<div class="meter twin-meter"><div class="meter-track"><div class="meter-fill ' + cls + '" style="width:' + pct(t.error_mm || 0) + '"></div>' +
+      '<div class="meter-target" style="left:' + pct(gap) + '" title="' + gap + ' mm clearance"></div></div><div class="meter-text small">gap ' + gap + ' mm</div></div>' +
+      '<dl class="facts"><dt>plan (x, y, z)</dt><dd>' + xyz(t.commanded_mm) + ' mm</dd><dt>servos say</dt><dd>' + xyz(t.measured_mm) + ' mm</dd>' +
+      '<dt>joint Δ</dt><dd class="joints">' + (joints || '–') + '</dd>' +
+      '<dt>highest load</dt><dd>' + (maxJ ? JOINT[maxJ] + ' ' + fmt(maxLoad, 0) + ' % of max torque' : '–') + '</dd></dl></div>';
+  }).join('');
+  $('twin').innerHTML = html || '–';
 }
 
 function renderWire(s) {

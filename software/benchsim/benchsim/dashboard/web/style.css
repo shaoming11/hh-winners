@@ -91,6 +91,19 @@ button.danger:not(:disabled) { background: var(--critical); border-color: var(--
 .facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 8px 0 0; font-size: 13px; }
 .facts dt { color: var(--muted); } .facts dd { margin: 0; font-variant-numeric: tabular-nums; }
 
+.twin-arm { padding: 8px 0; border-bottom: 1px solid var(--grid); }
+.twin-arm:last-child { border-bottom: 0; }
+.twin-arm.active .twin-head b { color: var(--s1); }
+.twin-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.twin-status { margin-left: auto; font-weight: 650; font-variant-numeric: tabular-nums; }
+.twin-status.ok { color: var(--good-ink); } .twin-status.warn { color: var(--warning); } .twin-status.crit { color: var(--critical-ink); }
+.twin-status.lag, .twin-status.idle { color: var(--muted); }
+.twin-meter { margin: 6px 0 4px; } .twin-meter .meter-track { height: 8px; } .twin-meter .meter-text { min-width: 70px; }
+.meter-fill.ok { background: var(--good); } .meter-fill.warn { background: var(--warning); } .meter-fill.crit { background: var(--critical); }
+.meter-fill.lag, .meter-fill.idle { background: var(--axis); }
+.joints span { margin-right: 10px; white-space: nowrap; }
+.caveat { margin: 8px 0 0; }
+
 .wire { font: 12px/1.45 ui-monospace, "SF Mono", Menlo, monospace; height: 220px; overflow: auto; background: var(--page); border-radius: 6px; padding: 6px 8px; }
 .wire .row { white-space: pre-wrap; overflow-wrap: anywhere; padding-left: 4.2em; text-indent: -4.2em; }
 .wire .t { color: var(--muted); } .wire .dev { font-weight: 700; }

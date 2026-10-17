@@ -8,14 +8,16 @@ from test_sequencer import PROTO, build
 
 from benchsim.dashboard import narration
 from benchsim.dashboard.feed import Feed
+from benchsim.dashboard.twin import Twin
 from benchsim.process import steps as S
 
 ORDER = {'pending': 0, 'running': 1, 'passed': 2, 'failed': 2, 'skipped': 2}
 
 
-def run_with_feed(hook=None, probes=None):
+def run_with_feed(hook=None, probes=None, twin=False):
     bb, seq = build(); snaps = []
-    feed = Feed(bb, snaps.append, rate_hz=20.0, timebase=bb.clock.now, probes=probes).attach(seq); feed.plan(PROTO)
+    tw = Twin(bb.world.m) if twin else None
+    feed = Feed(bb, snaps.append, rate_hz=20.0, timebase=bb.clock.now, probes=probes, twin=tw).attach(seq); feed.plan(PROTO)
     if hook: seq.ctx.on_tick_hooks.append(hook(bb, seq))
     out = seq.run(PROTO); feed.flush()
     return bb, out, snaps
@@ -112,3 +114,13 @@ def test_video_frames_and_auto_camera():
     assert hub.jpeg[:2] == b'\xff\xd8' and v.shown == 'overview' and v.set_camera('nope') is False
     n = hub.jpeg_ver; bb.clock.sleep(1.0); assert hub.jpeg_ver - n in (10, 11)          # fps of sim time
     v.set_camera('top'); v.idle(); assert v.shown == 'top'; v.detach()
+
+
+def test_twin_error_is_small_when_settled_and_shows_lag_while_moving():
+    bb, out, snaps = run_with_feed(twin=True)
+    tw = [s['arms']['transfer']['twin'] for s in snaps if 'error_mm' in s['arms']['transfer']['twin']]
+    settled = [t['error_mm'] for t in tw if t['settled']]; moving = [t['error_mm'] for t in tw if not t['settled']]
+    assert settled and max(settled) < 1.0, max(settled)
+    assert moving and max(moving) > 1.0                               # the streamed goal runs ahead of the servo
+    last = tw[-1]; assert len(last['commanded_mm']) == 3 and set(last['joint_err_deg']) == {'shoulder_pan', 'shoulder_lift', 'elbow_flex', 'wrist_flex', 'wrist_roll'}
+    assert 'error_mm' not in snaps[-1]['arms']['pourer']['twin']       # the pourer never moved in this protocol
