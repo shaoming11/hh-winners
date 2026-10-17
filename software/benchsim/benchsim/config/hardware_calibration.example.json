@@ -1,0 +1,121 @@
+{
+  "schema": "benchsim.hardware_calibration/1",
+  "status": "example: placeholder values, not measured. Copy to a file of your own and record every value at bring-up (software/benchsim/docs/bringup.md A1-A5).",
+  "notes": {
+    "convention": "q_rad = sign * (ticks - tick_at_zero) * 2 pi / ticks_per_rev; q is the upstream so101_new_calib MJCF joint angle",
+    "tick_at_zero": "Present_Position (raw, normalize=False) with the arm in the MJCF zero pose. 2047 is assumed: LeRobot's calibration puts each joint's half-turn homing at 2047",
+    "gripper": "two-point map: tick_closed at deg_closed (jaws touching) and tick_open at deg_open; placeholders assume 1:1 with the MJCF gripper joint",
+    "limits": "min_deg/max_deg default to the MJCF joint ranges rounded inward; narrow them to the bench's safe range",
+    "fingerprint": "null until recorded: {joint: [Homing_Offset, Min_Position_Limit, Max_Position_Limit]} read with LeRobotArm.read_fingerprint(); a mismatch refuses the arm (wrong port or swapped arms)",
+    "speeds": "max_speed_deg_s is capped by bench_params [arm] max_speed_deg_s; 60 deg/s is a bring-up value (assumed); acceleration_deg_s2 is written to the STS3215 Acceleration register (assumed)"
+  },
+  "ticks_per_rev": 4096,
+  "arms": {
+    "pourer": {
+      "lerobot_id": "wlb_pourer",
+      "fingerprint": null,
+      "max_speed_deg_s": 60.0,
+      "acceleration_deg_s2": 300.0,
+      "goal_tolerance_deg": 1.5,
+      "joints": {
+        "shoulder_pan": {
+          "id": 1,
+          "tick_at_zero": 2047,
+          "sign": 1,
+          "min_deg": -109.9,
+          "max_deg": 110.0
+        },
+        "shoulder_lift": {
+          "id": 2,
+          "tick_at_zero": 2047,
+          "sign": 1,
+          "min_deg": -99.9,
+          "max_deg": 100.0
+        },
+        "elbow_flex": {
+          "id": 3,
+          "tick_at_zero": 2047,
+          "sign": 1,
+          "min_deg": -96.8,
+          "max_deg": 96.8
+        },
+        "wrist_flex": {
+          "id": 4,
+          "tick_at_zero": 2047,
+          "sign": 1,
+          "min_deg": -95.0,
+          "max_deg": 94.9
+        },
+        "wrist_roll": {
+          "id": 5,
+          "tick_at_zero": 2047,
+          "sign": 1,
+          "min_deg": -157.2,
+          "max_deg": 162.7
+        },
+        "gripper": {
+          "id": 6,
+          "tick_closed": 2047,
+          "deg_closed": 0.0,
+          "tick_open": 3185,
+          "deg_open": 100.0,
+          "min_deg": -10.0,
+          "max_deg": 99.9
+        }
+      }
+    },
+    "transfer": {
+      "lerobot_id": "wlb_transfer",
+      "fingerprint": null,
+      "max_speed_deg_s": 60.0,
+      "acceleration_deg_s2": 300.0,
+      "goal_tolerance_deg": 1.5,
+      "joints": {
+        "shoulder_pan": {
+          "id": 1,
+          "tick_at_zero": 2047,
+          "sign": 1,
+          "min_deg": -109.9,
+          "max_deg": 110.0
+        },
+        "shoulder_lift": {
+          "id": 2,
+          "tick_at_zero": 2047,
+          "sign": 1,
+          "min_deg": -99.9,
+          "max_deg": 100.0
+        },
+        "elbow_flex": {
+          "id": 3,
+          "tick_at_zero": 2047,
+          "sign": 1,
+          "min_deg": -96.8,
+          "max_deg": 96.8
+        },
+        "wrist_flex": {
+          "id": 4,
+          "tick_at_zero": 2047,
+          "sign": 1,
+          "min_deg": -95.0,
+          "max_deg": 94.9
+        },
+        "wrist_roll": {
+          "id": 5,
+          "tick_at_zero": 2047,
+          "sign": 1,
+          "min_deg": -157.2,
+          "max_deg": 162.7
+        },
+        "gripper": {
+          "id": 6,
+          "tick_closed": 2047,
+          "deg_closed": 0.0,
+          "tick_open": 3185,
+          "deg_open": 100.0,
+          "min_deg": -10.0,
+          "max_deg": 99.9
+        }
+      }
+    }
+  }
+}

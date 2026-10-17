@@ -287,3 +287,43 @@ dye_g = 0.2                                 # assumed: "a few drops" of food col
 rgba_dyed = [1.0, 0.45, 0.6, 0.95]          # scene.py foam colour (food colouring)
 rgba_plain = [0.96, 0.95, 0.90, 0.95]       # assumed: undyed foam
 update_dt_s = 0.01                          # model integration step (s)
+
+[mega]
+# Arduino Mega 2560 firmware (firmware/mega/wlb_mega). protocol_core.cpp default_config() compiles these in;
+# tests/test_firmware_core.py and `python -m benchsim hw-check` fail if the two disagree. Change both, then
+# rebuild and reflash (firmware/mega/README.md).
+baud = 250000                               # electrical.md 4
+wdt_ms = 500                                # electrical.md 7: host link silent 500 ms -> all PWM off (SimMega.WDT_S)
+progress_ms = 200                           # protocol.py: auger progress at 5 Hz (SimMega.PROGRESS_S)
+settle_ms = 150                             # assumed: M45CHW lag after the profile; done = profile + settle (open loop)
+estop_release_ms = 500                      # software_architecture.md 7.4 RESET: D2 LOW >= 500 ms before CLR clears ESTOP
+hx_timeout_min_ms = 100                     # electrical.md 7: no HX711 data within max(100 ms, 4 x measured interval)
+hx_timeout_intervals = 4                    # electrical.md 7
+tare_samples = 8                            # SimMega TARE: mean of 8 conversions
+home_tt_deg = 0.0                           # deck home = its 0 deg mark; stage home = [stage] work_deg
+# M45CHW pulses: us = us_at_zero + us_per_deg * deg. All assumed until commissioning (electrical.md E10 and the
+# software_architecture.md 7.4 gauge). Carousel: deck_range_deg [-10, 280] spread over 500-2500 us (2000/290 us/deg);
+# if the servo covers only 270 deg over that pulse range, [carousel] deck_range_deg must shrink.
+# Stage: 2000 us per 270 deg with crank 75 deg (mid-stroke) at 1500 us.
+servo_us_min = 500                          # assumed M45CHW pulse range
+servo_us_max = 2500                         # assumed
+tt_us_at_zero = 568.9655                    # assumed: 500 + 10 * 2000/290
+tt_us_per_deg = 6.896552                    # assumed: 2000/290
+st_us_at_zero = 944.4445                    # assumed: 1500 - 75 * 2000/270
+st_us_per_deg = 7.407407                    # assumed: 2000/270
+# FB5311M-360 auger (electrical.md 4 and 6, software_architecture.md 6)
+aug_us_stop = 1500                          # architecture 6: about 1500 us = stop; measure the exact centre (E8)
+aug_us_offset = 200                         # architecture 6: dosing pulse 1500 +- 200 us
+aug_dir_sign = 1                            # assumed: pulse above the stop centre for dir = +1 (feeds yeast)
+aug_fb_sign = 1                             # assumed: A2 angle rises when the pulse is above the stop centre
+aug_fb_adc_min = 0                          # assumed: A2 reading at 0 deg; record min/max/wrap at E8
+aug_fb_adc_max = 1023                       # assumed: A2 reading at 360 deg
+aug_fb_max_step_deg = 45.0                  # assumed: a larger jump between two loop passes is a feedback glitch
+aug_fb_glitch_resync = 20                   # assumed: glitches in a row before resynchronising without counting
+
+[sts3215]
+# Feetech STS3215 register units (Feetech STS memory table), used by benchsim.backends.real
+goal_velocity_unit_ticks_s = 1.0            # Goal_Velocity (reg 46): steps/s; 0 means maximum, so never written as 0
+acceleration_unit_ticks_s2 = 100.0          # Acceleration (reg 41): 100 steps/s^2; 0 means maximum
+acceleration_reg_max = 254
+load_unit_permille = 1.0                    # Present_Load (reg 60): 0.1 % of max torque, bit 10 = direction
