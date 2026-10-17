@@ -140,9 +140,13 @@ def build(store: Store, runner) -> MCPServer:
         return {"ok": v.ok, "problems": v.problems, "summary": v.summary}
 
     @mcp.tool(description="The preset elephant-toothpaste plan with these quantities (grams / seconds); use it as "
+                          "quick=True drops the yeast re-weigh and the final beaker return, for a run that fits a "
+                          "90-second demo slot (same chemistry, same eruption). Use it as "
                           "the base for a run instead of inventing steps.")
-    def preset_plan(developer_g: float = 39.0, yeast_g: float = 7.0, water_g: float = 30.0, activate_s: float = 60.0) -> dict:
-        p = runner.preset_plan(Recipe(developer_g=developer_g, yeast_g=yeast_g, water_g=water_g, activate_s=activate_s))
+    def preset_plan(developer_g: float = 39.0, yeast_g: float = 7.0, water_g: float = 30.0, activate_s: float = 60.0,
+                    quick: bool = False) -> dict:
+        p = runner.preset_plan(Recipe(developer_g=developer_g, yeast_g=yeast_g, water_g=water_g, activate_s=activate_s,
+                                      quick=quick))
         return p.model_dump()
 
     # ------------------------------------------------------------ control (gated)

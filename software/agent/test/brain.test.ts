@@ -8,8 +8,8 @@ useTempDataDir();
 const { summarize, think, SILENT } = await import("../src/brain.js");
 const { memo } = await import("../src/memory.js");
 
-test("summarize: null state", () => {
-  assert.equal(summarize(null), "backend unreachable");
+test("summarize: no backend says so in words, not a status code", () => {
+  assert.equal(summarize(null), "I can't reach the bench right now.");
 });
 
 test("summarize: running state with doses, alerts and approvals", () => {
@@ -17,18 +17,18 @@ test("summarize: running state with doses, alerts and approvals", () => {
     alerts: [mkAlert({ severity: "warning", code: "DOSE_ERROR" })], pending_approvals: [{ id: "p1", summary: "run 20 g developer", requested_by: "sam", status: "pending" }],
     mega: { estop: true, fault: null } });
   const t = summarize(s);
-  assert.match(t, /^mode running; sim; run r1 "Elephant toothpaste" running, 40%, at "pour developer"/);
-  assert.match(t, /developer 38\.6 g \(target 39\)/);
+  // a person's sentences: progress and the step in the dashboard's words, no ids, no status codes
+  assert.match(t, /^A run is 40% through, weighing out 39 g of hydrogen peroxide\./, t);
+  assert.match(t, /38\.6 g of peroxide went in/, t);
   assert.ok(!t.includes("yeast"), "undosed omitted");
-  assert.ok(!t.includes("water_g"), "scalar doses omitted");
-  assert.match(t, /foam 12\.5 mm/);
-  assert.match(t, /E-STOP PRESSED/);
-  assert.match(t, /open alerts: warning DOSE_ERROR/);
-  assert.match(t, /waiting for approval: run 20 g developer/);
+  assert.ok(!/r1|mode running|DOSE_ERROR|developer_g/.test(t), "no machine words: " + t);
+  assert.match(t, /Foam is 13 mm up the flask/, t);
+  assert.match(t, /e-stop is pressed/i, t);
+  assert.match(t, /waiting for an operator: run 20 g developer/, t);
 });
 
-test("summarize: idle state is short", () => {
-  assert.equal(summarize(mkState()), "mode idle; sim");
+test("summarize: idle state is one plain sentence", () => {
+  assert.equal(summarize(mkState()), "The bench is idle, nothing moving.");
 });
 
 const hasKey = !!(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);

@@ -1,5 +1,8 @@
 # Bench on iMessage: demo script and test suite
 
+For a judging slot, see [DEMO_90S.md](DEMO_90S.md): the same pipeline in under 90 seconds, with
+measured timings.
+
 What to run, what to text, what should come back, and how we know it works.  The agent's words
 vary (it is a model); the facts, the tool calls and the safety behaviour do not.
 
@@ -33,7 +36,7 @@ for a 20 g / 5 g batch that is waiting for an operator.  Dashboard: `http://127.
 | 9 | `text me only if something breaks` | `set_person_preferences(notify_on=[critical])` | "Will do: criticals only." The run-complete summary will NOT be sent to you. |
 | 10 | `stop` | `run_control(safe_stop)` | ONE message: stopped, torque held, grippers closed, which step it was in. No "bench stopped itself", no second summary. |
 | 11 | `reset and run the standard recipe` | `run_control(reset)`, `start_run(requested_by=<you>)`, `decide_approval(by=<you>)` | Reset, validated (39 g / 7 g / 30 g), started because you are an operator and said run. |
-| 12 | `run it with 80 g of developer` | `start_run` -> VALIDATION with `suggested_fix` | "80 g is over the 45 g peroxide limit; want 45 g instead?" |
+| 12 | `run it with 80 g of developer` | `start_run` -> VALIDATION with `suggested_fix` | "80 g is over the 60 g the pourer will dose in one pour; want 60 g instead?" (the gate's own words: `step 2 (POUR_TO_SCALE): target 80.0 g outside 1..60`) |
 | 13 | send the same request twice (double-tap) | `start_run(idempotency_key=<message id>)` | One approval request, the second reply says it is the same request. |
 | 14 | wait for a run to finish | alert watcher, `run_complete` | One summary with doses and foam height, only to people whose `notify_on` includes run_complete/all. |
 | 15 | from a second phone (not operator): `approve` | `decide_approval` not called | "Only an operator can approve; <you> was asked." |
@@ -51,9 +54,9 @@ Unprompted messages you should see, and only these:
 |---|---|---|
 | Backend contracts + store + watchdog + runner + HTTP + MCP | `cd software && python3 -m pytest tests/test_backend.py -q` | 31 tests: schema round-trips, NaN-safe JSON, event log persistence, alert dedupe/ack, approval request/decide, watchdog rules, approved/needs-approval/validator-rejected runs, pause/resume/safe-stop/reset, direct commands and their refusals, SSE, in-process MCP tools |
 | Conversation UX | `python3 -m pytest tests/test_backend_ux.py -q` | describe() wording per mode, delta() change extraction, approval expiry + snooze, idempotent start_run, suggested_fix on VALIDATION, EXPIRED on decide, thread context, person preferences, the HTTP twins |
-| Whole simulator suite | `python3 -m pytest tests -q` | the 13 original sim tests plus the above |
+| Whole backend suite | `python3 -m pytest tests -q` | 69 tests: the two rows above, plus the plan gate (`tests/test_validator.py`, against `benchsim.process.steps.validate`).  The standalone `bench/` + `sim/` stack and its tests were retired on 2026-10-17; benchsim's own suite is `cd benchsim && python3 -m pytest tests -q` |
 | Agent (no key needed) | `cd software/agent && BACKEND_URL=http://127.0.0.1:<scratch port> npm test` | MCP bridge and tool list, memory persistence and cap, alert watcher: critical at once with still, warning batching, no re-send, one summary per run, storm of state events -> one message, requested stop not announced to the requester, notify_on/quiet-hours filtering, backend client, SSE |
-| Agent (live Claude) | same, with `ANTHROPIC_API_KEY` set | one real `think()` turn; `show_camera` attaches a picture |
+| Agent (live Claude) | same, with `ANTHROPIC_API_KEY` set | one real `think()` turn; `show_camera` attaches a picture; a texted photo is read back (`test/photos.test.ts`) |
 | Types | `cd software/agent && npx tsc --noEmit` | |
 | Live 4-turn conversation | `npx tsx <scratch>/live_think.mts` (see session notes) | DM answer from state; group chatter silent; non-operator request -> approval; operator "yes" -> run starts with the approver recorded |
 
@@ -68,5 +71,8 @@ Never run the agent suite against the demo backend: it presses the simulated e-s
 
 ## 3. Known gaps
 
-Voice (SMS line + SIP provider) not wired; inbound photos ignored; hardware backend never run on hardware;
-servo temperature/current not sensed (field is null by design).
+Voice (SMS line + SIP provider) not wired; hardware backend never run on hardware; servo
+temperature/current not sensed (field is null by design).
+
+Inbound photos **are** read as of 2026-10-17 (`agent/src/photos.ts`): text a picture and the model
+looks at it, HEIC converted through `sips` on macOS, anything it cannot read refused in one sentence.

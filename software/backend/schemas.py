@@ -142,6 +142,8 @@ class Recipe(Strict):
     yeast_g: float = 7.0
     water_g: float = 30.0
     activate_s: float = 60.0
+    quick: bool = Field(False, description="demo-slot plan: the same chemistry minus the yeast re-weigh and the "
+                                          "final beaker return, for a run that finishes inside a 90 s slot")
 
 
 class RunPlanCmd(_Cmd):

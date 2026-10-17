@@ -38,8 +38,8 @@ def test_describe_idle_with_history_mentions_last_run():
     s = ExperimentState(mode="idle", history=[hist])
     d = describe(s, 5)
     assert d.headline == "The bench is idle; nothing is moving."
-    assert "Last run r1 complete" in d.detail
-    assert "developer_g 38.50 g of 39 (-0.50)" in d.detail
+    assert "The last run finished cleanly" in d.detail
+    assert "38.5 g of peroxide (0.5 g under the 39 g target)" in d.detail, d.detail
 
 
 def test_describe_awaiting_approval_names_asker_and_expiry():
@@ -65,9 +65,10 @@ def test_describe_running_reports_progress_doses_and_recipe():
                    doses={"developer_g": Dose(target=39.0, actual=20.0, error=-1.0)})
     s = ExperimentState(mode="running", run=run, chemistry=ChemistryState(foam_h_mm=15.0))
     d = describe(s, 9)
-    assert d.headline == 'Run r42 is 35% through: 1 pour developer.'
-    assert d.detail == ("Doses so far: developer_g 20.00 g of 39 (-1.00). Foam column 15 mm. "
-                        "Recipe 39 g developer, 7 g yeast, 30 g water (requested by jay, approved by sam).")
+    assert d.headline == 'The run is 35% through; right now it is 1 pour developer.'
+    assert d.detail == ("In so far: 20.0 g of peroxide (1.0 g under the 39 g target). "
+                        "The foam is 15 mm up the flask. "
+                        "It is making 39 g peroxide, 7 g yeast and 30 g warm water, jay's request, approved by sam.")
     assert d.needs_human is None
 
 
@@ -79,8 +80,9 @@ def test_describe_safe_stop_names_step_fault_and_critical_alert():
     alert = Alert(id="al1", severity="critical", code="FAULT", message="SAFE_STOP triggered")
     s = ExperimentState(mode="safe_stop", run=run, alerts=[alert])
     d = describe(s, 3)
-    assert d.headline == 'Run r7 safe-stopped while 1 pour developer: spill detected mid-pour. Arms holding, grippers closed.'
-    assert d.needs_human == "Open critical alert: fault - SAFE_STOP triggered."
+    assert d.headline == ('The run stopped safely while 1 pour developer - spill detected mid-pour. '
+                          'The arms are holding what they held, grippers closed.')
+    assert d.needs_human == "Something needs a person: SAFE_STOP triggered"
 
 
 def test_describe_estop_and_mega_fault_take_priority_over_alerts():
@@ -326,3 +328,32 @@ def test_http_snooze_unknown_404(client):
     c, _ = client
     resp = c.post("/api/approvals/does-not-exist/snooze", json={"minutes": 5})
     assert resp.status_code == 404
+
+
+# =============================================================================================
+# g. mode precedence: a moving bench is never reported as "waiting for approval"
+# =============================================================================================
+def test_mode_running_outranks_a_pending_approval():
+    """A request left pending from an earlier ask must not make the dashboard (or describe) read
+    'awaiting approval' while the arms are mid-pour."""
+    from backend.project import mode_from
+    snap = {"seq_state": "RUNNING"}
+    assert mode_from(snap, awaiting_approval=True, run_active=True) == "running"
+    assert mode_from(snap, awaiting_approval=True, paused=True) == "paused"
+    assert mode_from({"seq_state": "IDLE"}, awaiting_approval=True) == "awaiting_approval"
+    # the runner still gets to declare a terminal mode once the run is over
+    assert mode_from({"seq_state": "DONE"}, awaiting_approval=False, run_active=False) == "complete"
+
+
+def test_quick_preset_drops_the_reweigh_and_the_return(client):
+    """recipe.quick is what makes a run fit a demo slot: same chemistry, 10 steps instead of 12."""
+    c, appmod = client
+    full = appmod.runner.preset_plan(Recipe(developer_g=20, yeast_g=5, water_g=15, activate_s=10))
+    quick = appmod.runner.preset_plan(Recipe(developer_g=20, yeast_g=5, water_g=15, activate_s=10, quick=True))
+    assert len(full.steps) == 11 and len(quick.steps) == 9, (len(full.steps), len(quick.steps))
+    assert "quick" in quick.title
+    kinds = [s.type for s in quick.steps]
+    assert "VERIFY_MASS" not in kinds, "the yeast re-weigh is what the quick plan drops"
+    assert kinds[-1] == "POUR_TO_FUNNEL" and quick.steps[-1].params.get("erupt"), "it still erupts"
+    assert kinds.count("POUR_TO_SCALE") == 2 and "DOSE_YEAST" in kinds, "both pours and the dose stay"
+    assert appmod.runner.validate_plan(quick).ok, appmod.runner.validate_plan(quick).problems

@@ -13,10 +13,19 @@ MODE_TEXT = {
     "awaiting_approval": "The bench is idle, waiting for an operator to approve a run.",
     "running": "A run is in progress.",
     "paused": "The run is paused; the arms are holding position.",
-    "safe_stop": "The bench safe-stopped: arms holding, grippers closed, servos off.",
+    "safe_stop": "The bench stopped safely: the arms are holding what they held, grippers closed.",
     "complete": "The last run finished.",
     "error": "The backend hit an error; the bench needs a human.",
 }
+
+# Reagent keys -> what a person calls them.  The dose keys come from the recipe (developer_g, ...);
+# "developer" is the trade name for the 12 % peroxide and means nothing to anyone else.
+REAGENT_WORDS = {"developer": "peroxide", "developer_g": "peroxide", "yeast": "yeast", "yeast_g": "yeast",
+                 "water": "water", "water_g": "warm water", "foam_peak_mm": "foam peak"}
+
+
+def reagent_word(key: str) -> str:
+    return REAGENT_WORDS.get(key, key.replace("_g", "").replace("_", " "))
 
 
 def _title(step) -> str:
@@ -31,11 +40,15 @@ def _titles(store: Store) -> dict[str, str]:
 
 
 def _dose_words(doses: dict) -> list[str]:
+    """what went in, as a person would say it: '19.3 g of peroxide (0.7 g under the 20 g target)'"""
     out = []
     for k, d in doses.items():
         if isinstance(d, Dose) and d.actual is not None:
-            err = f" ({d.error:+.2f})" if d.error is not None else ""
-            out.append(f"{k} {d.actual:.2f} g of {d.target:.0f}{err}")
+            if d.error is None or abs(d.error) < 0.05:
+                out.append(f"{d.actual:.1f} g of {reagent_word(k)}")
+            else:
+                off = "over" if d.error > 0 else "under"
+                out.append(f"{d.actual:.1f} g of {reagent_word(k)} ({abs(d.error):.1f} g {off} the {d.target:.0f} g target)")
     return out
 
 
@@ -46,21 +59,26 @@ def describe(s: ExperimentState, last_event_id: int) -> Describe:
     r = s.run
     if r is not None:
         step = _title(r.steps[r.current_step]) if r.current_step is not None and r.current_step < len(r.steps) else None
+        lower = lambda t: t[0].lower() + t[1:] if t else t
         if r.outcome == "running" and step:
-            head = f"Run {r.run_id} is {int(r.progress * 100)}% through: {step[0].lower() + step[1:]}."
+            head = f"The run is {int(r.progress * 100)}% through; right now it is {lower(step)}."
         elif r.outcome == "complete":
-            head = f"Run {r.run_id} finished after {r.bench_seconds:.0f} s of bench time."
+            head = f"The run finished, {r.bench_seconds:.0f} s of bench time from start to eruption."
         elif r.outcome == "SAFE_STOP":
             where = next((_title(st) for st in r.steps if st.status in ("fault", "error")), step)
-            head = f"Run {r.run_id} safe-stopped while {where[0].lower() + where[1:] if where else 'running'}: {r.faults[-1] if r.faults else 'no detail'}. Arms holding, grippers closed."
+            why = r.faults[-1] if r.faults else ""
+            head = (f"The run stopped safely while {lower(where) if where else 'it was running'}"
+                    + (f" - {why}" if why else "") + ". The arms are holding what they held, grippers closed.")
         dw = _dose_words(r.doses)
         if dw:
-            detail.append("Doses so far: " + ", ".join(dw) + ".")
+            detail.append(("In so far: " if r.outcome == "running" else "What went in: ") + ", ".join(dw) + ".")
         if s.chemistry and s.chemistry.foam_h_mm > 0:
-            detail.append(f"Foam column {s.chemistry.foam_h_mm:.0f} mm.")
-        who = f" (requested by {r.requested_by}, approved by {r.operator})" if r.requested_by and r.requested_by != r.operator else (f" (operator {r.operator})" if r.operator else "")
-        if who and r.outcome == "running":
-            detail.append(f"Recipe {r.recipe.developer_g:.0f} g developer, {r.recipe.yeast_g:.0f} g yeast, {r.recipe.water_g:.0f} g water{who}.")
+            detail.append(f"The foam is {s.chemistry.foam_h_mm:.0f} mm up the flask.")
+        if r.outcome == "running" and r.recipe is not None:
+            who = (f", {r.requested_by}'s request, approved by {r.operator}" if r.requested_by and r.requested_by != r.operator
+                   else (f", approved by {r.operator}" if r.operator else ""))
+            detail.append(f"It is making {r.recipe.developer_g:.0f} g peroxide, {r.recipe.yeast_g:.0f} g yeast "
+                          f"and {r.recipe.water_g:.0f} g warm water{who}.")
     if s.mega.estop:
         needs = "The e-stop is pressed; release it and clear the fault before anything can move."
     elif s.mega.fault:
@@ -68,15 +86,17 @@ def describe(s: ExperimentState, last_event_id: int) -> Describe:
     elif s.pending_approvals:
         p = s.pending_approvals[0]
         who = f"{p.requested_by_person} asked for" if p.requested_by_person else "Waiting on"
-        needs = f"{who} \"{p.summary.split(' - ')[0]}\"; an operator has to approve (id {p.id})" + (f", expires {p.expires_at[11:16]} UTC." if p.expires_at else ".")
+        needs = (f"{who} \"{p.summary.split(' - ')[0]}\" and it needs an operator's go-ahead"
+                 + (f" before {p.expires_at[11:16]} UTC" if p.expires_at else "") + f" (request {p.id}).")
     elif s.alerts:
         crit = [a for a in s.alerts if a.severity == "critical"]
         if crit:
-            needs = f"Open critical alert: {crit[0].code.lower().replace('_', ' ')} - {crit[0].message}."
+            needs = f"Something needs a person: {crit[0].message}"
     if s.mode == "idle" and not detail and s.history:
         h = s.history[0]
         dw = _dose_words(h.doses)
-        detail.append(f"Last run {h.run_id} {h.outcome}" + (f": {', '.join(dw)}" if dw else "") + ".")
+        outcome = {"complete": "finished cleanly", "SAFE_STOP": "was stopped partway"}.get(h.outcome, h.outcome)
+        detail.append(f"The last run {outcome}" + (f": {', '.join(dw)}" if dw else "") + ".")
     return Describe(headline=head, detail=" ".join(detail), needs_human=needs, last_event_id=last_event_id)
 
 

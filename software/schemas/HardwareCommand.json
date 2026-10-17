@@ -601,6 +601,12 @@
      "default": 60.0,
      "title": "Activate S",
      "type": "number"
+    },
+    "quick": {
+     "default": false,
+     "description": "demo-slot plan: the same chemistry minus the yeast re-weigh and the final beaker return, for a run that finishes inside a 90 s slot",
+     "title": "Quick",
+     "type": "boolean"
     }
    },
    "title": "Recipe",

@@ -81,12 +81,13 @@ function renderChem(s) {
   $('foam').innerHTML = bits.join('');
 }
 
-const CAM = { auto: 'Auto', overview: 'Overview', bench_cam: 'Close-up', top: 'Top', foam_cam: 'Flask', pour_cam: 'Pour', funnel_cam: 'Funnel', erupt_cam: 'Eruption' };
+const CAM = { auto: 'Auto', free: 'Free', overview: 'Overview', bench_cam: 'Close-up', top: 'Top', foam_cam: 'Flask', pour_cam: 'Pour', funnel_cam: 'Funnel', erupt_cam: 'Eruption' };
 let camKey = '';
+const orbit = { az: 135, el: -20, dist: 1.4, lookat: [0.3, 0.5, 0.15], dragging: false, pan: false, x: 0, y: 0 };
 function renderCams(s) {
   const v = s.probes && s.probes.video;
   if (!v) { $('cams').hidden = true; return; }
-  const names = ['auto'].concat(v.cameras);
+  const names = ['auto'].concat(v.cameras, ['free']);
   $('cams').hidden = false;
   if (names.join(',') !== camKey) {   // rebuild only when the camera list changes, so a click is never lost mid-rebuild
     camKey = names.join(',');
@@ -94,7 +95,9 @@ function renderCams(s) {
   }
   for (const b of $('cams').children) b.classList.toggle('on', b.dataset.cam === v.camera);
   $('cams').querySelector('.live').textContent = v.camera === 'auto' ? ' · ' + (CAM[v.shown] || v.shown) : '';
-  $('stage-sub').textContent = 'simulated camera · ' + (v.camera === 'auto' ? 'follows the step · showing ' + (CAM[v.shown] || v.shown).toLowerCase() : (CAM[v.camera] || v.camera).toLowerCase());
+  $('stage-sub').textContent = 'simulated camera · ' + (v.camera === 'free' ? 'free look · drag to orbit, shift-drag to pan, scroll to zoom'
+    : v.camera === 'auto' ? 'follows the step · showing ' + (CAM[v.shown] || v.shown).toLowerCase() : (CAM[v.camera] || v.camera).toLowerCase());
+  if (v.view && !orbit.dragging) { orbit.az = v.view.azimuth; orbit.el = v.view.elevation; orbit.dist = v.view.distance; orbit.lookat = v.view.lookat.slice(); }
 }
 $('cams').addEventListener('click', (e) => { const b = e.target.closest('button[data-cam]'); if (b) command('camera/' + b.dataset.cam); });
 
@@ -338,9 +341,83 @@ async function startReplay() {
 
 startReplay().then((replaying) => {
   if (replaying) return;
+  // ---- free look: drag to orbit, shift-drag (or middle/right drag) to pan, wheel to zoom ---------
+  // The page owns the gesture and sends absolute angles; the bench just renders what it is told.
+  const stage = $('video').parentElement;
+  let sendTimer = null, pending = false;
+  const pushView = () => {                       // ~20/s is plenty for a 15 fps stream
+    if (sendTimer) { pending = true; return; }
+    pending = false;
+    fetch('/api/view', { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ azimuth: orbit.az, elevation: orbit.el, distance: orbit.dist, lookat: orbit.lookat }) }).catch(() => {});
+    sendTimer = setTimeout(() => { sendTimer = null; if (pending) pushView(); }, 50);
+  };
+  stage.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button')) return;      // the camera chips and the fullscreen button keep working
+    orbit.dragging = true; orbit.pan = e.shiftKey || e.button === 1 || e.button === 2;
+    orbit.x = e.clientX; orbit.y = e.clientY;
+    stage.setPointerCapture(e.pointerId); stage.classList.add('grabbing'); e.preventDefault();
+  });
+  stage.addEventListener('pointermove', (e) => {
+    if (!orbit.dragging) return;
+    const dx = e.clientX - orbit.x, dy = e.clientY - orbit.y;
+    orbit.x = e.clientX; orbit.y = e.clientY;
+    if (orbit.pan) {
+      // pan across the view plane: right is perpendicular to the look direction, up tilts with elevation
+      const a = orbit.az * Math.PI / 180, el = orbit.el * Math.PI / 180, k = orbit.dist * 0.0022;
+      const right = [-Math.sin(a), Math.cos(a), 0];
+      const up = [-Math.cos(a) * Math.sin(el), -Math.sin(a) * Math.sin(el), Math.cos(el)];
+      for (let i = 0; i < 3; i++) orbit.lookat[i] += (-dx * right[i] + dy * up[i]) * k;
+    } else {
+      orbit.az -= dx * 0.4;
+      orbit.el = Math.max(-89, Math.min(89, orbit.el + dy * 0.3));
+    }
+    pushView();
+  });
+  const endDrag = (e) => {
+    if (!orbit.dragging) return;
+    orbit.dragging = false; stage.classList.remove('grabbing');
+    if (e && e.pointerId !== undefined && stage.hasPointerCapture(e.pointerId)) stage.releasePointerCapture(e.pointerId);
+  };
+  stage.addEventListener('pointerup', endDrag);
+  stage.addEventListener('pointercancel', endDrag);
+  stage.addEventListener('contextmenu', (e) => { if (orbit.dragging) e.preventDefault(); });
+  stage.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    orbit.dist = Math.max(0.05, Math.min(6, orbit.dist * (e.deltaY > 0 ? 1.08 : 0.926)));
+    pushView();
+  }, { passive: false });
+
+  // ---- fullscreen -------------------------------------------------------------------------------
+  const fsBtn = $('fs');
+  const inFs = () => document.fullscreenElement === stage;
+  fsBtn.addEventListener('click', () => {
+    if (inFs()) document.exitFullscreen().catch(() => {});
+    else stage.requestFullscreen().catch(() => {});
+  });
+  document.addEventListener('fullscreenchange', () => {
+    stage.classList.toggle('fs', inFs());
+    fsBtn.title = inFs() ? 'Exit fullscreen (Esc)' : 'Fullscreen (f)';
+    fsBtn.textContent = inFs() ? '⤡' : '⤢';
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'f' && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) fsBtn.click();
+  });
+
   const img = $('video');
-  img.addEventListener('load', () => { $('novideo').hidden = true; });
-  img.addEventListener('error', () => { $('novideo').hidden = false; });
-  img.src = '/stream.mjpg';
+  // The camera is one long-lived multipart response.  Unlike the /events feed, a browser does NOT
+  // re-open it by itself: if the backend restarts, the picture stays blank until someone reloads the
+  // page, while the rest of the dashboard carries on reconnecting.  So re-attach it on error.
+  let camRetry = null;
+  const attachCamera = () => { img.src = '/stream.mjpg?t=' + Date.now(); };   // cache-bust: force a new connection
+  img.addEventListener('load', () => {
+    $('novideo').hidden = true;
+    if (camRetry) { clearTimeout(camRetry); camRetry = null; }
+  });
+  img.addEventListener('error', () => {
+    $('novideo').hidden = false;
+    if (!camRetry) camRetry = setTimeout(() => { camRetry = null; attachCamera(); }, 2000);
+  });
+  attachCamera();
   connect();
 });

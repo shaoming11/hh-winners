@@ -17,20 +17,21 @@ CONFIG.operatorPhones = [];
 test("runSummary: complete run lists doses and foam", () => {
   const s = mkState({ run: mkRun("complete"), chemistry: { foam_h_mm: 85, spilled_total_g: 0 } });
   const t = runSummary(s);
-  assert.match(t, /^Run r1 finished/);
-  assert.match(t, /developer 38\.6 g \(-0\.4\)/);
+  assert.match(t, /^All done/);
+  assert.match(t, /38\.6 g of peroxide/, t);
+  assert.ok(!/run_id|r1|developer_g/.test(t), "no machine words: " + t);
   assert.ok(!t.includes("yeast"), "undosed reagent omitted");
-  assert.match(t, /foam 85 mm/);
-  assert.match(t, /Notebook/);
+  assert.match(t, /foam came up to 85 mm/);
+  assert.match(t, /notebook/i);
 });
 
 test("runSummary: SAFE_STOP names the failed step and the fault", () => {
   const s = mkState({ mode: "safe_stop", run: mkRun("SAFE_STOP"), health: { ok: false, spill_detected: true, spilled_g: 3, arm_settle_overruns: 0, open_alerts: 1 } });
   const t = runSummary(s);
-  assert.match(t, /safe-stopped during "pour developer"/);
-  assert.match(t, /spill detected/);
-  assert.match(t, /grippers closed/);
-  assert.match(t, /mode safe_stop/);          // tail is brain.summarize()
+  assert.match(t, /stopped safely while weighing out 39 g of hydrogen peroxide/, t);
+  assert.match(t, /spill detected/i);
+  assert.match(t, /grippers are closed/);
+  assert.ok(!/mode safe_stop|SAFE_STOP|r1/.test(t), "no state dump in a message to a person: " + t);
 });
 
 // ---------------------------------------------------------------- AlertWatcher with a fake backend
@@ -91,7 +92,7 @@ test("alerts: a warning waits for the batch timer, then one message", async () =
                            mkAlert({ id: "w2", severity: "warning", code: "SETTLE_OVERRUN", message: "arm took 4 s to settle", step: null })] }));
   await until(() => notified.length >= 4);
   assert.equal(texts().length, 2, "one message per recipient");
-  assert.match(texts()[0], /Minor things/);
+  assert.match(texts()[0], /Nothing urgent/);
   assert.match(texts()[0], /developer 1\.1 g over/);
   assert.match(texts()[0], /arm took 4 s to settle/);
   assert.equal(sends.filter((s) => s.text === undefined).length, 0, "no image for warnings");
@@ -120,7 +121,7 @@ test("alerts: running -> complete sends exactly one summary", async () => {
   push(mkState({ mode: "idle", run: mkRun("complete") }));
   await sleep(50);
   assert.equal(texts().length, 2, "one per recipient, once");
-  assert.match(texts()[0], /^Run r1 finished/);
+  assert.match(texts()[0], /^All done/);
   assert.equal(notified.length, 0, "summaries are not alerts");
   w.close();
 });
@@ -174,9 +175,9 @@ test("alerts: a stop the person asked for is not announced to them, and not call
   await sleep(60);
   const t = texts();
   assert.ok(t.every((x) => !/stopped itself/.test(x)), "not the bench's doing");
-  assert.ok(t.every((x) => /op stopped the bench/.test(x)), "says who stopped it");
+  assert.ok(t.every((x) => /^Stopped while /.test(x)), "says what it was doing when it stopped: " + t[0]);
   assert.equal(t.length, 1, "only the other subscriber (fan) hears about it, once, alert + summary merged");
-  assert.match(t[0], /safe-stopped during/);
+  assert.match(t[0], /stopped safely while/);
   assert.equal(sends.filter((s) => s.text === undefined).length, 0, "no camera still for a requested stop");
   w.close();
 });

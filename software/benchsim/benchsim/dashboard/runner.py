@@ -163,7 +163,8 @@ class Runner:
         probes = dict(r.probes, runner=self._info)
         if self.video is not None:
             self.video.snapshot = lambda: self.feed.last
-            probes['video'] = lambda: dict(camera=self.video.camera, shown=self.video.shown, cameras=self.video.cameras())
+            probes['video'] = lambda: dict(camera=self.video.camera, shown=self.video.shown, cameras=self.video.cameras(),
+                                           view=self.video.view())
         twin = Twin(bb.world.m) if bb.world is not None else None
         self.feed = Feed(bb, self._publish, ledger=r.ledger, twin=twin, probes=probes).attach(r.seq)
         self.feed.plan(r.steps)

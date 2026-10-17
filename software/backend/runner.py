@@ -29,7 +29,7 @@ if str(SOFTWARE / "benchsim") not in sys.path:
     sys.path.insert(0, str(SOFTWARE / "benchsim"))     # before `software/`, or the namespace dir shadows it
 
 from backend import project
-from backend.schemas import (HardwareCommand, HardwareReply, Plan as PlanSchema, PlanStep, Recipe,
+from backend.schemas import (Dose, HardwareCommand, HardwareReply, Plan as PlanSchema, PlanStep, Recipe,
                              RunPlanCmd, RunState, StepState, Validation, now_iso)
 from backend.store import Store
 from backend.watchdog import Watchdog
@@ -158,7 +158,7 @@ class BenchRunner:
             self.video = Video(self.hub, camera="auto", fps=15.0)
             self.video.snapshot = lambda: self.feed.last if self.feed else None
             probes["video"] = lambda: dict(camera=self.video.camera, shown=self.video.shown,
-                                           cameras=self.video.cameras())
+                                           cameras=self.video.cameras(), view=self.video.view())
         twin = Twin(w.m) if w is not None else None
         self.feed = Feed(r.bb, self._publish_snap, ledger=r.ledger, twin=twin, probes=probes).attach(r.seq)
         self.feed.plan(r.steps)
@@ -333,7 +333,16 @@ class BenchRunner:
         steps = S.demo_protocol(dict(developer_g=r.developer_g, developer_tol_g=2.0, yeast_g=r.yeast_g,
                                      yeast_tol_g=0.7, water_g=r.water_g, water_tol_g=2.0,
                                      activate_wait_s=r.activate_s))
-        return PlanSchema(title="elephant toothpaste (preset)", source="preset",
+        title = "elephant toothpaste (preset)"
+        if r.quick:
+            # A demo slot is shorter than the process.  Both closed-loop pours, the auger dose and the
+            # eruption stay; what goes is the scale re-weigh of the yeast (VERIFY_MASS, whose top-up loop
+            # is the slowest step) and putting the last beaker back, which happens after the foam anyway.
+            # The dose is still weighed - the water pour is relative to the live reading - but a short
+            # dose is no longer corrected, so quantities land as the auger delivers them.
+            steps = [s for s in steps if s.type != "VERIFY_MASS" and s.label != "9 P2 -> carousel"]
+            title += " - quick"
+        return PlanSchema(title=title, source="preset",
                           steps=[PlanStep(type=s.type, params=s.params, label=s.label) for s in steps])
 
     def validate_plan(self, plan: PlanSchema) -> Validation:
@@ -431,12 +440,31 @@ class BenchRunner:
         outcome = {"DONE": "complete", "SAFE_STOP": "SAFE_STOP", "FAILED": "aborted"}.get(state, state)
         reason = seq.ctx.stop_reason
         faults = [reason] if reason else []
-        doses = {}
+        # What actually went in, keyed by reagent - this is what a person asks about ("how much
+        # peroxide went in?") and what the chat summary reads back.  benchsim's run-log rows carry
+        # `target` and `measured` as separate dicts, so the amount lives at target.added_g /
+        # measured.added_g for a pour and at measured.content_g for the weighed yeast dose.
+        doses: dict[str, dict] = {}
+
+        def _dose(key, target, actual):
+            # Dose objects, not plain dicts: describe()/the agent check isinstance(d, Dose) before
+            # they will say a number out loud, so a dict here means the amounts silently vanish.
+            if target is None or actual is None:
+                return
+            doses[key] = Dose(target=round(float(target), 2), actual=round(float(actual), 2),
+                              error=round(float(actual) - float(target), 2))
+
         for row in (out or {}).get("steps", []):
-            m = row.get("measured") or {}
-            if isinstance(m, dict) and m.get("target") is not None:
-                doses[row.get("label") or row.get("type")] = {
-                    "target": m.get("target"), "actual": m.get("measured") or m.get("actual")}
+            t, m, prm = row.get("target") or {}, row.get("measured") or {}, row.get("params") or {}
+            if not isinstance(m, dict):
+                continue
+            if row.get("type") == "POUR_TO_SCALE" and prm.get("reagent"):
+                _dose(f"{prm['reagent']}_g", t.get("added_g"), m.get("added_g"))
+            elif row.get("type") == "VERIFY_MASS" and m.get("content_g") is not None:
+                _dose("yeast_g", t.get("content_g"), m.get("content_g"))
+            elif row.get("type") == "DOSE_YEAST" and "yeast_g" not in doses:
+                # no VERIFY_MASS in this plan (the quick one): fall back to what the auger delivered
+                _dose("yeast_g", prm.get("target_g"), m.get("sim_truth_in_beaker_g"))
         snap = self.feed.last or {}
         foam = (snap.get("probes") or {}).get("foam") or {}
         if foam.get("peak_mm") is not None:
@@ -484,7 +512,9 @@ class BenchRunner:
         if action in ("safe_stop", "abort"):
             if not self.running():
                 return HardwareReply(id=rid, ok=True, message="nothing running")
-            self._stop_request = f"{action} requested by {by}"
+            # This string is read back to people ("stopped during the water pour: ..."), so write it the
+            # way a colleague would say it instead of echoing the command name.
+            self._stop_request = f"stopped by {by}" if action in ("safe_stop", "abort") else f"{action} by {by}"
             self.paused = False
             self.store.event("command", f"{action} requested by {by}", level="warning")
             return HardwareReply(id=rid, ok=True,
@@ -525,6 +555,19 @@ class BenchRunner:
         if self.phase != "running":
             self._jobs.put(_Job(lambda: (self.video.idle(), self.feed.flush()), "camera"))
         return HardwareReply(id=rid, ok=True, message=f"camera: {name}")
+
+    def set_view(self, azimuth=None, elevation=None, distance=None, lookat=None) -> HardwareReply:
+        """mouse orbit/pan/zoom from the dashboard: absolute free-camera pose (the page owns the gesture).
+        Only floats on an MjvCamera change here - no GL call - so an HTTP thread may do it; the frame
+        itself is still drawn by the bench thread (idle nudge while stopped, frame hook while running)."""
+        rid = f"view-{int(time.time() * 1000)}"
+        if self.video is None:
+            return HardwareReply(id=rid, ok=False, err="STATE", message="rendering is off")
+        if not self.video.set_view(azimuth, elevation, distance, lookat):
+            return HardwareReply(id=rid, ok=False, err="STATE", message="no bench to look at yet")
+        if self.phase != "running":
+            self._jobs.put(_Job(lambda: (self.video.idle(), self.feed.flush()), "view"))
+        return HardwareReply(id=rid, ok=True, message="view moved", data=self.video.view() or {})
 
     # ================================================================== direct commands
     MOTION_KINDS = {"carousel", "stage", "auger", "arm_goals", "gripper", "arm_station"}
@@ -683,7 +726,7 @@ class BenchRunner:
         return rep
 
     # ================================================================== the dashboard's control verbs
-    def feed_control(self, cmd: str, by: str = "operator (dashboard)") -> tuple[bool, str]:
+    def feed_control(self, cmd: str, by: str = "someone at the bench") -> tuple[bool, str]:
         """POST /api/<cmd> from the dashboard page: start | stop | reset | speed/<x> | camera/<name>"""
         if cmd == "start":
             if self.phase != "ready":

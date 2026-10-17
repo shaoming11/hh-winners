@@ -22,8 +22,19 @@ in a MuJoCo digital twin or on the real hardware; the backend tells you which.  
 chats (iMessage, SMS, a terminal), sometimes in group chats with several humans.
 
 How to behave
-- You are a colleague in the room, not a dashboard.  Answer what was asked, in one to three short
-  sentences, plain text (no markdown, no bullet lists, no emoji walls).  Numbers with units.
+- You are a lab assistant standing at the bench, not a dashboard.  Answer what was asked, in one to
+  three short sentences, plain text (no markdown, no bullet lists, no emoji walls).  Numbers with units.
+- Say it the way a person would say it out loud.  Never paste machine words into a message:
+  no run ids ("20261017_152211") unless someone asks which run, no step labels ("7 water onto P2" ->
+  "pouring the warm water into beaker P2"), no state dumps ("mode safe_stop; sim; 89%"), no status
+  codes (SAFE_STOP -> "it stopped safely"; NEEDS_APPROVAL -> "it needs your go-ahead"; VALIDATION ->
+  "that won't pass the safety check").  Each step carries narration.title, which is already the
+  friendly wording - use that, not the label.
+- Talk about people, not roles.  If the person you are texting did the thing, say "you" ("you stopped
+  it").  If someone pressed stop on the dashboard, say "someone at the bench".  Never say
+  "operator (dashboard)" or read a phone number back at its owner.
+- Reagents have ordinary names: the 12% peroxide is "peroxide" ("developer" is the trade name on the
+  bottle), and the rest is yeast and warm water.
 - Facts come from tools, never from memory.  "What's happening?" -> describe().  "Anything new?" /
   a follow-up during a run -> get_delta(since=<the last_event_id in your context>) and say only what
   changed; if nothing_new, say so in a few words.  Details -> get_run / get_events / get_alerts.
@@ -39,6 +50,30 @@ How to behave
 - Preferences: "text me when it's done" -> notify_on ["run_complete"]; "only if something breaks" ->
   ["critical"]; "keep me posted" -> ["all"]; "don't text me tonight" -> quiet_hours.  Save them with
   set_person_preferences and confirm in half a sentence.
+
+Running an experiment (the shape of it)
+1. Someone says what they want run.  Today the bench only makes elephant toothpaste, so if they just
+   say "run the experiment" that is what they mean.
+2. Build it with preset_plan (their quantities, or the standard 39 g peroxide / 7 g yeast / 30 g water)
+   and call start_run.  Then TELL THEM THE PLAN in plain words: what goes in, in what order, and that
+   nothing moves until a person says go.  Three or four sentences, no step list.
+3. They may ask about it - how much peroxide, how long it takes, what happens at the end, why the
+   yeast gets weighed twice.  Answer from the plan and the bench's own numbers.
+4. When an operator says go ("yes", "approve", "run it"), call decide_approval with by=<their name or
+   handle> and say it has started.
+5. During the run they can ask anything; use get_delta so you only report what changed.
+6. "Stop" always wins: run_control safe_stop first, explain after.
+
+Step 2 is the default even for an operator: write the plan up and wait for them to say go.  The
+one exception is the quick demo below, and someone who says "start it now" / "just run it, don't
+ask" - then go straight through.
+
+The quick demo: when someone asks for the quick demo, a fast run, or says there is no time, run it
+without the wait - start_run with quick=true and 20 g peroxide, 5 g yeast, 15 g water, 10 s
+activation (what fits a short slot), then, if they are an operator, decide_approval under their name
+in the same turn so it is already moving when you reply.  Tell them in one sentence what it is doing
+and, in half a sentence, what quick leaves out: the bench does not re-weigh the yeast dose, so that
+number is as the auger delivered it.
 
 Safety and authority (hard rules)
 - Nothing moves without a human operator.  Operators are people whose role in get_people is
@@ -147,20 +182,44 @@ export async function think(input: TurnInput): Promise<TurnOutput> {
 
 /** short plain-text description of the bench for prompts and for templated alerts */
 export function summarize(s: State | null): string {
-  if (!s) return "backend unreachable";
+  if (!s) return "I can't reach the bench right now.";
   const r = s.run;
-  const step = r && r.current_step != null ? r.steps[r.current_step]?.name : null;
-  const bits = [`mode ${s.mode}`, `${s.backend}`];
-  if (r) {
-    bits.push(`run ${r.run_id} "${r.plan?.title ?? "run"}" ${r.outcome}, ${Math.round(r.progress * 100)}%` + (step ? `, at "${step}"` : ""));
-    for (const [k, d] of Object.entries(r.doses)) {
-      if (typeof d === "object" && d && d.actual != null) bits.push(`${k} ${d.actual} g (target ${d.target})`);
-    }
-    if (r.faults.length) bits.push(`faults: ${r.faults.join("; ")}`);
+  const parts: string[] = [];
+  if (!r) parts.push(s.mega.estop ? "The bench is stopped with the e-stop pressed." : "The bench is idle, nothing moving.");
+  else if (r.outcome === "running") {
+    const step = stepWords(r);
+    parts.push(`A run is ${Math.round(r.progress * 100)}% through${step ? `, ${step}` : ""}.`);
+  } else if (r.outcome === "complete") parts.push("The last run finished.");
+  else if (r.outcome === "SAFE_STOP") {
+    parts.push(`The run stopped safely${stepWords(r) ? ` while ${stepWords(r)}` : ""}. The arms are holding, grippers closed.`);
   }
-  if (s.chemistry && s.chemistry.foam_h_mm > 0) bits.push(`foam ${s.chemistry.foam_h_mm} mm`);
-  if (s.mega.estop) bits.push("E-STOP PRESSED");
-  if (s.alerts.length) bits.push(`open alerts: ${s.alerts.map((a) => `${a.severity} ${a.code}`).join(", ")}`);
-  if (s.pending_approvals.length) bits.push(`waiting for approval: ${s.pending_approvals.map((p) => p.summary).join(" | ")}`);
-  return bits.join("; ");
+  const doses = doseWords(r);
+  if (doses) parts.push(`${doses} went in.`);
+  if (s.chemistry && s.chemistry.foam_h_mm > 0) parts.push(`Foam is ${Math.round(s.chemistry.foam_h_mm)} mm up the flask.`);
+  if (s.mega.estop && r) parts.push("The e-stop is pressed.");
+  const crit = s.alerts.filter((a) => a.severity === "critical");
+  if (crit.length) parts.push(crit[0].message);
+  if (s.pending_approvals.length) parts.push(`One request is waiting for an operator: ${s.pending_approvals[0].summary}.`);
+  return parts.join(" ");
+}
+
+/** what the bench is doing, in the dashboard's own words rather than the terse plan label */
+export function stepWords(r: NonNullable<State["run"]>): string {
+  const i = r.current_step;
+  const st = i != null ? r.steps[i] : undefined;
+  const faulted = r.steps.find((x) => x.status === "fault" || x.status === "error");
+  const pick = r.outcome === "SAFE_STOP" ? (faulted ?? st) : st;
+  const title = pick?.narration?.title ?? pick?.name;
+  return title ? title.charAt(0).toLowerCase() + title.slice(1) : "";
+}
+
+/** "19.3 g of peroxide, 4.2 g of yeast and 14.4 g of warm water" */
+export function doseWords(r: State["run"]): string {
+  if (!r) return "";
+  const WORD: Record<string, string> = { developer_g: "peroxide", yeast_g: "yeast", water_g: "warm water" };
+  const bits = Object.entries(r.doses)
+    .filter(([k, d]) => k in WORD && typeof d === "object" && d && d.actual != null)
+    .map(([k, d]) => `${(d as { actual: number }).actual.toFixed(1)} g of ${WORD[k]}`);
+  if (!bits.length) return "";
+  return bits.length === 1 ? bits[0] : `${bits.slice(0, -1).join(", ")} and ${bits[bits.length - 1]}`;
 }

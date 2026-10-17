@@ -368,7 +368,8 @@ def test_runner_safe_stop(rig):
     assert rep.ok
     run = rig.wait_finished(timeout=30)
     assert run.outcome == "SAFE_STOP" and rig.mode == "safe_stop"
-    assert run.faults and "safe_stop requested by pytest" in run.faults[-1]
+    # the fault text is read back to people, so it says it in words: "stopped by <who>"
+    assert run.faults and "stopped by pytest" in run.faults[-1]
     assert any(s.status == "fault" for s in run.steps)
     faults = [a for a in rig.store.alerts.values() if a.code == "FAULT" and not a.resolved]
     assert faults and faults[0].severity == "critical" and faults[0].run_id == run_id

@@ -18,7 +18,10 @@ export type Describe = { headline: string; detail: string; needs_human: string |
 export type State = {
   v: string; ts: string; bench_t: number; backend: string; mode: string;
   run: null | { run_id: string; outcome: string; progress: number; plan?: { title: string } | null;
-    current_step?: number | null; steps: { name: string; status: string }[];
+    current_step?: number | null;
+    /** `narration.title` is the friendly wording for a step ("Weighing out 20 g of hydrogen peroxide");
+     *  `name` is the terse plan label ("2 developer onto P1") and is not for showing people. */
+    steps: { name: string; status: string; narration?: { title?: string | null } | null }[];
     doses: Record<string, { target: number; actual: number | null; error: number | null; topups: number } | number>;
     faults: string[]; operator: string; notebook_html?: string | null; recipe?: Record<string, number> | null };
   health: { ok: boolean; spill_detected: boolean; spilled_g: number; arm_settle_overruns: number; open_alerts: number };

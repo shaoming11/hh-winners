@@ -195,7 +195,11 @@ def mode_from(snap: dict, *, awaiting_approval: bool = False, paused: bool = Fal
     """`run_active` is the runner's own phase.  The sequencer reaches DONE before the run is over -
     benchsim's demo watches the foam for 14 s after the last step, and the record is written after
     that - so a terminal mode is the runner's to declare, never the feed's."""
-    if awaiting_approval:
+    # A pending request does NOT hide a bench that is moving: during a run the mode stays "running"
+    # and the request stays visible in `pending_approvals` (and in describe's needs_human).  Otherwise
+    # a stale request left over from an earlier ask makes the dashboard read "awaiting approval" while
+    # the arms are mid-pour.
+    if awaiting_approval and not (run_active or paused):
         return "awaiting_approval"
     if paused:
         return "paused"

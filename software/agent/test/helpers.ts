@@ -42,8 +42,11 @@ export function mkRun(outcome: string, o: Partial<NonNullable<State["run"]>> = {
   return {
     run_id: "r1", outcome, progress: outcome === "complete" ? 1 : 0.4, plan: { title: "Elephant toothpaste" },
     current_step: 1,
-    steps: [{ name: "home", status: "ok" }, { name: "pour developer", status: outcome === "SAFE_STOP" ? "failed" : "running" }, { name: "activate", status: "pending" }],
-    doses: { developer: { target: 39, actual: 38.6, error: -0.4, topups: 1 }, yeast: { target: 7, actual: null, error: null, topups: 0 }, water_g: 30 },
+    steps: [{ name: "home", status: "ok" },
+            { name: "2 developer onto P1", status: outcome === "SAFE_STOP" ? "fault" : "running",
+              narration: { title: "Weighing out 39 g of hydrogen peroxide" } },
+            { name: "7 activate", status: "pending", narration: { title: "Waiting 60 s: yeast activation" } }],
+    doses: { developer_g: { target: 39, actual: 38.6, error: -0.4, topups: 1 }, yeast_g: { target: 7, actual: null, error: null, topups: 0 } },
     faults: outcome === "SAFE_STOP" ? ["spill detected"] : [], operator: "sam",
     ...o,
   };

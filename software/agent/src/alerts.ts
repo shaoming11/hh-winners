@@ -9,7 +9,7 @@
 import { attachment } from "spectrum-ts";
 import { backend, type Alert, type NotifyKind, type Person, type State } from "./backend.js";
 import { CONFIG } from "./config.js";
-import { summarize } from "./brain.js";
+import { summarize, stepWords, doseWords } from "./brain.js";
 import { remember, type SpaceMemo } from "./memory.js";
 
 export type Sender = {
@@ -99,7 +99,7 @@ export class AlertWatcher {
     this.pendingWarn.clear();
     if (!list.length) return;
     const lines = list.map(describe);
-    const text = `Minor things on the bench, no action needed yet.\n${lines.join("\n")}`;
+    const text = `Nothing urgent, just so you know:\n${lines.join("\n")}`;
     const sent = await this.broadcast(text, false, `alert:${list.map((a) => a.id).join(",")}`, null, [], "warning");
     await this.markAll(list, sent);
     void s;
@@ -116,12 +116,14 @@ export class AlertWatcher {
     let text: string;
     let image: Buffer | null = null;
     if (unexpected.length) {
-      text = `Heads up, the bench stopped itself.\n${unexpected.map(describe).join("\n")}`
-        + (s.health.spill_detected ? `\nThat is 12% peroxide: goggles and gloves before wiping it.` : "");
+      text = `Heads up - the bench stopped itself.\n${unexpected.map(describe).join("\n")}`
+        + (s.health.spill_detected ? `\nThat is 12% peroxide: goggles and gloves before you wipe it.` : "");
       image = await backend.snapshot("overview").catch(() => null);
     } else if (list.length) {
       const a = list[0];
-      text = `${requesters.join(", ")} stopped the bench${a.step ? ` during ${a.step}` : ""}. Arms are holding, grippers closed.`;
+      const where = s.run ? stepWords(s.run) : "";
+      text = `Stopped${where ? ` while ${where}` : ""} - the arms are holding what they held, grippers closed.`;
+      void a;
     } else {
       text = "";
     }
@@ -177,16 +179,20 @@ export function inQuietHours(q: Person["quiet_hours"], now = new Date()): boolea
   return q.start <= q.end ? hm >= q.start && hm < q.end : hm >= q.start || hm < q.end;   // wraps midnight
 }
 
-const describe = (a: Alert) => `${a.code.toLowerCase().replace("_", " ")}: ${a.message}${a.step ? ` (during ${a.step})` : ""}`;
+const describe = (a: Alert) => `${a.message}${a.step ? ` (during ${a.step})` : ""}`;
 
 export function runSummary(s: State): string {
   const r = s.run!;
-  const doses = Object.entries(r.doses)
-    .filter(([, d]) => typeof d === "object" && d && d.actual != null)
-    .map(([k, d]) => { const x = d as { target: number; actual: number; error: number }; return `${k} ${x.actual} g (${x.error >= 0 ? "+" : ""}${x.error})`; });
   if (r.outcome === "complete") {
-    const foam = s.chemistry?.foam_h_mm ? `, foam ${s.chemistry.foam_h_mm} mm` : "";
-    return `Run ${r.run_id} finished: ${doses.join(", ")}${foam}. Notebook is on the dashboard.`;
+    const went = doseWords(r);
+    const foam = s.chemistry?.foam_h_mm ? ` The foam came up to ${Math.round(s.chemistry.foam_h_mm)} mm.` : "";
+    return `All done.${went ? ` ${went[0].toUpperCase()}${went.slice(1)} went in.` : ""}${foam} The notebook is on the dashboard.`;
   }
-  return `Run ${r.run_id} safe-stopped during "${r.steps.find((st) => st.status !== "ok" && st.status !== "pending")?.name ?? "?"}": ${r.faults.join("; ") || "no detail"}. Arms are holding, grippers closed. ${summarize(s)}`;
+  const where = stepWords(r);
+  const why = r.faults[r.faults.length - 1] ?? "";
+  // "stopped by <someone>" is the backend's own wording; the person reading this does not need it
+  // repeated back when they are the one who asked.
+  const because = why && !/^stopped by/i.test(why) ? ` ${why[0].toUpperCase()}${why.slice(1)}.` : "";
+  return `The run stopped safely${where ? ` while ${where}` : ""}. The arms are holding what they held and the grippers are closed.${because}`
+    + ` Say reset when you want the bench cleared.`;
 }

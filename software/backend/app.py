@@ -338,6 +338,22 @@ async def feed_mjpeg(request: Request):
     return await mjpeg(request)
 
 
+class View(BaseModel):
+    azimuth: float | None = None
+    elevation: float | None = None
+    distance: float | None = None
+    lookat: list[float] | None = None
+
+
+@app.post("/api/view")
+async def set_view(v: View):
+    """the dashboard's mouse orbit: absolute free-camera pose.  MUST stay above the /api/{cmd:path}
+    catch-all below, which would otherwise swallow it as a control verb."""
+    rep = await asyncio.get_running_loop().run_in_executor(
+        None, lambda: runner.set_view(v.azimuth, v.elevation, v.distance, v.lookat))
+    return JSONResponse(json.loads(rep.model_dump_json()), status_code=200 if rep.ok else 409)
+
+
 @app.post("/api/{cmd:path}")
 async def feed_command(cmd: str, request: Request):
     """the dashboard's verbs: start | stop | reset | speed/<x> | camera/<name>"""

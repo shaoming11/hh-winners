@@ -119,6 +119,15 @@ body.replay .caption { bottom: 56px; }
 .cams button:hover { color: var(--fg); }
 .cams button.on { background: var(--line-2); color: var(--fg); }
 .cams button .live { font-size: 10px; opacity: .8; }
+.stage { cursor: grab; touch-action: none; }            /* free look: drag to orbit, shift-drag to pan */
+.stage.grabbing { cursor: grabbing; }
+.fsbtn { position: absolute; bottom: 10px; right: 10px; width: 28px; height: 28px; display: grid; place-items: center;
+  border-radius: 999px; background: rgba(0,0,0,.6); border: 1px solid var(--line-2); color: var(--dim);
+  font: 400 13px/1 var(--font-sans); cursor: pointer; z-index: 2; }
+.fsbtn:hover { color: var(--fg); }
+.stage:fullscreen { aspect-ratio: auto; width: 100vw; height: 100vh; }
+.stage:fullscreen img { object-fit: contain; }           /* no cropping when the screen is a different shape */
+
 .banner { position: absolute; top: 0; left: 0; right: 0; padding: 10px 16px; background: rgba(0,0,0,.72); border-bottom: 1px solid var(--red); color: var(--red); font-family: var(--font-mono); font-size: 13px; }
 #banner:not([hidden]) ~ .cams, #banner:not([hidden]) ~ .armtag { top: 50px; }
 
