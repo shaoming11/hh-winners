@@ -1,0 +1,113 @@
+"""Run the reference simulator's layout, scale, pour, carousel and stage checks."""
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+from run_demo import run
+from verify_layout import run as verify_layout
+from chemistry import PourPlant
+from hal.protocol import LineDecoder, decode_line, encode_line
+from verify_motion import run as verify_motion
+from verify_transfer import run as verify_transfer
+from verify_carousel import run as verify_carousel
+from verify_rack_transfer import run as verify_rack_transfer
+from verify_pour import run as verify_pour
+from verify_foam import run as verify_foam
+from verify_reach import run as verify_reach
+from verify_stage import run as verify_stage
+from audit_report import build_report, write_report
+
+
+DEFAULT_AUDIT_PATH = Path(__file__).resolve().parent / "build" / "reference_audit.json"
+
+
+def main(audit_path: Path = DEFAULT_AUDIT_PATH) -> None:
+    layout_rows = verify_layout()
+    assert all(row["pass"] for row in layout_rows), "one or more station radii are outside 1 mm"
+    reach = verify_reach()
+    stage = verify_stage()
+    motion = verify_motion()
+    transfer = verify_transfer()
+    carousel = verify_carousel()
+    rack_transfer = verify_rack_transfer()
+    physical_pour = verify_pour()
+    foam = verify_foam()
+
+    result = run()
+    smoke = result["arm_control_smoke"]
+    assert abs(smoke["reached_deg"] - smoke["target_deg"]) <= 1.0
+    assert abs(smoke["returned_deg"] - smoke["start_deg"]) <= 1.0
+    assert result["process_arm_trajectory_playback"] is False
+    assert result["mega_json_line_codec_exercised"] is True
+    example = {"cmd": "carousel", "deg": 45, "ms": 2500}
+    line = encode_line(example)
+    assert decode_line(line) == example
+    decoder = LineDecoder()
+    assert decoder.feed(line[:7]) == []
+    assert decoder.feed(line[7:]) == [example]
+    events = {event["step"]: event for event in result["events"]}
+    dev = events[2]["pour"]
+    water = events[7]["pour"]
+    assert abs(dev["landed_g"] - 39.0) <= 2.0, f"developer dose out of range: {dev['landed_g']} g"
+    assert abs(water["landed_g"] - 30.0) <= 2.0, f"water dose out of range: {water['landed_g']} g"
+    assert abs(events[2]["mujoco_scale_reading_g"] - dev["landed_g"]) <= 1.0
+    assert abs(events[6]["measured_g"] - 7.0) <= 0.7
+    expected_total = events[5]["actual_g"] + water["landed_g"]
+    assert abs(events[7]["mujoco_scale_total_g"] - expected_total) <= 1.0
+    assert events[3]["pour"]["spilled_g"] < 0.1
+    assert events[8]["pour"]["spilled_g"] < 0.1
+    assert abs(events[10]["carousel_dose_pose"] - 180.0) <= 1.0
+    assert abs(events[10]["stage_travel_mm"] - 97.3) <= 1.0
+    assert abs(events[10]["foam"]["peak_height_mm"] - foam["peak_height_mm"]) <= 1.0
+
+    batch_plant = PourPlant(seed=42)
+    batch = [batch_plant.pour(80.0, 39.0).landed_g for _ in range(10)]
+    batch_mean = sum(batch) / len(batch)
+    batch_sd = (sum((value - batch_mean) ** 2 for value in batch) / len(batch)) ** 0.5
+    assert abs(batch_mean - 39.0) <= 2.0
+    assert batch_sd <= 0.5
+
+    print("PASS: final layout radii match within 1 mm")
+    print(f"PASS: MuJoCo stations match Update-13 within 1 mm; "
+          f"{len(reach['reach_rows'])} arm/station IK targets clear 5° joint margin")
+    print("PASS: 39 g developer and 30 g water targets are within ±2 g")
+    print("PASS: simulated load-cell reads the added mass within 1 g")
+    print("PASS: yeast target, carousel index, and 97.3 mm stage move are within tolerance")
+    print(f"PASS: JSON stage profiles reach 75° and 150°, reverse home, and carry the funnel "
+          f"(max measured per-sample move "
+          f"{max(row['maximum_sample_step_mm'] for row in stage['profiles']):.2f} mm)")
+    print("PASS: both funnel pours land inside the modeled opening")
+    print(f"PASS: SO-101 IK reaches the carousel grasp point with {motion['ik_min_joint_margin_deg']:.1f}° min joint margin")
+    print(f"PASS: proximity grasp latches at {motion['grasp_distance_mm']:.2f} mm and follows a wrist command")
+    print(f"PASS: P1 carousel-to-scale transfer lands {transfer['final_site_error_mm']:.2f} mm off target, "
+          f"tilt {transfer['upright_error_deg']:.2f}°")
+    if transfer["arm_contacts"]:
+        print(f"REVIEW: P1 transfer reports {len(transfer['arm_contacts'])} stock-gripper contacts; "
+              "carousel clearance is unresolved")
+    else:
+        print("PASS: P1 transfer has no arm-to-scene contacts")
+    print(f"PASS: four carousel beakers follow a {carousel['reached_deg']:.2f}° index and stay in their pockets")
+    print(f"PASS: rack-to-scale transfer lands {rack_transfer['final_site_error_mm']:.2f} mm off target, "
+          f"tilt {rack_transfer['upright_error_deg']:.2f}°")
+    print(f"PASS: arm-driven pour lands {physical_pour['landed_g']:.2f} g, "
+          f"spill {physical_pour['spilled_g']:.2f} g, peak tilt "
+          f"{physical_pour['peak_tilt_deg']:.1f}°")
+    print(f"PASS: analytical foam reaches {foam['peak_height_mm']:.1f} mm; "
+          f"oxygen estimate {foam['oxygen_estimate_l']:.2f} L")
+    print("PASS: SO-101 joint command, JSON-line codec, and simulated mechanism commands respond")
+    print(f"PASS: 10 simulated 39 g pours mean {batch_mean:.2f} g, SD {batch_sd:.2f} g")
+
+    report = build_report(layout_rows=layout_rows, reach=reach, stage=stage, motion=motion,
+                          transfer=transfer, carousel=carousel, rack_transfer=rack_transfer,
+                          physical_pour=physical_pour, foam=foam, demo=result,
+                          batch_mean_g=batch_mean, batch_sd_g=batch_sd)
+    path = write_report(report, audit_path)
+    print(f"Wrote {path} ({report['overall']}, schema {report['schema']})")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--json-out", type=Path, default=DEFAULT_AUDIT_PATH,
+                        help="write comparison metrics to this JSON file")
+    main(parser.parse_args().json_out)

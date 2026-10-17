@@ -5,14 +5,19 @@ SO101*.step
 # Redundant with the .f3d and 28 MB
 exports/assembly/wet-lab-bench_WORK.step
 
+# Local simulator dependencies and fetched upstream robot meshes
+software/reference_sim/.venv/
+software/reference_sim/assets/so101/
+software/reference_sim/build/
+MUJOCO_LOG.TXT
+
 # OS cruft
 .DS_Store
-
+__pycache__/
+*.py[cod]
 # Simulation outputs and fetched third-party assets (python -m benchsim.assets fetch)
 software/out/
-__pycache__/
 .pytest_cache/
 software/MUJOCO_LOG.TXT
-
 .env
 *.env
