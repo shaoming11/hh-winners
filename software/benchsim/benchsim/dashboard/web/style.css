@@ -69,6 +69,7 @@ body.replay .badge { border-color: var(--s2); color: var(--s2); }
 .cams button.on { background: var(--s1); color: #fff; }
 .cams button .live { font-size: 11px; opacity: .8; }
 .banner { position: absolute; top: 0; left: 0; right: 0; padding: 12px 20px; background: var(--critical); color: #fff; font-weight: 650; font-size: 18px; }
+#banner:not([hidden]) ~ .cams, #banner:not([hidden]) ~ .armtag { top: 60px; }
 
 .meter { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
 .meter-track { position: relative; flex: 1; height: 14px; border-radius: 4px; background: var(--grid); }
@@ -77,7 +78,9 @@ body.replay .badge { border-color: var(--s2); color: var(--s2); }
 .meter-target { position: absolute; top: -5px; bottom: -5px; width: 2px; background: var(--ink); }
 .meter-text { min-width: 150px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
 
-.runner { margin-top: 8px; }
+.runner { margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.low { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 10px; }
+@media (max-width: 700px) { .low { grid-template-columns: minmax(0, 1fr); } }
 
 /* Run panel: Claude Code terminal look. "✻ title… (meta)" then "  ⎿  " and the todo rows: glyph | step no. | label */
 .run-scroll { font: 13px/1.55 ui-monospace, "SF Mono", Menlo, monospace; }
@@ -113,13 +116,13 @@ body.replay .badge { border-color: var(--s2); color: var(--s2); }
 
 .legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 8px; color: var(--ink-2); }
 .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; background: var(--c); }
-.vessel { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); gap: 2px 10px; align-items: center; padding: 3px 0; }
+.vessel { display: grid; grid-template-columns: 8.5em minmax(0, 1fr) 4.5em; gap: 0 10px; align-items: center; padding: 2px 0; }
 .vessel .name { color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .vessel .vbar { display: flex; gap: 2px; height: 12px; }
 .vessel .vbar i { display: block; height: 100%; background: var(--c); }
 .vessel .vbar i:first-child { border-radius: 4px 0 0 4px; } .vessel .vbar i:last-child { border-radius: 0 4px 4px 0; }
 .vessel .vbar i:only-child { border-radius: 4px; }
-.vessel .txt { grid-column: 2; color: var(--muted); font-variant-numeric: tabular-nums; }
+.vessel .txt { text-align: right; white-space: nowrap; color: var(--muted); font-variant-numeric: tabular-nums; }
 .vessel.empty .vbar { background: var(--grid); border-radius: 4px; height: 4px; }
 .facts-row { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .facts-row b { color: var(--ink); font-weight: 650; }
@@ -134,31 +137,49 @@ body.replay .badge { border-color: var(--s2); color: var(--s2); }
 .facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 8px 0 0; font-size: 13px; }
 .facts dt { color: var(--muted); } .facts dd { margin: 0; font-variant-numeric: tabular-nums; }
 
-.twin-arm { padding: 8px 0; border-bottom: 1px solid var(--grid); }
-.twin-arm:last-child { border-bottom: 0; }
-.twin-arm.active .twin-head b { color: var(--s1); }
-.twin-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.twin-status { margin-left: auto; font-weight: 650; font-variant-numeric: tabular-nums; }
+/* Arms: one row per arm (name | holding | error meter with the gap tick | status) */
+.twin-arm { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 72px 8em; align-items: center; gap: 10px; padding: 3px 0; }
+.twin-arm b { white-space: nowrap; }
+.twin-arm.active b { color: var(--s1); }
+.twin-arm .hold { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.twin-arm .meter-track { height: 6px; }
+.twin-arm .meter-target { top: -4px; bottom: -4px; }
+.twin-status { text-align: right; white-space: nowrap; font-weight: 650; font-variant-numeric: tabular-nums; }
 .twin-status.ok { color: var(--good-ink); } .twin-status.warn { color: var(--warning); } .twin-status.crit { color: var(--critical-ink); }
 .twin-status.lag, .twin-status.idle { color: var(--muted); }
-.twin-meter { margin: 6px 0 4px; } .twin-meter .meter-track { height: 8px; } .twin-meter .meter-text { min-width: 70px; }
 .meter-fill.ok { background: var(--good); } .meter-fill.warn { background: var(--warning); } .meter-fill.crit { background: var(--critical); }
 .meter-fill.lag, .meter-fill.idle { background: var(--axis); }
 .facts dt { white-space: nowrap; }
-.joints { display: flex; flex-wrap: wrap; gap: 0 10px; }
-.joints span { white-space: nowrap; }
-.caveat { margin: 8px 0 0; }
 
-.wire { font: 12px/1.45 ui-monospace, "SF Mono", Menlo, monospace; height: 220px; overflow: auto; background: var(--page); border-radius: 6px; padding: 6px 8px; }
-.wire .row { white-space: pre-wrap; overflow-wrap: anywhere; padding-left: 4.2em; text-indent: -4.2em; }
+.wire { font: 12px/1.45 ui-monospace, "SF Mono", Menlo, monospace; height: 200px; overflow: auto; background: var(--page); border-radius: 6px; padding: 6px 8px; }
+.wire .row { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wire .t { color: var(--muted); } .wire .dev { font-weight: 700; }
 .wire .tx .arrow { color: var(--s1); } .wire .rx .arrow { color: var(--s3); }
 .wire .fault, .wire .bad { color: var(--critical-ink); }
-.note { display: inline-block; white-space: nowrap; text-indent: 0; color: var(--muted); font-size: 11px; border: 1px solid var(--grid); border-radius: 3px; padding: 0 4px; margin-left: 4px; }
-.wire-legend { margin-top: 6px; }
+.note { display: inline-block; white-space: nowrap; color: var(--muted); font-size: 11px; line-height: 1.3; border: 1px solid var(--grid); border-radius: 3px; padding: 0 4px; }
 
 .errors { list-style: none; margin: 0; padding: 0; font-size: 13px; }
-.errors li { padding: 4px 0; border-bottom: 1px solid var(--grid); }
+.errors li { padding: 3px 0; border-bottom: 1px solid var(--grid); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.errors li:last-child { border-bottom: 0; }
 .errors li.crit::before { content: "✕ "; color: var(--critical-ink); font-weight: 700; }
 .errors li.ok::before { content: "✓ "; color: var(--good-ink); font-weight: 700; }
 .errors li.warn::before { content: "! "; color: var(--warning); font-weight: 700; }
+
+/* Whole dashboard in one viewport on a laptop-sized screen: the video shrinks to leave the Chemistry/Wire row its
+   room, and anything that still overflows (the run list, the wire log) scrolls inside its own card. Smaller screens
+   keep the stacked, scrolling layout above. */
+@media (min-width: 1000px) and (min-height: 640px) {
+  :root { --below-video: 382px; }   /* header + page padding + runner line + the Chemistry/Wire row (2 foam lines) */
+  body { height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
+  .bar { flex: none; }
+  .grid { flex: 1; min-height: 0; grid-template-rows: minmax(0, 1fr); align-items: stretch; }
+  .left { display: flex; flex-direction: column; min-height: 0; }
+  .stage { flex: none; align-self: center; width: min(100%, calc((100dvh - var(--below-video)) * 16 / 9)); }
+  .low { flex: 1; min-height: 0; }
+  .low .card { display: flex; flex-direction: column; min-height: 0; }
+  #card-chem { overflow: auto; }
+  .wire { flex: 1; min-height: 0; height: auto; }
+  .right { min-height: 0; }
+  #card-run { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .run-scroll { flex: 1; min-height: 0; overflow: auto; }
+}

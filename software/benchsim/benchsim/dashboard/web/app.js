@@ -67,8 +67,9 @@ function renderChem(s) {
     const total = parts.reduce((a, [k]) => a + comp[k], 0);
     const bar = parts.map(([k, , c]) => '<i style="--c: var(' + c + '); width: ' + (comp[k] / top * 100) + '%" title="' + esc(k) + ' ' + fmt(comp[k], 1) + ' g"></i>').join('');
     const txt = parts.length ? parts.map(([k]) => k + ' ' + fmt(comp[k], 1)).join(' · ') + ' g' : 'empty';
-    return '<div class="vessel' + (parts.length ? '' : ' empty') + '"><span class="name">' + esc(label) + '</span><span class="vbar">' + bar + '</span>' +
-      '<span class="txt">' + esc(txt) + (parts.length > 1 ? ' (' + fmt(total, 1) + ' g)' : '') + '</span></div>';
+    // one line per vessel: the total shows, the per-species split is in the tooltip
+    return '<div class="vessel' + (parts.length ? '' : ' empty') + '" title="' + esc(label + ': ' + txt) + '"><span class="name">' + esc(label) + '</span><span class="vbar">' + bar + '</span>' +
+      '<span class="txt">' + (parts.length ? fmt(total, 1) + ' g' : 'empty') + '</span></div>';
   }).join('');
   const f = s.probes && s.probes.foam; const bits = [];
   if (s.spilled_g !== null && s.spilled_g !== undefined) bits.push('spilled <b>' + fmt(s.spilled_g, 2) + ' g</b>');
@@ -108,7 +109,7 @@ function renderBar(s) {
   $('btn-start').disabled = phase !== 'ready';
   $('btn-stop').disabled = !(phase === 'running' || phase === 'starting');
   $('btn-reset').disabled = !(phase === 'ready' || phase === 'finished');
-  $('runner').textContent = runner ? 'Runner: ' + runner.name + ' · log: ' + runner.out : '';
+  $('runner').textContent = $('runner').title = runner ? 'Runner: ' + runner.name + ' · log: ' + runner.out : '';
 }
 
 function meter(cur, s) {
@@ -221,51 +222,59 @@ const TIGHTEST_MM = 5.3;   // smallest verified clearance in the demo (held beak
 const JOINT = { shoulder_pan: 'pan', shoulder_lift: 'lift', elbow_flex: 'elbow', wrist_flex: 'w.flex', wrist_roll: 'w.roll' };
 const xyz = (p) => p ? p.map((v) => fmt(v, 1)).join(', ') : '–';
 
+const ARM_SHORT = { pourer: 'Pourer (W)', transfer: 'Transfer (E)' };
+
 function twinStatus(t, gap) {
-  if (t.error_mm === undefined) return ['idle', 'no command yet'];
-  if (!t.settled) return ['lag', 'moving: ' + fmt(t.error_mm, 1) + ' mm tracking lag'];
-  if (t.error_mm >= gap) return ['crit', '✕ ' + fmt(t.error_mm, 2) + ' mm: more than the ' + gap + ' mm gap'];
-  if (t.error_mm >= gap / 2) return ['warn', '! ' + fmt(t.error_mm, 2) + ' mm: over half the ' + gap + ' mm gap'];
-  return ['ok', '✓ ' + fmt(t.error_mm, 2) + ' mm off the plan'];
+  // -> [class, short label, full sentence]
+  if (t.error_mm === undefined) return ['idle', 'idle', 'no command yet'];
+  if (!t.settled) return ['lag', 'moving ' + fmt(t.error_mm, 1) + ' mm', 'moving: ' + fmt(t.error_mm, 1) + ' mm tracking lag'];
+  if (t.error_mm >= gap) return ['crit', '✕ ' + fmt(t.error_mm, 2) + ' mm', '✕ ' + fmt(t.error_mm, 2) + ' mm: more than the ' + gap + ' mm gap'];
+  if (t.error_mm >= gap / 2) return ['warn', '! ' + fmt(t.error_mm, 2) + ' mm', '! ' + fmt(t.error_mm, 2) + ' mm: over half the ' + gap + ' mm gap'];
+  return ['ok', '✓ ' + fmt(t.error_mm, 2) + ' mm', '✓ ' + fmt(t.error_mm, 2) + ' mm off the plan'];
 }
 
 function renderTwin(s) {
+  // one line per arm; plan/servo positions, joint errors and load are in the row's tooltip
   const cur = s.current;
   const html = Object.entries(s.arms || {}).map(([name, a]) => {
     const t = a.twin || {};
     const active = cur && cur.narration.arm === name;
     const gap = active && cur.narration.clearance ? cur.narration.clearance.mm : TIGHTEST_MM;
-    const [cls, label] = twinStatus(t, gap);
+    const [cls, label, sentence] = twinStatus(t, gap);
     const top = Math.max(gap * 1.5, t.error_mm || 0);
     const pct = (v) => Math.max(0, Math.min(100, (v / top) * 100)) + '%';
-    const joints = t.joint_err_deg ? Object.entries(t.joint_err_deg).map(([j, v]) => '<span>' + JOINT[j] + ' ' + (v >= 0 ? '+' : '') + fmt(v, 1) + '°</span>').join('') : '';
+    const joints = t.joint_err_deg ? Object.entries(t.joint_err_deg).map(([j, v]) => JOINT[j] + ' ' + (v >= 0 ? '+' : '') + fmt(v, 1) + '°').join('  ') : '–';
     const loads = (a.load_pm || []).slice(0, 5).map((v) => Math.abs(v) / 10);
     const maxLoad = loads.length ? Math.max(...loads) : 0;
     const maxJ = Object.keys(JOINT)[loads.indexOf(maxLoad)];
-    return '<div class="twin-arm' + (active ? ' active' : '') + '">' +
-      '<div class="twin-head"><b>' + esc(ARM[name] || name) + '</b>' + (a.holding ? ' <span class="muted">holding ' + esc(a.holding) + '</span>' : '') +
-      '<span class="twin-status ' + cls + '">' + esc(label) + '</span></div>' +
-      '<div class="meter twin-meter"><div class="meter-track"><div class="meter-fill ' + cls + '" style="width:' + pct(t.error_mm || 0) + '"></div>' +
-      '<div class="meter-target" style="left:' + pct(gap) + '" title="' + gap + ' mm clearance"></div></div><div class="meter-text small">gap ' + gap + ' mm</div></div>' +
-      '<dl class="facts"><dt>plan (x, y, z)</dt><dd>' + xyz(t.commanded_mm) + ' mm</dd><dt>servos say</dt><dd>' + xyz(t.measured_mm) + ' mm</dd>' +
-      '<dt>joint Δ</dt><dd class="joints">' + (joints || '–') + '</dd>' +
-      '<dt>highest load</dt><dd>' + (maxJ ? JOINT[maxJ] + ' ' + fmt(maxLoad, 0) + ' % of max torque' : '–') + '</dd></dl></div>';
+    const tip = [sentence + ' (gap ' + gap + ' mm)', 'plan (x, y, z): ' + xyz(t.commanded_mm) + ' mm', 'servos say: ' + xyz(t.measured_mm) + ' mm',
+      'joint Δ: ' + joints, 'highest load: ' + (maxJ ? JOINT[maxJ] + ' ' + fmt(maxLoad, 0) + ' % of max torque' : '–')].join('\n');
+    return '<div class="twin-arm' + (active ? ' active' : '') + '" title="' + esc(tip) + '"><b>' + esc(ARM_SHORT[name] || name) + '</b>' +
+      '<span class="hold muted">' + (a.holding ? 'holding ' + esc(a.holding) : '') + '</span>' +
+      '<div class="meter-track"><div class="meter-fill ' + cls + '" style="width:' + pct(t.error_mm || 0) + '"></div><div class="meter-target" style="left:' + pct(gap) + '"></div></div>' +
+      '<span class="twin-status ' + cls + '">' + esc(label) + '</span></div>';
   }).join('');
   $('twin').innerHTML = html || '–';
 }
+
+// follow new lines until the reader scrolls up; kept from scroll events because the box changes height with the window
+let wireStick = true;
+$('wire').addEventListener('scroll', () => { const b = $('wire'); wireStick = b.scrollTop + b.clientHeight >= b.scrollHeight - 8; });
 
 function renderWire(s) {
   const box = $('wire');
   const fresh = s.wire.filter((w) => w.id > wireSeen);
   if (!fresh.length) return;
-  const stick = box.scrollTop + box.clientHeight >= box.scrollHeight - 8;
+  const stick = wireStick;
   for (const w of fresh) {
     const div = document.createElement('div');
     div.className = 'row ' + w.dir;
     const arrow = w.dir === 'tx' ? '→' : w.dir === 'rx' ? '←' : '!';
     const who = w.dev === 'mega' ? 'Mega' : w.dev;
+    // one line each (the note goes before the text so the ellipsis never hides it); the full line is the tooltip
     div.innerHTML = '<span class="t">' + fmt(w.t, 2) + '</span> <span class="arrow">' + arrow + '</span> <span class="dev">' + esc(who) +
-      '</span> ' + esc(w.text) + (w.note ? '<span class="note">' + esc(w.note) + '</span>' : '');
+      '</span> ' + (w.note ? '<span class="note">' + esc(w.note) + '</span> ' : '') + esc(w.text);
+    div.title = fmt(w.t, 2) + ' ' + arrow + ' ' + who + ' ' + w.text + (w.note ? ' (' + w.note + ')' : '');
     box.appendChild(div);
   }
   wireSeen = fresh[fresh.length - 1].id;
@@ -282,7 +291,7 @@ function renderErrors(s) {
     items.push([e.outcome === 'grasped' ? 'ok' : 'crit', (ARM[e.arm] || e.arm) + ' ' + verdict + ': jaw stopped at ' +
       fmt(e.jaw_deg, 2) + '°, expected ' + fmt(e.expected_deg, 2) + '°']);
   }
-  $('errors').innerHTML = items.length ? items.slice(-12).map(([c, t]) => '<li class="' + c + '">' + esc(t) + '</li>').join('') : '<li class="muted">none</li>';
+  $('errors').innerHTML = items.length ? items.slice(-4).map(([c, t]) => '<li class="' + c + '" title="' + esc(t) + '">' + esc(t) + '</li>').join('') : '<li class="muted">none</li>';
 }
 
 // ------------------------------------------------------------------ wiring
