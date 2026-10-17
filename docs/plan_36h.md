@@ -1,5 +1,9 @@
 # 36-hour build plan
 
+**Status:** historical planning draft based on an earlier station and rack arrangement. It is not
+a current task schedule. Use [demo_process.md](demo_process.md), [electrical.md](electrical.md) and
+[print_list.md](print_list.md) for the final design and assembly instructions.
+
 **Assumed window:** Fri 7 pm → Sun 7 am. If the real start differs, shift every time. Times are also given as hours from the start (H+x).
 
 **Team:**

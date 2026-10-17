@@ -1,4 +1,9 @@
-# Software architecture (plan, no code written yet)
+# Proposed runtime software architecture (historical plan)
+
+**Status:** This is a design proposal, not a description of the software in this checkout. Some
+offline planner code is included under `software/tools/planner/`, but the planned host application,
+Arduino firmware, tests and generated runtime configuration are not present. The hardware design
+was later simplified; [electrical.md](electrical.md) is authoritative for final wiring and pins.
 
 Revision 2, after the CDR of 2026-10-14. Rulings: `review/records/cdr_ruling.md`; full reasoning:
 `review/records/cdr_record.json`.

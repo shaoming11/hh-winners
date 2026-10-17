@@ -1,30 +1,29 @@
 # Wet Lab Bench
 
-## Why this matters
-**Experiments are now the bottleneck of science, and only rich labs can automate them.**
+## Goal and current scope
 
-AI can propose hundreds of recipes, catalysts or formulations in minutes, but someone still has to mix and measure every one by hand. When that loop is automated, discovery speeds up dramatically. Liverpool's mobile robot chemist ran **688 experiments in 8 days on its own** and found a photocatalyst mix **about 6x more active** than its starting point ([Burger et al., *Nature* 2020](https://doi.org/10.1038/s41586-020-2442-2)). That speed is locked inside a few well-funded labs: self-driving labs and cloud labs cost from **$100k**, or **$25k a month** ([sources](docs/motivation.md)).
+Wet Lab Bench explores whether low-cost robot arms and ordinary labware can automate a small
+gravimetric chemistry workflow. The long-term idea is to connect experiment planning, execution,
+measurement and record keeping. **This repository documents the bench design and offline motion
+planning; it does not contain the run-time laptop application or Arduino firmware.** The camera,
+AI decision loop and automatic lab notebook are proposed extensions, not capabilities of this
+checkout.
 
-**Wet Lab Bench brings that loop down to about $500 and ordinary glassware.**
-1. An AI agent plans the experiment.
-2. Two **$120 open-source SO-101 arms** run it **by weight** (closed-loop pours on a load cell, auger powder dosing).
-3. A **camera measures the result**.
-4. The agent decides what to try next.
-5. Every step is logged automatically.
+The documented demo is a fixed elephant's-toothpaste recipe, not an autonomous catalyst search:
+1. The operator loads rough amounts of developer, warm water and yeast, and preloads soap and dye
+   into the flask.
+2. Two open-source SO-101 arms move beakers. The pourer arm is designed to weigh liquid onto a
+   load-cell scale before pouring it into the flask.
+3. A servo-driven auger doses yeast by revolutions; the scale verifies its mass.
+4. A stage moves the flask toward the audience for the eruption.
 
-That gives any lab with a good question machine-speed discovery, and it brings two more benefits for free:
-- **Reproducible:** in a large survey, **over 70 % of researchers had failed to reproduce someone else's experiment** ([Baker, *Nature* 2016](https://doi.org/10.1038/533452a)). Every dose here is weighed and every mass logged, so a protocol becomes something anyone can re-run exactly.
-- **Safe:** nearly half of surveyed researchers have been hurt in a lab ([sources](docs/motivation.md)). The person running the experiments never handles the hazardous reagent.
+The intended benefits are lower-cost access to weighing and transfer automation, more repeatable
+doses, and less time spent by the operator measuring and transferring reagents. The operator still
+loads the reagents and handles cleanup. The peroxide demo requires splash goggles and nitrile
+gloves. Evidence and qualifications for the broader motivation are in [docs/motivation.md](docs/motivation.md).
 
-**The demo:** elephant's toothpaste is a stand-in for catalyst screening, chosen because a crowd can see it.
-1. The agent varies the **catalyst (yeast)** and the **oxidizer (12 % peroxide)**.
-2. The bench runs each recipe.
-3. The camera measures **foam height and rise speed**.
-4. The agent improves the recipe over 2 to 3 runs.
-
-The same loop applies to buffer recipes, coatings, crystallization conditions and dose-response curves.
-
-> *"Self-driving labs have shown they can find better materials in days instead of months, but only for the handful of labs that can spend $100k+. We're bringing that loop down to $500 and ordinary glassware: an AI plans the experiment, two open-source arms run it by weight, a camera measures the result, and every step is logged so anyone can reproduce it."*
+The long-term goal is to adapt this pattern to other small-scale workflows, such as buffer recipes
+or crystallization conditions. The current demo does not choose experiments or optimize a recipe.
 
 
 A tabletop robotic wet lab built for HackHarvard (Oct 16–18, 2026). Two open-source SO-101
@@ -34,8 +33,9 @@ the audience for the eruption.
 
 **Video of the run:** [media/wet_lab_run.mp4](media/wet_lab_run.mp4)
 
-**Status: final design (2026-10-15).** The layout is verified: planner Update 13, all 8 arm steps
-pass with margin. Parts are ordered and printing.
+**Status recorded 2026-10-15:** final hardware layout. Planner Update 13 reports all 8 arm steps
+passing its geometry checks. The print status below reflects the last recorded report, not a live
+inventory. Dose accuracy is a design target and requires measurement on the assembled bench.
 
 ## Start here
 
@@ -52,7 +52,8 @@ pass with margin. Parts are ordered and printing.
 
 Where an older file (`bom/BOM.*`, `bom/BOM_links.*`, `bom/delivery_check*`,
 `docs/electrical_block.svg`, `docs/software_architecture.md`, `review/`) disagrees with the
-documents above, the documents above win.
+documents above, the documents above win. `docs/plan_36h.md` is an earlier build plan; use the
+walkthrough, electrical design and print list for the final arrangement.
 
 ## The design in one page
 
@@ -118,7 +119,7 @@ docs/
   electrical.md              final simplified electrics
   print_list.md              final printed parts and status
   BENCH_PLACEMENT_SHEET.txt  one-page tape positions
-  software_architecture.md   software plan (pre-simplification; electrical.md wins on pins/hardware)
+  software_architecture.md   historical runtime-software proposal; no host app or firmware included
 bom/
   BOM_final.md               what was bought (LEAN v4)
   BOM.csv / BOM.md / BOM_links.* / delivery_check*   earlier full BOM, reference only
@@ -144,7 +145,7 @@ reagent rack on Y-right) is in git history at commit `644fa86`.
 ## Possibility we may explore (not committed): Jev as a fast decision layer
 [Jev](https://pub.towardsai.net/what-is-jev-ai-a-practical-guide-to-system-one-and-executable-decisions-c289a750a3ae) (TypeSafe AI, public since Sept 2026) is a *decision* model, not a chatbot.
 - **How it works:** you give it context and a typed question, and it returns a bounded choice, an ordinal score, or a yes/no probability with confidence.
-- **Where it might fit:** next to the LLM protocol step in [docs/pitch.md](docs/pitch.md), as a fast, structured judge.
+- **Where it might fit:** alongside a future protocol-to-actions layer, as a fast, structured judge.
   - **Scope / safety gate:** "Is this typed protocol within the bench's supported actions? yes/no + confidence" and "hazard level 1–5". This would sit alongside the hard-coded validator, never replacing it.
   - **Run-time checks:** "Given the last 2 s of scale readings, is the pour progressing / stalled / spilling?" and "Given the step log and camera check, continue / pause for the operator?"
   - **Routing:** map free-text requests to one of our recipe templates.

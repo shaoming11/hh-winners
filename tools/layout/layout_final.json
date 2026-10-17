@@ -320,7 +320,8 @@
   "carousel TT-01 slides -43.7 mm along Y-left; E5/PS-01 move with it; PS-01 +4 mm along E5",
   "WS-01 saddle moves from X-front to the outside of Y-right (rotated 90 deg)"
  ],
- "status": "Update 11 candidate FAIL (A top-down carry 6.5 deg; B scale pour and funnel pour at grip 40 no manifold). Best state = Update 9 coordinates (coordinates_mm / frame_changes / stations_on_extrusions): B scale pour PASS; A carousel<->scale and funnel steps open. See layout_final.md Updates 9-11.",
+ "status": "Update 13 final: ALL 8 STEPS PASS. See layout_final.md section Update 13 and update13_final for final coordinates and margins.",
+ "status_update11": "Update 11 candidate FAIL (A top-down carry 6.5 deg; B scale pour and funnel pour at grip 40 no manifold). Best state = Update 9 coordinates (coordinates_mm / frame_changes / stations_on_extrusions): B scale pour PASS; A carousel<->scale and funnel steps open. See layout_final.md Updates 9-11.",
  "status_update10": "Restructure (A top-down transfers, B all pours) not run: no layout satisfies all reach windows; closest candidate fails B side-grasp scale pick by ~3 deg (r 273 vs ~285). See layout_final.md Update 10.",
  "candidate_update10": {
   "arm_A_base": [
