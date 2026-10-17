@@ -100,3 +100,15 @@ def test_server_endpoints():
         assert calls == ['start', 'stop']
     finally:
         srv.shutdown()
+
+
+def test_video_frames_and_auto_camera():
+    from benchsim.bench import make_bench
+    from benchsim.dashboard import server, video as V
+    snap = dict(current=dict(type='STAGE', params=dict(position='ERUPT')))
+    assert V.auto_camera(snap) == 'foam_cam' and V.auto_camera(dict(current=dict(type='TRANSFER', params={}))) == 'bench_cam'
+    assert V.auto_camera(dict(current=None, steps=[dict(status='passed', type='STAGE', label='10 ERUPT')])) == 'foam_cam'
+    hub = server.Hub(); bb = make_bench('sim'); v = V.Video(hub, fps=10.0, width=320, height=180); v.attach(bb.world)
+    assert hub.jpeg[:2] == b'\xff\xd8' and v.shown == 'overview' and v.set_camera('nope') is False
+    n = hub.jpeg_ver; bb.clock.sleep(1.0); assert hub.jpeg_ver - n in (10, 11)          # fps of sim time
+    v.set_camera('top'); v.idle(); assert v.shown == 'top'; v.detach()

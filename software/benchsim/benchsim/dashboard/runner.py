@@ -87,6 +87,10 @@ class Runner:
         if cmd == 'reset':
             if self.phase in ('running', 'starting', 'building'): return False, 'cannot reset while %s' % self.phase
             self.phase = 'building'; self.cmds.put('reset'); return True, 'rebuilding the bench'
+        if cmd.startswith('camera/'):
+            name = cmd.split('/', 1)[1]
+            if self.video is None or not self.video.set_camera(name): return False, 'unknown camera %s' % name
+            return True, 'camera: %s' % name
         return False, 'unknown command %s' % cmd
 
     # ------------------------------------------------------------------ main thread
@@ -101,7 +105,11 @@ class Runner:
         self.phase = 'building'; self.stop_flag = False; self.result = None
         r = self.run_obj = self.make_run(self.out_root, self.seed); bb = r.bb
         self.pacer = Pacer(bb.clock, self.speed)
-        self.feed = Feed(bb, self.hub.publish, ledger=r.ledger, probes=dict(r.probes, runner=self._info)).attach(r.seq)
+        probes = dict(r.probes, runner=self._info)
+        if self.video is not None:
+            self.video.snapshot = lambda: self.feed.last
+            probes['video'] = lambda: dict(camera=self.video.camera, shown=self.video.shown, cameras=self.video.cameras())
+        self.feed = Feed(bb, self.hub.publish, ledger=r.ledger, probes=probes).attach(r.seq)
         self.feed.plan(r.steps)
         r.seq.ctx.on_tick_hooks.append(self._stop_hook)
         if bb.world is not None:

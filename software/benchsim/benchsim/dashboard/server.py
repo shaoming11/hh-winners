@@ -4,7 +4,7 @@ server only through ``Hub`` (latest snapshot JSON, latest JPEG, one Condition).
 
     GET  /                 index.html (web/)          GET /events        text/event-stream, one snapshot per message
     GET  /app.js, ...      other files in web/        GET /stream.mjpg   multipart/x-mixed-replace JPEG frames
-    GET  /api/snapshot     latest snapshot JSON       POST /api/<cmd>    start | stop | reset  ->  {"ok", "message"}
+    GET  /api/snapshot     latest snapshot JSON       POST /api/<cmd>    start | stop | reset | camera/<name>  ->  {"ok", "message"}
 """
 import http.server
 import json
@@ -73,8 +73,8 @@ def make_handler(hub, control, web=WEB, extra_files=None):
             self._send(200, p.read_bytes(), TYPES.get(p.suffix, 'application/octet-stream'))
 
         def do_POST(self):
-            cmd = self.path.split('?')[0].rsplit('/', 1)[-1]
             if not self.path.startswith('/api/'): return self._send(404, b'not found', 'text/plain')
+            cmd = self.path.split('?')[0][len('/api/'):]
             ok, msg = control(cmd)
             self._send(200 if ok else 409, json.dumps(dict(ok=ok, message=msg)).encode(), 'application/json')
 

@@ -57,6 +57,10 @@ button.danger:not(:disabled) { background: var(--critical); border-color: var(--
 .cap-step { font-size: 14px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
 .cap-title { font-size: clamp(18px, 2.2vw, 30px); font-weight: 650; line-height: 1.2; }
 .armtag { position: absolute; top: 14px; left: 14px; padding: 4px 10px; border-radius: 6px; background: var(--overlay); color: var(--overlay-ink); font-weight: 600; }
+.cams { position: absolute; top: 12px; right: 12px; display: flex; gap: 4px; padding: 3px; border-radius: 8px; background: var(--overlay); }
+.cams button { padding: 3px 9px; font-size: 13px; border: 0; background: transparent; color: var(--overlay-ink); }
+.cams button.on { background: var(--s1); color: #fff; }
+.cams button .live { font-size: 11px; opacity: .8; }
 .banner { position: absolute; top: 0; left: 0; right: 0; padding: 12px 20px; background: var(--critical); color: #fff; font-weight: 650; font-size: 18px; }
 
 .meter { display: flex; align-items: center; gap: 12px; margin-top: 8px; }

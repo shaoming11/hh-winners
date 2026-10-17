@@ -33,8 +33,23 @@ function toast(msg) {
 
 // ------------------------------------------------------------------ render
 function render(s) {
-  renderBar(s); renderTimeline(s); renderCaption(s); renderNow(s); renderWire(s); renderErrors(s);
+  renderBar(s); renderCams(s); renderTimeline(s); renderCaption(s); renderNow(s); renderWire(s); renderErrors(s);
 }
+
+const CAM = { auto: 'Auto', overview: 'Overview', bench_cam: 'Close-up', top: 'Top', foam_cam: 'Flask' };
+let camKey = '';
+function renderCams(s) {
+  const v = s.probes && s.probes.video;
+  if (!v) { $('cams').hidden = true; return; }
+  const names = ['auto'].concat(v.cameras);
+  const key = v.camera + '|' + v.shown + '|' + names.join(',');
+  if (key === camKey) return;
+  camKey = key;
+  $('cams').hidden = false;
+  $('cams').innerHTML = names.map((n) => '<button data-cam="' + esc(n) + '" class="' + (n === v.camera ? 'on' : '') + '">' + esc(CAM[n] || n) +
+    (n === 'auto' && v.camera === 'auto' ? ' <span class="live">· ' + esc(CAM[v.shown] || v.shown) + '</span>' : '') + '</button>').join('');
+}
+$('cams').addEventListener('click', (e) => { const b = e.target.closest('button[data-cam]'); if (b) command('camera/' + b.dataset.cam); });
 
 function renderBar(s) {
   const runner = s.probes && s.probes.runner;
