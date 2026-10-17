@@ -9,6 +9,7 @@ class Renderer:
         self.opt = mujoco.MjvOption()
         for g in (0, 1, 2): self.opt.geomgroup[g] = 1
         self.opt.geomgroup[3] = 0; self.opt.geomgroup[4] = 0
+        for g in range(6): self.opt.sitegroup[g] = 0     # sites are named points (beaker lip, pockets...), not parts
 
     def frame(self, data, camera='overview'):
         self.r.update_scene(data, camera=camera, scene_option=self.opt)
