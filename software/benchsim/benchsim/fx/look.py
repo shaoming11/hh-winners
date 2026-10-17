@@ -20,7 +20,7 @@ SPECIES = {'developer': ((0.55, 0.83, 1.00, 0.58), 1.0), 'water': ((0.30, 0.58, 
 FOAM = (1.0, 0.99, 0.97, 1.0)
 FOAM_YEAST = (1.0, 0.97, 0.91, 1.0)
 FOAM_GLOW = 0.28                      # foam scatters light: a little emission keeps it bright white in the shade
-DYE_STREAK = (0.99, 0.40, 0.60, 1.0)
+DYE = (0.99, 0.40, 0.60, 1.0)               # food colouring as it shows in foam (bench_params [foam] rgba_dyed hue)
 GLASS = dict(rgba=(0.84, 0.93, 0.98, 0.28), specular=1.0, shininess=0.95)
 PP = dict(rgba=(0.95, 0.97, 0.98, 0.22), specular=0.6, shininess=0.7)
 FLOOR_Z = -900.0                      # the bench top is 900 mm above the lab floor
@@ -54,7 +54,7 @@ def tint(contents, alpha_min=0.0):
     return c
 
 
-def mid_x(a, b): return 0.5 * (a + b)
+def mid(a, b): return 0.5 * (a + b)
 
 
 class Look:
@@ -81,9 +81,9 @@ class Look:
 
     # ================================================================== entry
     def __call__(self, scn):
-        t0 = time.perf_counter(); c = Canvas(scn)
-        self.lights(scn); self.restyle(c); self.room(c)
-        for gid in self.hidden: c.hide(gid)
+        t0 = time.perf_counter(); c = Canvas(scn); mg = c.model_geoms()
+        self.lights(scn); self.restyle(c, mg); self.room(c)
+        for gid in self.hidden: c.hide(mg.get(gid, ()))
         self.liquids(c); self.streams(c); self.drips(c); self.funnel(c); self.yeast(c); self.spills(c); self.foam(c)
         self.ms.append((time.perf_counter() - t0) * 1000.0)
 
@@ -100,30 +100,30 @@ class Look:
             L.pos[:] = [0.5, 0.2, 2.0]; d = np.array([0.25, 0.45, -1.0]); L.dir[:] = d / np.linalg.norm(d)
             L.ambient[:] = 0.06; L.diffuse[:] = 0.22; L.specular[:] = 0.05; L.attenuation[:] = [1, 0, 0]; L.cutoff = 180.0; L.exponent = 0.0
 
-    def restyle(self, c):
+    def restyle(self, c, mg):
         for gid, st in self.style.items():
-            for g in c.find(gid):
+            for g in mg.get(gid, ()):
                 g.rgba[:] = st['rgba']; g.specular = st['specular']; g.shininess = st['shininess']
         for gid in self.metal:
-            for g in c.find(gid): g.rgba[:] = (0.74, 0.76, 0.79, 1); g.specular = 0.7; g.shininess = 0.6
+            for g in mg.get(gid, ()): g.rgba[:] = (0.74, 0.76, 0.79, 1); g.specular = 0.7; g.shininess = 0.6
         if self.mat['fx_worktop'] >= 0:
-            for g in c.find(self.table): g.rgba[:] = (1, 1, 1, 1); c.material(g, self.m, self.mat['fx_worktop'])
+            for g in mg.get(self.table, ()): g.rgba[:] = (1, 1, 1, 1); c.material(g, self.m, self.mat['fx_worktop'])
 
     def room(self, c):
         x0, y0, x1, y1 = self.table_xy; m = self.m; mat = self.mat
-        cx, cy = mid_x(x0, x1), mid_x(y0, y1)
+        cx, cy = mid(x0, x1), mid(y0, y1)
         WX0, WX1, WY0, WY1, CEIL = x0 - 520, x1 + 520, y0 - 1000, y1 + 40, 2000.0
         hz = (CEIL - FLOOR_Z) / 2; zc = (CEIL + FLOOR_Z) / 2; white = (1, 1, 1, 1)
         c.box((cx, cy, FLOOR_Z - 10), (3000, 3000, 10), white, matid=mat['fx_floor'], model=m, specular=0.2)
-        c.box((cx, cy, mid_x(FLOOR_Z, -20)), ((x1 - x0) / 2 - 25, (y1 - y0) / 2 - 25, (-20 - FLOOR_Z) / 2), (0.80, 0.82, 0.84, 1), specular=0.2)
+        c.box((cx, cy, mid(FLOOR_Z, -20)), ((x1 - x0) / 2 - 25, (y1 - y0) / 2 - 25, (-20 - FLOOR_Z) / 2), (0.80, 0.82, 0.84, 1), specular=0.2)
         tile_top = 620.0
-        c.box((cx, WY1 + 10, mid_x(FLOOR_Z, tile_top)), ((WX1 - WX0) / 2, 10, (tile_top - FLOOR_Z) / 2), white, matid=mat['fx_tile'], model=m)
-        c.box((cx, WY1 + 10, mid_x(tile_top, CEIL)), ((WX1 - WX0) / 2, 10, (CEIL - tile_top) / 2), white, matid=mat['fx_paint'], model=m)
-        c.box((WX0 - 10, mid_x(WY0, WY1), mid_x(FLOOR_Z, tile_top)), (10, (WY1 - WY0) / 2, (tile_top - FLOOR_Z) / 2), white, matid=mat['fx_tile'], model=m)
-        c.box((WX0 - 10, mid_x(WY0, WY1), mid_x(tile_top, CEIL)), (10, (WY1 - WY0) / 2, (CEIL - tile_top) / 2), white, matid=mat['fx_paint'], model=m)
-        c.box((WX1 + 10, mid_x(WY0, WY1), zc), (10, (WY1 - WY0) / 2, hz), white, matid=mat['fx_paint'], model=m)
+        c.box((cx, WY1 + 10, mid(FLOOR_Z, tile_top)), ((WX1 - WX0) / 2, 10, (tile_top - FLOOR_Z) / 2), white, matid=mat['fx_tile'], model=m)
+        c.box((cx, WY1 + 10, mid(tile_top, CEIL)), ((WX1 - WX0) / 2, 10, (CEIL - tile_top) / 2), white, matid=mat['fx_paint'], model=m)
+        c.box((WX0 - 10, mid(WY0, WY1), mid(FLOOR_Z, tile_top)), (10, (WY1 - WY0) / 2, (tile_top - FLOOR_Z) / 2), white, matid=mat['fx_tile'], model=m)
+        c.box((WX0 - 10, mid(WY0, WY1), mid(tile_top, CEIL)), (10, (WY1 - WY0) / 2, (CEIL - tile_top) / 2), white, matid=mat['fx_paint'], model=m)
+        c.box((WX1 + 10, mid(WY0, WY1), zc), (10, (WY1 - WY0) / 2, hz), white, matid=mat['fx_paint'], model=m)
         c.box((cx, WY0 - 10, zc), ((WX1 - WX0) / 2, 10, hz), white, matid=mat['fx_paint'], model=m)
-        c.box((cx, mid_x(WY0, WY1), CEIL + 10), ((WX1 - WX0) / 2, (WY1 - WY0) / 2, 10), (0.9, 0.9, 0.9, 1))
+        c.box((cx, mid(WY0, WY1), CEIL + 10), ((WX1 - WX0) / 2, (WY1 - WY0) / 2, 10), (0.9, 0.9, 0.9, 1))
 
     # ================================================================== liquids at rest
     def liquids(self, c):
@@ -148,7 +148,7 @@ class Look:
     def streams(self, c):
         ctx = self.ctx; t = ctx.t
         for s in ctx.streams():
-            col = tint(s['contents']); col[3] = 1.0
+            col = tint(s['contents']); col[:3] = lerp(col[:3], (1, 1, 1), 0.35); col[3] = 1.0
             Q = s['q_ml_s'] * 1000.0; pts = s['points']
             rad = np.clip(np.sqrt(Q / (math.pi * np.maximum(s['speed'], 1.0))) * 1.15, 0.7, 3.4)
             if s['q_ml_s'] >= 1.5:
@@ -224,7 +224,8 @@ class Look:
             for i in range(n):
                 zm = (i + 0.5) * dz; c.cylinder(axis + [0, 0, z0 + zm], ctx.flask_radius(zm) - 0.8, dz / 2, col, specular=0.4, shininess=0.6)
         if fo is None: return
-        self.base = np.r_[FOAM_YEAST[:3] if fo['yeast'] else FOAM[:3], 1.0]; self.dyed = fo['dyed']
+        white = np.asarray(FOAM_YEAST[:3] if fo['yeast'] else FOAM[:3])
+        self.base = np.r_[lerp(white, DYE[:3], 0.42) if fo['dyed'] else white, 1.0]
         hF = min(fl['foam_h'], fl['geo']['height'])
         if fo['inside_ml'] > 0.3 and hF > hL + 0.5:           # foam rising inside the flask, seen through the glass
             n = max(1, int(math.ceil((hF - hL) / 8.0))); dz = (hF - hL) / n
@@ -262,19 +263,21 @@ class Look:
         if spilled > 0.5: self.spill_over(c, axis, fun, fl, spilled, scroll, slump)
 
     def foam_rgba(self, phi, s, seed):
-        """white foam (cream with yeast) with dye streaks running along the rope, wavering a little (arrays in, (n, 4) out)"""
-        phi = np.asarray(phi, float); s = np.broadcast_to(np.asarray(s, float), phi.shape)
-        col = np.tile(self.base, (phi.size, 1))
-        if self.dyed:
-            v = np.cos(3 * phi + 0.7 * np.sin(s / 35.0 + seed)) + 0.35 * (hash01v((s // 9).astype(int), seed, 71) - 0.5)
-            k = np.clip(0.5 + (v - 0.62) * 1.2, 0.0, 1.0) * (v > 0.62)
-            col[:, :3] = self.base[:3] + (np.asarray(DYE_STREAK[:3]) - self.base[:3]) * k[:, None]
+        """foam colour per blob (arrays in, (n, 4) out): the dye is mixed into the flask liquid, so the foam comes out an
+        even pastel; lighter streaks run along the rope and each bubble varies a little in shade"""
+        phi = np.asarray(phi, float); s = np.broadcast_to(np.asarray(s, float), phi.shape); n = phi.size
+        col = np.tile(self.base, (n, 1))
+        v = np.cos(2 * phi + 0.9 * np.sin(s / 45.0 + seed))
+        k = np.clip((v - 0.35) * 1.4, 0.0, 1.0) * 0.6
+        col[:, :3] += (1.0 - col[:, :3]) * k[:, None]
+        col[:, :3] *= (0.96 + 0.06 * hash01v(np.round(s * 10).astype(int), np.round(phi * 100).astype(int), seed, 72))[:, None]
+        np.minimum(col, 1.0, out=col)
         return col
 
     def blobs(self, c, P, r, rgba):
         c.spheres(P, r, rgba, emission=FOAM_GLOW, specular=0.04, shininess=0.1)
 
-    def blob_tube(self, c, path, radius, scroll, side, seed=0, step=6.0, n_around=5):
+    def blob_tube(self, c, path, radius, scroll, side, seed=0, step=7.0, n_around=5):
         """foam extruded along a path: rings of blobs at material positions that travel with the scroll, so the foam
         visibly moves out of the neck; ``side`` is a fixed normal (the path stays in one vertical plane)"""
         seg = np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(path, axis=0), axis=1))]; L = seg[-1]
@@ -286,11 +289,11 @@ class Look:
         P = path[i - 1] + (path[i] - path[i - 1]) * f; T = path[i] - path[i - 1]; T /= np.maximum(np.linalg.norm(T, axis=1), 1e-9)[:, None]
         n1 = side - T * (T @ side)[:, None]; n1 /= np.maximum(np.linalg.norm(n1, axis=1), 1e-9)[:, None]; n2 = np.cross(T, n1)
         R = radius(s) * (0.92 + 0.16 * hash01v(k, seed, 11))
-        self.blobs(c, P, R * 0.84, self.base)                                       # core
+        self.blobs(c, P, R * 0.9, self.base)                                         # core
         phi = 2 * math.pi * (hash01v(k, seed, 12)[:, None] / n_around + np.arange(n_around)[None, :] / n_around)
-        rb = R[:, None] * (0.44 + 0.16 * hash01v(k[:, None], np.arange(n_around)[None, :], seed, 13))
+        rb = R[:, None] * (0.40 + 0.14 * hash01v(k[:, None], np.arange(n_around)[None, :], seed, 13))
         U = np.cos(phi)[..., None] * n1[:, None, :] + np.sin(phi)[..., None] * n2[:, None, :]
-        Q = P[:, None, :] + U * (R[:, None] - rb * 0.8)[..., None]
+        Q = P[:, None, :] + U * (R[:, None] - rb * 0.95)[..., None]
         self.blobs(c, Q.reshape(-1, 3), rb.reshape(-1), self.foam_rgba(phi.reshape(-1), np.repeat(s, n_around), seed))
 
     def dome(self, c, top, R):
@@ -305,7 +308,7 @@ class Look:
         z = np.linspace(z0, z1, 40); a = np.pi * np.maximum(r_cone(z) ** 2 - r_col ** 2, 0.0)
         return float(np.sum(0.5 * (a[1:] + a[:-1]) * np.diff(z)) / 1000.0)
 
-    def annulus(self, c, axis, z, r_in, r_out, seed, top=False, rb_max=8.0):
+    def annulus(self, c, axis, z, r_in, r_out, seed, top=False, rb_max=10.0):
         """one layer of foam filling the ring between r_in and r_out at height z"""
         rb = max(min(0.5 * (r_out - r_in), rb_max), 3.5); n_r = max(1, int((r_out - r_in) / (1.7 * rb)))
         P = []; r = []; phis = []
@@ -336,10 +339,10 @@ class Look:
         n_layers = max(1, int(math.ceil(h / 10.0)))
         for li in range(n_layers):
             z = z_c + min((li + 0.5) * 10.0, h)
-            self.annulus(c, axis, z, ctx.flask_radius(z - z_floor, inner=False) + 1.0, r_well, 200 + li, top=li == n_layers - 1, rb_max=9.0)
+            self.annulus(c, axis, z, ctx.flask_radius(z - z_floor, inner=False) + 1.0, r_well, 200 + li, top=li == n_layers - 1, rb_max=11.0)
         z_top = z_c + h; R = ctx.funnel_geo['rim_r']; thick = (6.0 + 6.0 * min(v_ml / 150.0, 1.0)) * (0.55 + 0.45 * slump)
         for i, ang in enumerate((0.35, 2.4, 4.3)[:1 + int(min(v_ml / 60.0, 2))]):     # more drapes as more foam spills
             u = np.array([math.cos(ang), math.sin(ang), 0.0]); s2 = np.cross(u, [0, 0, 1.0])
             p0 = axis + u * (R - 6) + [0, 0, fun[2] + 4]; p1 = axis + u * (R + 6) + [0, 0, fun[2] - 6]; p2 = axis + u * (r_well - 6) + [0, 0, z_top + 3]
             path = np.array([p0, p1] + [lerp(p1, p2, x) for x in np.linspace(0.1, 1.0, 10)])
-            self.blob_tube(c, path, lambda s: np.full_like(s, thick), scroll * 0.7 + 13 * i, s2, seed=10 + i, step=7.0, n_around=4)
+            self.blob_tube(c, path, lambda s: np.full_like(s, thick), scroll * 0.7 + 13 * i, s2, seed=10 + i, step=8.0, n_around=4)

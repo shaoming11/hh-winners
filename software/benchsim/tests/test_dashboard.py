@@ -129,6 +129,7 @@ def test_video_frames_and_auto_camera():
     assert V.auto_camera(snap) == 'erupt_cam' and V.auto_camera(dict(current=dict(type='TRANSFER', params={}))) == 'bench_cam'
     assert V.auto_camera(dict(current=None, steps=[dict(status='passed', type='STAGE', label='10 ERUPT')])) == 'erupt_cam'
     assert V.auto_camera(dict(current=dict(type='POUR_TO_SCALE', params={}))) == 'pour_cam'
+    assert V.auto_camera(dict(current=dict(type='TRANSFER', params={}), probes=dict(foam=dict(column_mm=12.0)))) == 'erupt_cam'
     hub = server.Hub(); bb = make_bench('sim'); v = V.Video(hub, fps=10.0, width=320, height=180); v.attach(bb.world)
     assert hub.jpeg[:2] == b'\xff\xd8' and v.shown == 'overview' and v.set_camera('nope') is False
     n = hub.jpeg_ver; bb.clock.sleep(1.0); assert hub.jpeg_ver - n in (10, 11)          # fps of sim time

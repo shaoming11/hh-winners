@@ -30,6 +30,7 @@ class Context:
         self.sid = {n: m.site(n).id for n in ('funnel_rim', 'flask_neck_top', 'auger_outlet')}
         self.bid = {bk: m.body('beaker_' + bk).id for bk in BEAKERS}; self.sled = m.body('sled').id
         self._flask_table = self._flask_volume_table()
+        self._spill_seen = 0; self._spill_cells = {}       # spills() reads LM.landings incrementally
 
     @classmethod
     def from_world(cls, world):
@@ -155,14 +156,16 @@ class Context:
         return dict(g=g, contents=parts, rim=self.site('funnel_rim')) if g > 1e-4 else None
 
     def spills(self):
-        """table landings merged per 5 mm cell: list of (xy, mL, contents)"""
+        """table landings merged per 5 mm cell: list of (xy, mL, contents). LM.landings only grows (a row per landed
+        parcel, thousands per pour), so only the rows added since the last frame are read."""
         LM = self.LM
         if LM is None: return []
-        cells = {}
-        for x in LM.landings:
+        rows = LM.landings; cells = self._spill_cells
+        for x in rows[self._spill_seen:]:
             if x['recv'] != 'table': continue
             k = (round(x['xy'][0] / 5), round(x['xy'][1] / 5)); c = cells.setdefault(k, [np.zeros(2), 0.0, 0.0])
             c[0] += np.asarray(x['xy']) * x['g']; c[1] += x['g']; c[2] += x['g'] / DENSITY.get('water', 1.0)
+        self._spill_seen = len(rows)
         return [(c[0] / c[1], c[2], None) for c in cells.values() if c[1] > 0]
 
     # ------------------------------------------------------------------ yeast auger

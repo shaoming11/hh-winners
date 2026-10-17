@@ -313,7 +313,8 @@ Known disagreements found so far (the JSON coordinates are authoritative):
 ```
 
 A browser page for the audience. It shows the sim camera with the current step drawn over it (auto camera: close-up
-for transfers and dosing, pour and funnel close-ups for the pours, a wide eruption camera) and a 12-step timeline. Four cards sit beside them:
+for transfers and dosing, pour and funnel close-ups for the pours, a wide eruption camera from the moment the foam
+leaves the neck) and a 12-step timeline. Four cards sit beside them:
 - **Now:** what is happening, the chemical and amount, the timeout, and the tightest verified gap.
 - **Chemistry:** contents of every vessel from the ledger, plus O₂ and the foam column.
 - **Twin:** where the plan puts each gripper vs where the servos say it is, in mm, against the step's clearance.
@@ -344,7 +345,7 @@ The page uses only the standard library and plain HTML/JS: no npm and no build s
   ballistic arc (thinning as they speed up, drops at a trickle, splash and ripples where they land), liquid running
   through the funnel into the flask, yeast falling from the auger, and an elephant-toothpaste eruption sized by the
   foam model: the column rises from the neck, topples back into the funnel once it reaches `column_max_mm`, fills the
-  cone, spills over the rim and piles up in the catch well, with dye streaks along the foam. These geoms exist only in
+  cone, spills over the rim and piles up in the catch well, tinted by the dye in the flask. These geoms exist only in
   each frame's scene copy, so the model, the physics and every reported number are unchanged, and the vision camera
   and `verify_mechanisms` still render the plain scene. Marker sites (the grey balls) are hidden in every offscreen
   render. `python -m benchsim.fx.preview` writes plain | fx stills of a pour, the funnel pour, a dose and the eruption

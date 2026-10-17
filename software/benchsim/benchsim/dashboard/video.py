@@ -2,8 +2,8 @@
 it and hands it to the Hub (/stream.mjpg). Main thread only: the renderer owns a GL context.
 
 ``camera`` is a scene camera name or 'auto', which follows the running step: close-up on the carousel and scale for
-transfers and dosing, the pour and funnel close-ups for pours, the eruption camera for the eruption, the overview
-otherwise. ``fx=True`` draws the camera look (benchsim.fx: room, glass, liquids, streams, foam) into each frame.
+transfers and dosing, the pour and funnel close-ups for pours, the eruption camera from the moment the foam leaves the
+neck, the overview otherwise. ``fx=True`` draws the camera look (benchsim.fx: room, glass, liquids, streams, foam) into each frame.
 """
 import io
 
@@ -14,6 +14,8 @@ AUTO = {'TRANSFER': 'bench_cam', 'DOSE_YEAST': 'bench_cam', 'CAROUSEL': 'bench_c
 
 
 def auto_camera(snap):
+    foam = ((snap or {}).get('probes') or {}).get('foam') or {}
+    if (foam.get('column_mm') or 0) > 0: return 'erupt_cam'          # once the foam is out of the neck, watch it
     cur = (snap or {}).get('current')
     if cur is None:
         steps = (snap or {}).get('steps') or []

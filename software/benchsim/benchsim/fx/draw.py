@@ -96,12 +96,17 @@ class Canvas:
         for i in range(len(pts) - 1): self.capsule(pts[i], pts[i + 1], 0.5 * (radii[i] + radii[i + 1]), rgba, **kw)
 
     # ---------------------------------------------------------------- model geoms in the scene copy
-    def find(self, gid):
-        s = self.scn; ot = int(mujoco.mjtObj.mjOBJ_GEOM)
-        return [s.geoms[i] for i in range(s.ngeom) if s.geoms[i].objtype == ot and s.geoms[i].objid == gid]
+    def model_geoms(self):
+        """the scene copies of model geoms, by model geom id (one pass over the scene)"""
+        s = self.scn; ot = int(mujoco.mjtObj.mjOBJ_GEOM); out = {}
+        for i in range(s.ngeom):
+            g = s.geoms[i]
+            if g.objtype == ot: out.setdefault(g.objid, []).append(g)
+        return out
 
-    def hide(self, gid):
-        for g in self.find(gid): g.rgba[3] = 0.0; g.size[:] = 0.0
+    @staticmethod
+    def hide(geoms):
+        for g in geoms: g.rgba[3] = 0.0; g.size[:] = 0.0
 
 
 def lerp(a, b, t): return np.asarray(a, float) + (np.asarray(b, float) - np.asarray(a, float)) * float(t)
