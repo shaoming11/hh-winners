@@ -1,4 +1,9 @@
-"""Dashboard feed: watches a sequencer run without changing it (no HTTP here)."""
+"""Dashboard: the feed watches a sequencer run without changing it; runner controls; HTTP endpoints."""
+import json
+import urllib.error
+import urllib.request
+
+import numpy as np
 from test_sequencer import PROTO, build
 
 from benchsim.dashboard import narration
@@ -64,3 +69,34 @@ def test_narration_covers_the_demo():
     funnel_p2 = [s for s in S.demo_protocol() if s.type == 'POUR_TO_FUNNEL' and s.params['beaker'] == 'P2'][0]
     assert 'O₂' in narration.describe(funnel_p2.to_dict())['science']['equation']
     assert narration.clearance(dict(type='POUR_TO_FUNNEL', params={}))['mm'] == 5.3
+
+
+def test_runner_controls_and_operator_stop(tmp_path):
+    from benchsim.dashboard import runner as R, server
+    hub = server.Hub(); r = R.Runner(hub, speed=0, out_root=tmp_path)
+    assert r.control('start')[0] is False                       # still building
+    r.build(); assert r.control('stop')[0] is False and r.control('reset')[0] is True
+    r.build(); assert r.control('start') == (True, 'starting') and r.control('start')[0] is False
+    r.stop_flag = True; r._start()                              # Stop pressed before the first tick
+    assert r.result['state'] == 'SAFE_STOP' and r.phase == 'finished'
+    snap = json.loads(hub.snap)
+    assert snap['stop_reason'] == 'operator stop (dashboard)' and snap['probes']['runner']['phase'] == 'finished'
+    assert r.control('reset')[0] is True
+
+
+def test_server_endpoints():
+    from benchsim.dashboard import server
+    hub = server.Hub(); calls = []
+    srv = server.serve(hub, lambda c: (calls.append(c) or c == 'start', 'ok %s' % c), port=0)
+    base = 'http://127.0.0.1:%d' % srv.server_address[1]
+    try:
+        hub.publish(dict(t=float('nan'), x=np.float32(1.5)))
+        assert json.loads(urllib.request.urlopen(base + '/api/snapshot').read()) == dict(t=None, x=1.5)
+        assert b'Wet Lab Bench' in urllib.request.urlopen(base + '/').read()
+        req = urllib.request.Request(base + '/api/start', method='POST')
+        assert json.loads(urllib.request.urlopen(req).read()) == dict(ok=True, message='ok start')
+        try: urllib.request.urlopen(urllib.request.Request(base + '/api/stop', method='POST')); assert False
+        except urllib.error.HTTPError as e: assert e.code == 409
+        assert calls == ['start', 'stop']
+    finally:
+        srv.shutdown()

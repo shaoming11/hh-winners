@@ -95,10 +95,10 @@ class Feed:
     def flush(self):
         """build and publish a snapshot now; never raises"""
         try:
-            snap = self.snapshot()
+            snap = self.snapshot(); self.publish(snap)
         except Exception as e:
             self._error('feed: %r' % e); return self.last
-        self.last = snap; self.publish(snap); return snap
+        self.last = snap; return snap
 
     # ------------------------------------------------------------------ wire panel
     def _add_wire(self, dev, d, text, note=None):
@@ -111,7 +111,7 @@ class Feed:
         if kind == 'torque': self._add_wire(arm, 'tx', 'torque %s' % ('ON' if value else 'OFF')); return
         if now - self._arm_line_t.get(arm, -1e9) < ARM_LINE_S: return
         self._arm_line_t[arm] = now
-        self._add_wire(arm, 'tx', 'goal %s deg' % deg(value), note='streamed at 50 Hz, 1 line per %.1f s shown' % ARM_LINE_S)
+        self._add_wire(arm, 'tx', 'goal %s deg' % deg(value), note='sampled')
 
     def _pump_mega(self):
         log = self.mega.log
@@ -124,7 +124,7 @@ class Feed:
         self._mega_cur = len(log)
         s = self.mega.last_sample
         if s is not None and self.clock.now() - self._sample_line_t >= SAMPLE_LINE_S:
-            self._sample_line_t = self.clock.now(); self._add_wire('mega', 'rx', protocol.encode(s).strip(), note='scale stream, 1 of 80 lines/s shown')
+            self._sample_line_t = self.clock.now(); self._add_wire('mega', 'rx', protocol.encode(s).strip(), note='sampled')
 
     # ------------------------------------------------------------------ snapshot
     def _protocol(self):
