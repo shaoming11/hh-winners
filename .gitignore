@@ -1,0 +1,9 @@
+# Source CAD — large, third-party, and reproducible from the .f3d
+*.stp
+SO101*.step
+
+# Redundant with the .f3d and 28 MB
+exports/assembly/wet-lab-bench_WORK.step
+
+# OS cruft
+.DS_Store
