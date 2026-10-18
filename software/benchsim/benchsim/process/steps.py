@@ -42,7 +42,29 @@ class Step:
 
 def demo_protocol(recipe=None):
     """docs/demo_process.md section 4, steps 1-9"""
-    r = recipe or dict(developer_g=39.0, developer_tol_g=2.0, yeast_g=7.0, yeast_tol_g=0.7, water_g=30.0, water_tol_g=2.0, activate_wait_s=60.0)
+    r = dict(developer_g=39.0, developer_tol_g=2.0, yeast_g=7.0, yeast_tol_g=0.7, water_g=30.0, water_tol_g=2.0, activate_wait_s=60.0,
+             premixed_yeast_water=True, yeast_in_flask=True)
+    r.update(recipe or {})
+    if r.get('yeast_in_flask'):                     # MVP: yeast-water already in the flask; peroxide is the only reagent moved
+        return [
+            Step('TRANSFER', dict(beaker='P1', src='carousel_pick', dst='scale_pan'), '1 P1 carousel -> scale'),
+            Step('POUR_TO_SCALE', dict(reagent='developer', beaker='P1', target_g=r['developer_g'], tol_g=r['developer_tol_g'], relative=False),
+                 '2 peroxide (developer) onto P1'),
+            Step('POUR_TO_FUNNEL', dict(beaker='P1', erupt=True), '3 P1 -> funnel, then ERUPT (reaction starts)'),
+            Step('TRANSFER', dict(beaker='P1', src='scale_pan', dst='carousel_pick'), '4 P1 -> carousel'),
+        ]
+    if r.get('premixed_yeast_water'):               # P2 arrives as a yeast-water mix: no dose, no water pour, no wait
+        return [
+            Step('TRANSFER', dict(beaker='P1', src='carousel_pick', dst='scale_pan'), '1 P1 carousel -> scale'),
+            Step('POUR_TO_SCALE', dict(reagent='developer', beaker='P1', target_g=r['developer_g'], tol_g=r['developer_tol_g'], relative=False),
+                 '2 developer onto P1'),
+            Step('POUR_TO_FUNNEL', dict(beaker='P1', erupt=False), '3 P1 -> funnel'),
+            Step('TRANSFER', dict(beaker='P1', src='scale_pan', dst='carousel_pick'), '4 P1 -> carousel'),
+            Step('CAROUSEL', dict(beaker='P2', station='pick'), '5 turn P2 (yeast-water) to the pick spot'),
+            Step('TRANSFER', dict(beaker='P2', src='carousel_pick', dst='scale_pan'), '6 P2 (yeast-water) -> scale'),
+            Step('POUR_TO_FUNNEL', dict(beaker='P2', erupt=True), '8 P2 -> funnel, then ERUPT (reaction starts)'),
+            Step('TRANSFER', dict(beaker='P2', src='scale_pan', dst='carousel_pick'), '9 P2 -> carousel'),
+        ]
     return [
         Step('TRANSFER', dict(beaker='P1', src='carousel_pick', dst='scale_pan'), '1 P1 carousel -> scale'),
         Step('POUR_TO_SCALE', dict(reagent='developer', beaker='P1', target_g=r['developer_g'], tol_g=r['developer_tol_g'], relative=False),
@@ -77,6 +99,8 @@ def validate(steps, initial=None):
     returns (ok, problems: list of str). ``initial``: dict beaker -> location (default demo loading)."""
     loc = dict(initial or {'P1': 'carousel_pick', 'P2': 'carousel_aux', 'dev': 'rack_1', 'water': 'rack_3'})
     content = {b: 0.0 for b in loc}; flask_ml = 15.0; problems = []; stage = 'WORK'; on_scale = None; yeast_in = {}
+    if not any(st.type == 'DOSE_YEAST' for st in steps):   # no dose in the plan: P2 is loaded as the pre-mixed yeast-water
+        content['P2'] = 37.0; yeast_in['P2'] = 7.0
     for i, st in enumerate(steps):
         p = st.params; tag = 'step %d (%s)' % (i + 1, st.type)
         if st.type not in STEP_TYPES: problems.append('%s: unknown step type' % tag); continue
@@ -118,6 +142,10 @@ def validate(steps, initial=None):
             if not need('beaker', 'station'): continue
             if p['station'] not in ('pick', 'auger'): problems.append('%s: station must be pick or auger' % tag)
             if loc.get(p['beaker'], '').startswith('scale'): problems.append('%s: %s is on the scale' % (tag, p['beaker']))
+            elif p['station'] == 'pick':                    # the deck turns: this pocket to the pick spot, the others off it
+                for b, l in loc.items():
+                    if b != p['beaker'] and l == 'carousel_pick': loc[b] = 'carousel_aux'
+                loc[p['beaker']] = 'carousel_pick'
         elif st.type == 'DOSE_YEAST':
             if not need('beaker', 'target_g', 'tol_g'): continue
             if p['beaker'] not in CAROUSEL_BEAKERS or loc.get(p['beaker']) == 'scale_pan': problems.append('%s: %s must be in the carousel' % (tag, p['beaker']))

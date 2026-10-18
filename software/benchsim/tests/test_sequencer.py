@@ -27,7 +27,7 @@ def build():
 def test_transfer_verify_transfer_runs():
     bb, seq = build(); out = seq.run(PROTO)
     assert out['state'] == 'DONE' and out['passed'] == 3
-    assert abs(out['steps'][0]['measured']['beaker_tare_g'] - 18.0) < 0.5
+    assert abs(out['steps'][0]['measured']['beaker_tare_g'] - __import__('benchsim.layout', fromlist=['x']).load_params()['beaker']['empty_mass_g']) < 0.5
 
 
 def test_stop_during_carry_keeps_beaker_and_torque():

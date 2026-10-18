@@ -130,7 +130,12 @@ def main():
     ap.add_argument('--check', action='store_true', help='pre-flight only: open the ports read-only, check every waypoint, move nothing')
     a = ap.parse_args()
     plans = json.loads((paths.SIM_ROOT / 'reports' / 'native_plans.json').read_text())['steps']
-    order = [k for k in plans if not a.steps or k.split()[0] in a.steps]
+    R = layout.load_params()['recipe']
+    if R.get('yeast_in_flask'): default = ('1', '2', '3', '4')          # MVP: peroxide only, yeast-water already in the flask
+    elif R.get('premixed_yeast_water'): default = ('1', '2', '3', '4', '6', '8', '9')
+    else: default = tuple(k.split()[0] for k in plans)
+    order = [k for k in plans if k.split()[0] in (a.steps or default)]
+    last_funnel = [k for k in order if 'funnel' in k][-1:]                # the sled goes out after the last funnel pour
     bench = layout.load_bench()
     kw = dict(PORTS, calibration_path=CAL, dry_run=a.check)
     if a.no_mega: kw['port_mega'] = None
@@ -192,7 +197,7 @@ def main():
                 fast = funnel and seg['phase'] == 'pour' and not seg['name'].startswith('untilt')   # tilt-in + pour: all at once
                 print('   %-38s %s%s' % (seg['name'], seg['phase'], '  (all at once)' if fast else ''), flush=True)
                 play_segment(arm, seg, 1.0 if fast else a.speed)
-                if funnel and 'P2' in k and seg['phase'] == 'drain' and mega is not None:
+                if k in last_funnel and seg['phase'] == 'drain' and mega is not None:
                     St = bench['params']['stage']           # last pour done: the sled carries the flask out right away
                     r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['erupt_deg']), ms=int(St['move_s'] * 1000))
                     print('   sled out to %.0f deg (erupt)' % r['deg'], flush=True)
@@ -200,7 +205,7 @@ def main():
             end = s['segments'][-1]['qs'][-1]
             err = go(arm, end, a.speed, 'back at park', tol=8.0, timeout=15.0)
             if not err < 8.0: raise TimeoutError('%s arm did not get back to park (%.0f deg off)' % (s['arm'], err))
-        if mega is not None and any('P2 funnel' in k for k in order):
+        if mega is not None and last_funnel:
             St = bench['params']['stage']
             r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['work_deg']), ms=int(St['move_s'] * 1000))
             print('sled back to %.0f deg (work)' % r['deg'], flush=True)

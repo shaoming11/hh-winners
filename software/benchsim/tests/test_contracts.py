@@ -28,7 +28,8 @@ def test_validator_rejects_bad_orders():
 
 def test_erupt_rides_on_the_reaction_pour():
     demo = steps.demo_protocol()
-    assert [s.params['erupt'] for s in demo if s.type == 'POUR_TO_FUNNEL'] == [False, True] and 'STAGE' not in [s.type for s in demo]
+    er = [s.params['erupt'] for s in demo if s.type == 'POUR_TO_FUNNEL']
+    assert er[-1] and not any(er[:-1]) and 'STAGE' not in [s.type for s in demo]     # only the last funnel pour erupts
     late = demo + [steps.Step('WAIT', dict(seconds=5))]                     # the stage is at ERUPT after the reaction pour
     ok, problems = steps.validate(late)
     assert not ok and any('after ERUPT' in p for p in problems)
