@@ -33,6 +33,36 @@ PORTS = dict(port_mega=os.environ.get('WLB_MEGA', '/dev/cu.usbserial-1130'),
              port_pourer=os.environ.get('WLB_POURER', '/dev/cu.usbmodem58760435221'),
              port_transfer=os.environ.get('WLB_TRANSFER', '/dev/cu.usbmodem58CD1767761'))
 CAL = os.path.join(paths.SIM_ROOT, 'benchsim', 'config', 'hardware_calibration.bench.json')
+OVERRIDES = os.path.join(paths.SIM_ROOT, 'benchsim', 'config', 'pose_overrides.json')   # scripts/teach_poses.py writes it
+
+
+def load_overrides():
+    try:
+        with open(OVERRIDES) as f: return json.load(f)
+    except (OSError, ValueError): return {}
+
+
+def save_overrides(ov):
+    with open(OVERRIDES, 'w') as f: json.dump(ov, f, indent=1)
+
+
+def apply_overrides(segs, key, ov=None):
+    """hand-taught corrections (deg per joint) for poses of step ``key``: the taught segment and the slow (non-joint)
+    segments touching it shift by the offset; the neighbouring joint moves end / start at the shifted pose"""
+    ov = load_overrides() if ov is None else ov
+    segs = [dict(g, qs=[list(q) for q in g['qs']]) for g in segs]
+    for name, d in (ov.get(key) or {}).items():
+        names = [g['name'] for g in segs]
+        if name not in names: continue
+        i = names.index(name); off = np.radians(np.asarray(d, float))
+        lo = i
+        while lo > 0 and segs[lo - 1]['kind'] != 'joint': lo -= 1
+        hi = i
+        while hi + 1 < len(segs) and segs[hi + 1]['kind'] != 'joint': hi += 1
+        for g in segs[lo:hi + 1]: g['qs'] = [list(np.asarray(q) + off) for q in g['qs']]
+        if lo > 0: segs[lo - 1]['qs'][-1] = list(np.asarray(segs[lo - 1]['qs'][-1]) + off)
+        if hi + 1 < len(segs): segs[hi + 1]['qs'][0] = list(np.asarray(segs[hi + 1]['qs'][0]) + off)
+    return segs
 REACH_DEG = 5.0          # a segment's last waypoint counts as reached inside this (gravity sag is ~3 deg)
 NEAR_DEG = 2.0           # segment ends near the cups (approach / pick / place / retreat)
 GRIP_HOLD_S = 0.4        # after the jaws close or open
@@ -86,12 +116,14 @@ def sled_wait():
 def turn_deck(mega, deg, bench):
     """carousel move with one retry: a TT_TIMEOUT that does not reproduce happened once on the bench"""
     for attempt in (1, 2):
-        cur = mega.command('PING').get('tt') or 0.0
+        cur = mega.command('PING').get('tt')
+        if cur is not None and abs(deg - cur) <= 2.0: return dict(deg=cur)          # already there (inside the noise)
+        cur = cur or 0.0
         ms = int(max(1000, abs(deg - cur) / 45.0 * 1000 * bench['params']['carousel']['min_s_per_45deg']) + 200)
         try: return mega.motion('TT', done_timeout=ms / 1000 + 6, deg=float(deg), ms=ms)
         except MegaError as e:
             if attempt == 2: raise
-            print('   carousel: %s, clearing and retrying once' % e, flush=True); mega.command('CLR')
+            print('   carousel: %s, re-homing and retrying once' % e, flush=True); mega.command('CLR', home=True)
 
 
 def deck_for_step(name, bench):
@@ -126,11 +158,12 @@ def go(arm, q, speed, label='', tol=REACH_DEG, timeout=WAYPOINT_TIMEOUT_S, quiet
     return err
 
 
-def bench_segments(segs):
+def bench_segments(segs, key=None):
     """the plan's segments, adjusted for the bench: jaws wide open while approaching a cup (until they close); the
     pour manifold cut before its arm-flip region, a drain hold, then the pour retraced back to the 40 deg pose
     (the plan's untilt starts at 40 deg, which made the arm snap back from 105 deg)"""
     out = []; closed = False
+    if key is not None: segs = apply_overrides(segs, key)
     for seg in segs:
         seg = dict(seg); qs = [list(q) for q in seg['qs']]
         if seg['phase'] == 'pick': qs[0][5] = math.radians(APPROACH_GRIP_DEG); closed = True
@@ -198,7 +231,7 @@ def main():
     # pre-flight: every planned waypoint must be inside the arm's calibrated limits, or nothing moves
     bad = []
     for k in order + [x for x in plans if x not in order][:0]:
-        for seg in bench_segments(plans[k]['segments']):
+        for seg in bench_segments(plans[k]['segments'], k):
             for q in seg['qs']:
                 try: arms[plans[k]['arm']].check_goal(np.asarray(q, float))
                 except ValueError as e: bad.append('%s / %s: %s' % (k, seg['name'], e))
@@ -240,7 +273,7 @@ def main():
                 r = turn_deck(mega, deck, bench)
                 print('   carousel at %.1f deg' % r['deg'], flush=True)
             funnel = 'funnel' in k
-            for seg in bench_segments(s['segments']):
+            for seg in bench_segments(s['segments'], k):
                 fast = funnel and seg['phase'] == 'pour' and not seg['name'].startswith('untilt')   # tilt-in + pour: all at once
                 print('   %-38s %s%s' % (seg['name'], seg['phase'], '  (all at once)' if fast else ''), flush=True)
                 play_segment(arm, seg, 1.0 if fast else a.speed)
