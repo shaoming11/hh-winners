@@ -25,6 +25,7 @@ sys.path.insert(0, HERE)
 import replay_plan as rp  # noqa: E402
 
 OK_FILE = '/tmp/claude-501/teach_ok'
+MAX_NUDGE_DEG = 25.0     # bigger corrections are refused: the slow segments around the pose shift by the same offset
 # (step prefix, segment whose END is the pose, what it is)
 KEY_POSES = [
     ('1', 'touch fixed finger to P1', 'transfer: pick P1 at the carousel'),
@@ -77,13 +78,19 @@ def main():
                 print('   %-38s %s' % (g['name'], g['phase']), flush=True); rp.play_segment(arm, g, a.speed)
             planned = np.asarray(s['segments'][[g['name'] for g in s['segments']].index(seg_name)]['qs'][-1], float)
             arm.set_torque(False)
-            wait_ok(label)
-            q = arm.read_positions()
-            d = np.degrees(q - planned); d[5] = 0.0                  # the gripper opening is not taught here
+            while True:
+                wait_ok(label)
+                q = arm.read_positions()
+                d = np.degrees(q - planned); d[5] = 0.0              # the gripper opening is not taught here
+                big = np.abs(d[:5]).max()
+                if big <= MAX_NUDGE_DEG: break
+                print('   that is %.0f deg on one joint (%s): a different arm posture, not a nudge. Put it back near the '
+                      'planned pose and adjust it gently.' % (big, ' '.join('%+.0f' % x for x in d[:5])), flush=True)
             ov.setdefault(key, {})[seg_name] = [round(float(x), 2) for x in d]
             rp.save_overrides(ov)
             print('   saved: %s' % ' '.join('%s %+.1f' % (n, x) for n, x in zip(('pan', 'lift', 'elbow', 'wflex', 'wroll', 'grip'), d)), flush=True)
             arm.set_torque(True)                                      # holds the taught pose
+            segs = rp.bench_segments(s['segments'], key)            # back out along the corrected path
             for g in reversed(segs[:idx + 1]):                        # back out the way it came
                 back = dict(g); back['qs'] = g['qs'][::-1]; back['kind'] = 'cartesian' if len(g['qs']) > 2 else g['kind']
                 rp.play_segment(arm, back, a.speed)
