@@ -36,6 +36,7 @@ def assets():
 def page(api, sha):
     OUT.mkdir(parents=True, exist_ok=True)
     html = (WEB / "index.html").read_text().replace("<title>Wet Lab Bench · live</title>", "<title>AutoChem · live bench</title>")
+    html = html.replace('<span class="name">Wet Lab Bench</span>', '<span class="name">AutoChem</span>')
     html = html.replace('<link rel="stylesheet" href="/style.css">', '<link rel="stylesheet" href="%s">' % (CDN % (sha, "style.css")))
     html = html.replace('<script src="/app.js"></script>',
                         '<script>window.AUTOCHEM_API = %s;</script>\n<script src="%s"></script>' % (json.dumps(api.rstrip("/")), CDN % (sha, "app.js")))
