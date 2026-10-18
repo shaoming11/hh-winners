@@ -22,6 +22,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 from benchsim import layout, mechanisms, paths  # noqa: E402
 from benchsim.bench import make_bench  # noqa: E402
+from benchsim.interfaces import MegaError  # noqa: E402
 
 PORTS = dict(port_mega=os.environ.get('WLB_MEGA', '/dev/cu.usbserial-1130'),
              port_pourer=os.environ.get('WLB_POURER', '/dev/cu.usbmodem58760435221'),
@@ -140,7 +141,7 @@ def main():
             go(arm, rest, min(a.speed, 0.3), 'rest ' + name)
         for arm in arms.values(): arm.set_torque(False)
         print('\ndone: both arms back at rest, torque off')
-    except (KeyboardInterrupt, ConnectionError, TimeoutError) as stop_reason:
+    except (KeyboardInterrupt, ConnectionError, TimeoutError, MegaError) as stop_reason:
         print('\nstopping:', type(stop_reason).__name__, stop_reason)
         for name, arm in arms.items():
             try: arm.set_goal(arm.read_positions(), 1.0)
