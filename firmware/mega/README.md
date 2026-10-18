@@ -54,7 +54,7 @@ pack is plugged in.
 | Pin | AVR | Use |
 |---|---|---|
 | D2 | PE4 / INT4 | E-stop pole 2, `INPUT_PULLUP`, NC to GND. Rising edge: the interrupt disconnects all three compare outputs and drives D6/D7/D8 LOW at once; the core then latches `ESTOP` |
-| D15 | PJ0 | HX711 DOUT, read on `PINJ` (RX3; Serial3 unused; moved D3 → D11 → D15 to fit the bench wiring) |
+| D31 | PC6 | HX711 DOUT, read on `PINC` (moved D3 → D11 → D31 to fit the bench wiring) |
 | D4 | PG5 | HX711 SCK on `PORTG`; 25 pulses (channel A, gain 128) with interrupts off for about 25 µs |
 | D6 / D7 / D8 | PH3/OC4A, PH4/OC4B, PH5/OC4C | Carousel, stage, auger. Timer4 mode 14, prescaler 8, `ICR4 = 39999` (50 Hz), `OCR4x = 2 × µs`. No Servo library |
 | A2 | PF2 / ADC2 | Auger feedback, AVcc reference |

@@ -28,10 +28,10 @@
 #else
 #define ESTOP_OPEN() ((PINE & ESTOP_BIT) != 0)
 #endif
-#define HX_DT_BIT _BV(PJ0)          // D15 = PJ0 (RX3, Serial3 unused): HX711 DOUT (D3 -> D11 -> D15 to fit the bench wiring)
-#define HX_DT_PIN PINJ
-#define HX_DT_DDR DDRJ
-#define HX_DT_PORT PORTJ
+#define HX_DT_BIT _BV(PC6)          // D31 = PC6: HX711 DOUT (D3 -> D11 -> D31 to fit the bench wiring)
+#define HX_DT_PIN PINC
+#define HX_DT_DDR DDRC
+#define HX_DT_PORT PORTC
 #define HX_SCK_BIT _BV(PG5)         // D4 = PG5: HX711 SCK, written on PORTG
 #define TT_BIT _BV(PH3)             // D6 = PH3 / OC4A: carousel M45CHW
 #define ST_BIT _BV(PH4)             // D7 = PH4 / OC4B: stage M45CHW
