@@ -660,7 +660,7 @@ void Core::handle_line(const char* line, size_t n, uint32_t now) {
     }
     if (cmd == C_TT || cmd == C_ST) {
         int i = cmd == C_ST;
-        if (!ax_[i].known) { reply_err(seq, E_STATE, "position unknown: home it by hand, then CLR home:true", now); return; }
+        if (!ax_[i].known && !(i == 0 && cfg_.tt_closed)) { reply_err(seq, E_STATE, "position unknown: home it by hand, then CLR home:true", now); return; }   // closed-loop TT: measured, never unknown
         start_axis(i, seq, obj_.get("deg")->f, obj_.get("ms")->f, now);
         reply_simple(seq, "ack", now);
         return;
