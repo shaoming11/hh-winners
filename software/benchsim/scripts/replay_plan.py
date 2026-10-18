@@ -249,6 +249,11 @@ def main():
         rest = np.radians(REST_DEG)
         if mega is not None:
             mega.command('CLR', home=True)
+            St = bench['params']['stage']               # the sled starts out (flask under the funnel); it retracts only
+            st = mega.command('PING').get('st')         # after the last pour, and stays retracted until the next run
+            if st is None or abs(st - St['work_deg']) > 2.0:
+                r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['work_deg']), ms=int(St['move_s'] * 1000))
+                print('sled out to %.0f deg (start position)' % r['deg'], flush=True)
         if a.rest:
             for name, arm in arms.items():
                 if not a.yes: input('\nEnter: move %s to the rest pose (slow) ' % name)
@@ -278,7 +283,7 @@ def main():
                 print('   %-38s %s%s' % (seg['name'], seg['phase'], '  (all at once)' if fast else ''), flush=True)
                 play_segment(arm, seg, 1.0 if fast else a.speed)
                 if k in last_funnel and seg['phase'] == 'drain' and mega is not None:
-                    # the pour is done: the sled carries the flask out at once, the arm retraces / retreats meanwhile
+                    # the pour is done: the sled retracts at once, the arm retraces / retreats meanwhile
                     # (the beaker's lip stays >= 65 mm above the funnel rim through the pour, so the funnel passes under it)
                     sled_start(bench['params']['stage']['erupt_deg'], bench['params']['stage'])
             sled_wait()
@@ -288,10 +293,6 @@ def main():
             if not err < 8.0: raise TimeoutError('%s arm did not get back to park (%.0f deg off)' % (s['arm'], err))
         if mega is not None and a.end_turn:             # finale: the next cup comes round to the pick spot
             r = turn_deck(mega, a.end_turn, bench); print('carousel turned to %.0f deg (end)' % r['deg'], flush=True)
-        if mega is not None and last_funnel:
-            St = bench['params']['stage']
-            r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['work_deg']), ms=int(St['move_s'] * 1000))
-            print('sled back to %.0f deg (work)' % r['deg'], flush=True)
         for name, arm in arms.items():
             if not a.yes: input('\nEnter: return %s to the rest pose ' % name)
             go(arm, rest, min(a.speed, 0.3), 'rest ' + name)

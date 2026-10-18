@@ -328,11 +328,11 @@ tt_dir_sign = 1
 tt_fb_zero_deg = 244.0                      # 2026-10-18: feedback angle with a cup on the pick spot = deck 0
 tt_us_stop = 1500                           # measured: no motion from 1450 to 1550 us
 tt_us_db = 62                               # measured: no motion from 1460 to 1540 us, moves at 1440 / 1560
-tt_kp = 3.0                                 # us past the deadband per deg of error (tune on the deck)
+tt_kp = 5.0                                 # us past the deadband per deg of error (tune on the deck)
 tt_kd = 0.0                                 # us per deg/s of speed error (P only unless it overshoots)
 tt_kff = 0.0                                # feedforward (off: P only tracks the profile well enough)
 tt_hold_deg = 2.0                           # holds the target after a move; corrects past this drift
-tt_max_off = 60
+tt_max_off = 90
 tt_tol_deg = 2.5
 tt_db_deg = 1.0
 tt_release = true                           # 2026-10-17: the deck's inertia makes the TT servo hunt while holding; firmware stops its pulses after each move
