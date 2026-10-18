@@ -192,6 +192,6 @@ def test_cli_writes_report(tmp_path, capsys):
     out = tmp_path / 'ai.json'
     assert ai_main(['--text', str(EXAMPLE), '--preset', '--approve', '--out', str(out)]) == 0
     r = json.loads(out.read_text())
-    assert r['approved'] and r['proposal']['source'] == 'preset' and r['validation']['ok'] and len(r['steps']) == len(S.demo_protocol())
+    assert r['approved'] and r['proposal']['source'] == 'preset' and r['validation']['ok'] and len(r['steps']) == 11
     assert r['approval']['approver'] == 'command line --approve' and r['llm']['status'] == 'not used (--preset)'
     assert 'VALIDATION: PASSED' in capsys.readouterr().out

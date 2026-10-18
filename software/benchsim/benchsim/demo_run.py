@@ -55,11 +55,6 @@ class SimDemo:
         self.foam = FoamModel(w, self.L); load_flask(self.L)
         self.L.add('dev', 'developer', INITIAL['developer_ml'] * DENSITY['developer'])
         self.L.add('water', 'water', INITIAL['water_ml'] * DENSITY['water']); self.aug.fill(INITIAL['hopper_g'])
-        R = P['recipe']
-        if R.get('yeast_in_flask'):                     # MVP: the yeast-water mix is loaded into the flask by hand
-            self.L.add('flask', 'yeast', R['yeast_g']); self.L.add('flask', 'water', R['water_g'])
-        elif R.get('premixed_yeast_water'):             # P2 is loaded already holding the yeast-water mix
-            self.L.add('P2', 'yeast', R['yeast_g']); self.L.add('P2', 'water', R['water_g'])
         self.planner = poses.Planner(w.m, w.b); self.gh = grip_heights()
         self.mech = Mechanisms(bb.mega, bench=None)
         self.rl = runlog.RunLog(out_root, 'sim', seed=seed); self.dir = self.rl.dir; (self.dir / 'frames').mkdir(exist_ok=True)
@@ -213,14 +208,6 @@ class SimDemo:
                         measured=dict(rev_done=done.get('rev_done'), sim_truth_in_beaker_g=round(self.L.mass(p['beaker']), 3), hopper_g=round(self.L.mass('hopper'), 3)),
                         detail='first pass %.2f rev; verified on the scale in the next steps' % rev)
         sk['DOSE_YEAST'] = dose_yeast
-
-        def carousel(step, ctx):
-            """turn the deck so the beaker's pocket is at the station (pre-mixed P2: brought to the pick spot)"""
-            p = step.params
-            mv = self.mech.carousel_to(p['beaker'], p['station']) or {}
-            return dict(target=dict(station=p['station']), measured=dict(deck_deg=round(float(self.mech.deck), 2)),
-                        detail='%s pocket at %s' % (p['beaker'], p['station']))
-        sk['CAROUSEL'] = carousel
 
         def verify_mass(step, ctx):
             """scale check; for a beaker with a pending auger dose, short doses go back for top-ups (demo_process step 6)"""

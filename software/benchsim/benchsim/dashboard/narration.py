@@ -53,8 +53,6 @@ def describe(step):
         else:
             out['title'] = 'Pouring the hydrogen peroxide into the flask'
             out['chemical'] = REAGENT['developer']
-            if p.get('erupt'):                          # MVP: the yeast-water is already in the flask, so this pour starts it
-                out['title'] = 'Pouring the hydrogen peroxide onto the yeast: the reaction starts'; out['science'] = REACTION
         out['detail'] = 'Pourer arm empties %s through the funnel. Soap and dye are already in the flask.' % p['beaker']
         if p.get('erupt') and p['beaker'] != 'P2':
             # the live-demo plan (steps.flask_demo_protocol): the yeast went into the flask by hand, so the peroxide starts it

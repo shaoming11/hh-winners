@@ -155,7 +155,9 @@ yeast_tol_g = 0.7
 water_g = 30.0
 water_tol_g = 2.0
 activate_wait_s = 60.0
-yeast_in_flask = true                       # 2026-10-18 MVP: the yeast-water mix is pre-measured into the flask (with the soap and
+# The two flags below pick the steps scripts/replay_plan.py runs on the real arms. The simulator and the dashboard do not
+# read them: the dashboard's "full run | demo" switch picks its plan (steps.demo_protocol / steps.flask_demo_protocol).
+yeast_in_flask = true                      # 2026-10-18 MVP: the yeast-water mix is pre-measured into the flask (with the soap and
                                             # dye); the arms only measure the peroxide into P1 and pour it into the funnel
 premixed_yeast_water = true                 # 2026-10-18: P2 is loaded already holding yeast_g yeast in water_g warm water (mixed by
                                             # hand beforehand); the demo skips the yeast dose, the water pour and the wait
