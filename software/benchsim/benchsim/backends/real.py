@@ -440,9 +440,23 @@ class LeRobotArm:
         unit = self.sts['goal_velocity_unit_ticks_s']
         floor = 0.3 * vpk / unit                  # never a crawl speed: Goal_Velocity goes out in a sync write (no reply), so a
         vel = {n: int(min(max(round(dq[i] / t_move / unit), floor), round(vpk / unit))) for i, n in enumerate(JOINTS)}   # lost write must not leave a joint at 1 step/s
-        self._write('Goal_Velocity', vel)
-        self._write('Goal_Position', ticks)
+        self._write_verified('Goal_Velocity', vel)
+        self._write_verified('Goal_Position', ticks)
         self._goal = ticks
+
+    def _write_verified(self, reg, values, tries=3):
+        """sync write, read back (sync read has replies) and re-send what a motor missed: a sync write gets no status
+        packet, and on the bench single motors drop one now and then (an elbow kept its old goal, a wrist its old speed)"""
+        want = {n: int(v) for n, v in values.items()}; miss = want
+        self._write(reg, want)
+        if self.dry_run: return
+        for _ in range(tries):
+            try: got = self._read(reg)
+            except ConnectionError: continue
+            miss = {n: v for n, v in want.items() if int(got.get(n, -1)) != v}
+            if not miss: return
+            self._write(reg, miss)
+        raise ConnectionError('%s: %s not taken by %s after %d tries' % (self.name, reg, sorted(miss), tries))
 
     def is_moving(self):
         try: return any(self._read('Moving').values())

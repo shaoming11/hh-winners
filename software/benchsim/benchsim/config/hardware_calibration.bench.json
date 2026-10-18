@@ -7,7 +7,7 @@
     "gripper": "tick_closed = LeRobot range_min (TPU fin-ray fingertips just touching), 1 deg per 4096/360 ticks; deg_open 100 at tick_closed + 1138",
     "limits": "min_deg/max_deg default to the MJCF joint ranges rounded inward; narrow them to the bench's safe range",
     "fingerprint": "null until recorded: {joint: [Homing_Offset, Min_Position_Limit, Max_Position_Limit]} read with LeRobotArm.read_fingerprint(); a mismatch refuses the arm (wrong port or swapped arms)",
-    "speeds": "max_speed_deg_s is capped by bench_params [arm] max_speed_deg_s; 60 deg/s is a bring-up value (assumed); acceleration_deg_s2 is written to the STS3215 Acceleration register (assumed)"
+    "speeds": "2026-10-18: 120 deg/s, 600 deg/s^2 (60/300 bring-up values were sluggish); replay_plan runs at 60 % by default"
   },
   "ticks_per_rev": 4096,
   "arms": {
@@ -45,8 +45,8 @@
           2947
         ]
       },
-      "max_speed_deg_s": 60.0,
-      "acceleration_deg_s2": 300.0,
+      "max_speed_deg_s": 120.0,
+      "acceleration_deg_s2": 600.0,
       "goal_tolerance_deg": 1.5,
       "joints": {
         "shoulder_pan": {
@@ -129,8 +129,8 @@
           2743
         ]
       },
-      "max_speed_deg_s": 60.0,
-      "acceleration_deg_s2": 300.0,
+      "max_speed_deg_s": 120.0,
+      "acceleration_deg_s2": 600.0,
       "goal_tolerance_deg": 1.5,
       "joints": {
         "shoulder_pan": {
