@@ -418,6 +418,7 @@ NEAR_DEG = 2.0           # segment ends near the cups (approach / pick / place /
 GRIP_HOLD_S = 0.4        # after the jaws close or open
 APPROACH_GRIP_DEG = 85.0 # jaws almost fully open on every approach: the widest margin for a cup that is a bit off
 POUR_JUMP_DEG = 3.0      # the planned pour manifold swings the arm through ~17 deg/sample near 84-96 deg tilt: stop before
+POUR_EXTRA_ROLL_DEG = {'3': 25.0}   # funnel pour: past the smooth 84 deg part, the wrist roll alone turns this much further (past flat, so it empties)
 POUR_DRAIN_S = 1.5       # hold at the deepest smooth tilt so the beaker empties
 GRAB_HELD_DEG = 1.5      # jaws stopped this far short of the closed command = a beaker is in them (side grip: held 2.9-3.4, missed 0.2-0.5)
 GRABS = []               # (step, held, deg short) for the run summary
@@ -555,6 +556,12 @@ def bench_segments(segs, key=None, arm=None):
             cut = next((i for i, x in enumerate(d) if x > POUR_JUMP_DEG), len(qs) - 1)
             qs = qs[:cut + 1]
             seg['qs'] = qs; seg['name'] = 'pour to %.0f deg tilt (smooth part)' % (40 + 65.0 * cut / max(1, len(d))); out.append(seg)
+            extra = POUR_EXTRA_ROLL_DEG.get((key or '').split(' ')[0], 0.0)
+            if extra:                                   # wrist roll only, on in the direction the pour was rolling
+                sgn = 1.0 if qs[-1][4] >= qs[0][4] else -1.0
+                more = [qs[-1][:4] + [qs[-1][4] + sgn * math.radians(extra) * t] + qs[-1][5:] for t in np.linspace(0, 1, 9)[1:]]
+                out.append(dict(name='roll %.0f deg further (past flat)' % extra, phase='pour', kind='cartesian', qs=[qs[-1]] + more))
+                qs = qs + more
             out.append(dict(name='drain %.1f s' % POUR_DRAIN_S, phase='drain', kind='hold', qs=[qs[-1]]))
             out.append(dict(name='retrace the pour to 40 deg', phase='pour_back', kind='cartesian', qs=qs[::-1]))
             continue
