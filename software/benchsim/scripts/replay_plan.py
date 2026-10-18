@@ -47,6 +47,42 @@ WAYPOINT_TIMEOUT_S = 2.0          # last waypoint of a segment
 PASS_TIMEOUT_S = 0.4              # intermediate waypoints
 
 
+MEGA = None              # set in main(); the sled can run in the background while an arm moves
+SLED = {}                # {'seq', 't_end', 'deg'} while a background stage move is running
+
+
+def mega_tick():
+    """while a background stage move runs: read its replies and keep the Mega's 500 ms comm watchdog fed"""
+    if not SLED or MEGA is None: return
+    MEGA._pump(); MEGA._keepalive()
+    if MEGA.faults: raise MegaError(MEGA.faults[-1])
+    for r in MEGA.replies.get(SLED['seq'], []):
+        if 'err' in r: raise MegaError(r)
+        if r.get('done'):
+            print('   sled at %.0f deg' % r['deg'], flush=True); SLED.clear(); return
+    if time.time() > SLED['t_end']: raise TimeoutError('sled move seq %d not done' % SLED['seq'])
+
+
+def nap(seconds):
+    """sleep, but keep a background sled move serviced"""
+    t_end = time.time() + seconds
+    while True:
+        mega_tick(); left = t_end - time.time()
+        if left <= 0: return
+        time.sleep(min(left, 0.05))
+
+
+def sled_start(deg, St):
+    """send the stage move and return at once (its ack is checked); mega_tick() follows it to done"""
+    seq = MEGA.send('ST', deg=float(deg), ms=int(St['move_s'] * 1000)); MEGA.wait(seq, key=('ack',))
+    SLED.update(seq=seq, t_end=time.time() + St['move_s'] + St['timeout_extra_s'] + 3, deg=deg)
+    print('   sled moving to %.0f deg (in parallel with the arm)' % deg, flush=True)
+
+
+def sled_wait():
+    while SLED: nap(0.05)
+
+
 def deck_for_step(name, bench):
     """deck angle that puts the step's carousel pocket at the pick spot (None: the step does not use the carousel)"""
     if 'carousel' not in name: return None
@@ -70,7 +106,7 @@ def go(arm, q, speed, label='', tol=REACH_DEG, timeout=WAYPOINT_TIMEOUT_S, quiet
             if misses >= 10: raise
             time.sleep(0.05); continue
         if err < tol: return err
-        time.sleep(0.03)
+        nap(0.03)
     if not quiet:
         try: d = np.degrees(arm.read_positions() - np.asarray(q, float))
         except ConnectionError: d = np.full(6, np.nan)
@@ -103,7 +139,7 @@ def bench_segments(segs):
 
 def play_segment(arm, seg, speed):
     if seg['kind'] == 'hold':
-        time.sleep(POUR_DRAIN_S); return
+        nap(POUR_DRAIN_S); return
     qs = seg['qs']
     if seg['kind'] == 'joint' and len(qs) == 2: qs = qs[1:]          # joint moves: straight to the end
     vmax = arm.vmax_deg_s * speed
@@ -113,11 +149,11 @@ def play_segment(arm, seg, speed):
         dt = 0.0 if prev is None else float(np.degrees(np.abs(q - prev))[:5].max()) / vmax
         try: arm.set_goal(q, speed_scale=speed)
         except ConnectionError: pass              # a dropped packet: the next waypoint supersedes it
-        time.sleep(max(dt, 0.02)); prev = q
+        nap(max(dt, 0.02)); prev = q
     near = seg['phase'] in ('approach', 'pick', 'place', 'retreat')        # close to the cups: tighter end
     grip = seg['phase'] in ('pick', 'place')                                 # the jaws must finish closing / opening
     go(arm, qs[-1], speed, seg['name'], tol=NEAR_DEG if near else REACH_DEG, joints=6 if grip else 5)
-    if grip: time.sleep(GRIP_HOLD_S)
+    if grip: nap(GRIP_HOLD_S)
 
 
 def main():
@@ -142,6 +178,7 @@ def main():
     bb = make_bench('real', allow_hardware=True, **kw)
     arms = bb.arms
     mega = None if a.no_mega else bb.mega
+    global MEGA; MEGA = mega
     if mega is not None:                          # opening the CH340 port resets the Mega: wait for the boot line
         time.sleep(2.5)
         try: bb.transport.read_lines()
@@ -198,9 +235,10 @@ def main():
                 print('   %-38s %s%s' % (seg['name'], seg['phase'], '  (all at once)' if fast else ''), flush=True)
                 play_segment(arm, seg, 1.0 if fast else a.speed)
                 if k in last_funnel and seg['phase'] == 'drain' and mega is not None:
-                    St = bench['params']['stage']           # last pour done: the sled carries the flask out right away
-                    r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['erupt_deg']), ms=int(St['move_s'] * 1000))
-                    print('   sled out to %.0f deg (erupt)' % r['deg'], flush=True)
+                    # the pour is done: the sled carries the flask out at once, the arm retraces / retreats meanwhile
+                    # (the beaker's lip stays >= 65 mm above the funnel rim through the pour, so the funnel passes under it)
+                    sled_start(bench['params']['stage']['erupt_deg'], bench['params']['stage'])
+            sled_wait()
             # never start the next step (maybe the other arm) before this arm is really back at park
             end = s['segments'][-1]['qs'][-1]
             err = go(arm, end, a.speed, 'back at park', tol=8.0, timeout=15.0)
