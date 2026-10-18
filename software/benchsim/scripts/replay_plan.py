@@ -47,7 +47,10 @@ def deck_for_step(name, bench):
 
 def go(arm, q, speed, label='', tol=REACH_DEG, timeout=WAYPOINT_TIMEOUT_S, quiet=False):
     """command one waypoint and wait until every joint is within tol (or the timeout)"""
+    try: span = np.degrees(np.abs(arm.read_positions() - np.asarray(q, float)))[:5].max()
+    except ConnectionError: span = 90.0
     arm.set_goal(np.asarray(q, float), speed_scale=speed)
+    timeout = max(timeout, 1.5 * span / (arm.vmax_deg_s * speed) + (0.0 if quiet else 1.0))   # long moves get the time they need
     t0 = time.time(); err = float('nan'); misses = 0
     while time.time() - t0 < timeout:
         try:
