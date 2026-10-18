@@ -150,9 +150,9 @@ STUB_ARDUINO = r'''
 #include <deque>
 #include <string>
 #define _BV(b) (1 << (b))
-extern volatile uint8_t PORTB, DDRB, PINB, PORTE, DDRE, PINE, PORTG, DDRG, PORTH, DDRH, TCCR4A, TCCR4B, TCCR4C, TIMSK4, TIFR4, SREG;
+extern volatile uint8_t PORTB, DDRB, PINB, PORTJ, DDRJ, PINJ, PORTE, DDRE, PINE, PORTG, DDRG, PORTH, DDRH, TCCR4A, TCCR4B, TCCR4C, TIMSK4, TIFR4, SREG;
 extern volatile uint16_t TCNT4, ICR4, OCR4A, OCR4B, OCR4C;
-enum { PB5 = 5, PE3 = 3, PE4 = 4, PE5 = 5, PG5 = 5, PH3 = 3, PH4 = 4, PH5 = 5, COM4A1 = 7, COM4A0 = 6, COM4B1 = 5, COM4B0 = 4, COM4C1 = 3,
+enum { PB5 = 5, PJ0 = 0, PE3 = 3, PE4 = 4, PE5 = 5, PG5 = 5, PH3 = 3, PH4 = 4, PH5 = 5, COM4A1 = 7, COM4A0 = 6, COM4B1 = 5, COM4B0 = 4, COM4C1 = 3,
        COM4C0 = 2, WGM41 = 1, WGM43 = 4, WGM42 = 3, CS41 = 1, TOV4 = 0, TOIE4 = 0 };
 #define A2 56
 #define INPUT_PULLUP 2
@@ -194,7 +194,7 @@ SMOKE = r'''
 #include <stdio.h>
 #include "Arduino.h"
 #include "EEPROM.h"
-volatile uint8_t PORTB, DDRB, PINB, PORTE, DDRE, PINE, PORTG, DDRG, PORTH, DDRH, TCCR4A, TCCR4B, TCCR4C, TIMSK4, TIFR4, SREG;
+volatile uint8_t PORTB, DDRB, PINB, PORTJ, DDRJ, PINJ, PORTE, DDRE, PINE, PORTG, DDRG, PORTH, DDRH, TCCR4A, TCCR4B, TCCR4C, TIMSK4, TIFR4, SREG;
 volatile uint16_t TCNT4, ICR4, OCR4A, OCR4B, OCR4C;
 StubSerial Serial;
 StubEEPROM EEPROM;
