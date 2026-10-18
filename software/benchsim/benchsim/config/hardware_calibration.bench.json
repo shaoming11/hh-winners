@@ -1,0 +1,183 @@
+{
+  "schema": "benchsim.hardware_calibration/1",
+  "status": "measured 2026-10-18 on the bench: LeRobot calibration (wlb_pourer / wlb_transfer) + zero-pose and sign check against the sim (all five arm joints match LeRobot degrees 1:1)",
+  "notes": {
+    "convention": "q_rad = sign * (ticks - tick_at_zero) * 2 pi / ticks_per_rev; q is the upstream so101_new_calib MJCF joint angle",
+    "tick_at_zero": "Present_Position at LeRobot 0 deg = (range_min + range_max) / 2 of the LeRobot calibration; the bench check put both arms at LeRobot 0 and they matched the MJCF zero pose, + directions match the sim on every joint",
+    "gripper": "tick_closed = LeRobot range_min (TPU fin-ray fingertips just touching), 1 deg per 4096/360 ticks; deg_open 100 at tick_closed + 1138",
+    "limits": "min_deg/max_deg default to the MJCF joint ranges rounded inward; narrow them to the bench's safe range",
+    "fingerprint": "null until recorded: {joint: [Homing_Offset, Min_Position_Limit, Max_Position_Limit]} read with LeRobotArm.read_fingerprint(); a mismatch refuses the arm (wrong port or swapped arms)",
+    "speeds": "max_speed_deg_s is capped by bench_params [arm] max_speed_deg_s; 60 deg/s is a bring-up value (assumed); acceleration_deg_s2 is written to the STS3215 Acceleration register (assumed)"
+  },
+  "ticks_per_rev": 4096,
+  "arms": {
+    "pourer": {
+      "lerobot_id": "wlb_pourer",
+      "fingerprint": {
+        "shoulder_pan": [
+          -2022,
+          776,
+          3512
+        ],
+        "shoulder_lift": [
+          1218,
+          669,
+          3005
+        ],
+        "elbow_flex": [
+          766,
+          1158,
+          3373
+        ],
+        "wrist_flex": [
+          -1910,
+          866,
+          3226
+        ],
+        "wrist_roll": [
+          2044,
+          0,
+          4095
+        ],
+        "gripper": [
+          584,
+          1753,
+          2947
+        ]
+      },
+      "max_speed_deg_s": 60.0,
+      "acceleration_deg_s2": 300.0,
+      "goal_tolerance_deg": 1.5,
+      "joints": {
+        "shoulder_pan": {
+          "id": 1,
+          "tick_at_zero": 2144.0,
+          "sign": 1,
+          "min_deg": -109.9,
+          "max_deg": 110.0
+        },
+        "shoulder_lift": {
+          "id": 2,
+          "tick_at_zero": 1837.0,
+          "sign": 1,
+          "min_deg": -99.7,
+          "max_deg": 99.7
+        },
+        "elbow_flex": {
+          "id": 3,
+          "tick_at_zero": 2265.5,
+          "sign": 1,
+          "min_deg": -94.3,
+          "max_deg": 94.3
+        },
+        "wrist_flex": {
+          "id": 4,
+          "tick_at_zero": 2046.0,
+          "sign": 1,
+          "min_deg": -95.0,
+          "max_deg": 94.9
+        },
+        "wrist_roll": {
+          "id": 5,
+          "tick_at_zero": 2047.5,
+          "sign": 1,
+          "min_deg": -157.2,
+          "max_deg": 162.7
+        },
+        "gripper": {
+          "id": 6,
+          "tick_closed": 1753,
+          "deg_closed": 0.0,
+          "tick_open": 2891,
+          "deg_open": 100.0,
+          "min_deg": 0.0,
+          "max_deg": 99.9
+        }
+      }
+    },
+    "transfer": {
+      "lerobot_id": "wlb_transfer",
+      "fingerprint": {
+        "shoulder_pan": [
+          -1977,
+          739,
+          3472
+        ],
+        "shoulder_lift": [
+          -1000,
+          791,
+          3394
+        ],
+        "elbow_flex": [
+          1260,
+          959,
+          3164
+        ],
+        "wrist_flex": [
+          1342,
+          743,
+          3108
+        ],
+        "wrist_roll": [
+          -1769,
+          0,
+          4095
+        ],
+        "gripper": [
+          704,
+          1571,
+          2743
+        ]
+      },
+      "max_speed_deg_s": 60.0,
+      "acceleration_deg_s2": 300.0,
+      "goal_tolerance_deg": 1.5,
+      "joints": {
+        "shoulder_pan": {
+          "id": 1,
+          "tick_at_zero": 2105.5,
+          "sign": 1,
+          "min_deg": -109.9,
+          "max_deg": 110.0
+        },
+        "shoulder_lift": {
+          "id": 2,
+          "tick_at_zero": 2092.5,
+          "sign": 1,
+          "min_deg": -99.9,
+          "max_deg": 100.0
+        },
+        "elbow_flex": {
+          "id": 3,
+          "tick_at_zero": 2061.5,
+          "sign": 1,
+          "min_deg": -93.9,
+          "max_deg": 93.9
+        },
+        "wrist_flex": {
+          "id": 4,
+          "tick_at_zero": 1925.5,
+          "sign": 1,
+          "min_deg": -95.0,
+          "max_deg": 94.9
+        },
+        "wrist_roll": {
+          "id": 5,
+          "tick_at_zero": 2047.5,
+          "sign": 1,
+          "min_deg": -157.2,
+          "max_deg": 162.7
+        },
+        "gripper": {
+          "id": 6,
+          "tick_closed": 1571,
+          "deg_closed": 0.0,
+          "tick_open": 2709,
+          "deg_open": 100.0,
+          "min_deg": 0.0,
+          "max_deg": 99.9
+        }
+      }
+    }
+  }
+}
