@@ -66,12 +66,12 @@
   {
    "station": "carousel centre",
    "model_mm": [
-    807.9,
-    523.5
+    755.7,
+    297.0
    ],
    "source_mm": [
-    807.9,
-    523.5
+    755.7,
+    297.0
    ],
    "error_mm": 0.0,
    "pass_": true,
@@ -80,34 +80,40 @@
   {
    "station": "carousel pick pocket",
    "model_mm": [
-    744.12,
-    468.83,
+    718.22,
+    372.17,
     61.7
    ],
    "source_mm": [
-    744.1,
-    468.8,
+    718.2,
+    372.2,
     61.7
    ],
-   "error_mm": 0.041,
+   "error_mm": 0.032,
    "pass_": true,
    "source": "update13_final"
   },
   {
-   "station": "carousel auger pocket",
+   "station": "carousel auger on the pocket circle (r, z)",
    "model_mm": [
-    871.68,
-    578.17,
+    83.97,
     61.7
    ],
    "source_mm": [
-    871.6,
-    578.2,
+    84.0,
     61.7
    ],
-   "error_mm": 0.086,
+   "error_mm": 0.033,
    "pass_": true,
    "source": "update13_final"
+  },
+  {
+   "station": "every pocket reaches the auger in deck range",
+   "model_mm": [],
+   "source_mm": [],
+   "error_mm": 0.0,
+   "pass_": true,
+   "source": "mechanisms.station_table"
   },
   {
    "station": "rack pocket 1",
@@ -184,12 +190,12 @@
   {
    "station": "auger outlet over auger pocket",
    "model_mm": [
-    871.6,
-    578.2
+    834.5,
+    326.0
    ],
    "source_mm": [
-    871.6,
-    578.2
+    834.5,
+    326.0
    ],
    "error_mm": 0.0,
    "pass_": true,
@@ -201,37 +207,37 @@
    "beaker": "P1",
    "station": "carousel_pocket_0",
    "final_mm": [
-    744.12,
-    468.83,
+    718.22,
+    372.17,
     61.59
    ],
    "target_mm": [
-    744.12,
-    468.83,
+    718.22,
+    372.17,
     61.7
    ],
-   "error_mm": 0.112,
-   "moved_mm": 0.162,
-   "tilt_deg": 0.048,
+   "error_mm": 0.11,
+   "moved_mm": 0.16,
+   "tilt_deg": 0.024,
    "initial_penetration_mm": 0.0,
    "pass_": true
   },
   {
    "beaker": "P2",
-   "station": "carousel_pocket_1",
+   "station": "carousel_pocket_2",
    "final_mm": [
-    862.56,
-    459.72,
+    793.18,
+    221.83,
     61.59
    ],
    "target_mm": [
-    862.57,
-    459.72,
+    793.18,
+    221.83,
     61.7
    ],
-   "error_mm": 0.113,
-   "moved_mm": 0.163,
-   "tilt_deg": 0.058,
+   "error_mm": 0.111,
+   "moved_mm": 0.161,
+   "tilt_deg": 0.033,
    "initial_penetration_mm": 0.0,
    "pass_": true
   },
@@ -328,12 +334,12 @@
   {
    "arm": "transfer",
    "station": "carousel pick",
-   "r_mm": 191.2,
-   "bearing_deg": 46.8,
-   "recorded_r": 191.1,
-   "recorded_bearing": 48,
-   "dr": 0.1,
-   "dbearing": -1.2
+   "r_mm": 254.2,
+   "bearing_deg": 26.5,
+   "recorded_r": 254.2,
+   "recorded_bearing": 26.5,
+   "dr": -0.0,
+   "dbearing": -0.0
   },
   {
    "arm": "transfer",
@@ -348,21 +354,21 @@
   {
    "arm": "-",
    "station": "carousel_pick vs centre",
-   "r_mm": 84.04,
-   "bearing_deg": 220.61,
+   "r_mm": 84.03,
+   "bearing_deg": 116.5,
    "recorded_r": 84.0,
    "recorded_bearing": null,
-   "dr": 0.04,
+   "dr": 0.03,
    "dbearing": null
   },
   {
    "arm": "-",
    "station": "carousel_auger vs centre",
-   "r_mm": 83.96,
-   "bearing_deg": 40.65,
+   "r_mm": 83.97,
+   "bearing_deg": 20.2,
    "recorded_r": 84.0,
    "recorded_bearing": null,
-   "dr": -0.04,
+   "dr": -0.03,
    "dbearing": null
   }
  ],
@@ -385,14 +391,14 @@
    "part": "TT-04 v4 beaker ring",
    "file": "TT-04_beaker-ring-v4-4x100mL_qty1.stl",
    "body": "carousel",
-   "yaw_deg": 18.105325832605825,
+   "yaw_deg": -85.99467416739415,
    "t": [
-    -0.016734985655944,
-    0.0018549595239392147,
+    0.005875967059751019,
+    0.015778898277631015,
     58.6
    ],
    "verified": "fit: 4 pocket bores to the r84 pockets + floor Z",
-   "residual_mm": 0.12335734710567181,
+   "residual_mm": 0.12335734710563924,
    "note": "body frame = carousel deck at angle 0; bore r 30.34, locating ribs r 28.25"
   },
   {
@@ -511,10 +517,10 @@
    "part": "TT-01 v2 turntable base",
    "file": "TT-01_turntable-base-v2_qty1.stl",
    "body": "world",
-   "yaw_deg": 220.6,
+   "yaw_deg": 180.0,
    "t": [
-    807.9,
-    523.5,
+    755.7,
+    297.0,
     0.0
    ],
    "verified": "assumed: local origin on the carousel axis, rotated with the unit by update13_final carousel.rotation_deg",
@@ -566,11 +572,11 @@
    "note": "deck on a hinge with a position servo"
   },
   {
-   "part": "auger PS-01 post + DH-01 head",
+   "part": "auger PS-01 post + DH-01 head + E5",
    "visual": "procedural",
    "collision": "box",
-   "source": "outlet over update13_final carousel.auger at Z 169.5 (demo_process step 5)",
-   "note": "post/head placement radial from the pocket, not from CAD; screw not modelled"
+   "source": "layout_final carousel.auger_post_box / auger_head_box / auger_rail_E5 (STL extents as placed)",
+   "note": "bounding boxes of the CAD parts; screw not modelled"
   },
   {
    "part": "auger dosing",

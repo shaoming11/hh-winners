@@ -34,7 +34,15 @@ def measure(model, data, b):
     row('funnel rim (sled at WORK)', mm(data.site('funnel_rim').xpos), st['funnel']['xy'] + [st['funnel']['z']])
     row('carousel centre', mm(data.xanchor[model.joint('carousel').id])[:2], st['carousel_centre']['xy'])
     row('carousel pick pocket', mm(data.site('pocket0').xpos), st['carousel_pick']['xy'] + [st['carousel_pick']['z']])
-    row('carousel auger pocket', mm(data.site('pocket2').xpos), st['carousel_auger']['xy'] + [st['carousel_auger']['z']])
+    # the auger may sit anywhere on the pocket circle (trial saddle layout: ~96 deg from the pick, not opposite it):
+    # it must be on the circle, at beaker-bottom height, and every pocket must be able to reach it inside the deck range
+    cc = np.asarray(st['carousel_centre']['xy']); p0 = mm(data.site('pocket0').xpos)
+    row('carousel auger on the pocket circle (r, z)', [float(np.linalg.norm(np.asarray(st['carousel_auger']['xy']) - cc)), st['carousel_auger']['z']],
+        [float(np.linalg.norm(p0[:2] - cc)), float(p0[2])])
+    from . import mechanisms
+    bad = [r['pocket'] for r in mechanisms.station_table(b.bench) if r['station'] == 'auger' and r['deck_deg'] is None]
+    rows.append(dict(station='every pocket reaches the auger in deck range', model_mm=bad, source_mm=[], error_mm=float(len(bad)),
+                     pass_=not bad, source='mechanisms.station_table'))
     for i in (1, 2, 3):
         row('rack pocket %d' % i, mm(data.site('rack_%d' % i).xpos), st['rack_%d' % i]['xy'] + [st['rack_%d' % i]['z']])
     for name, key in (('X-front rail centre Y', 'front_centre_Y'), ('X-back rail centre Y', 'rear_centre_Y')):

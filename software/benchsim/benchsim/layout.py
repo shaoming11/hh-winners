@@ -58,7 +58,8 @@ def load_bench():
         add('rack_%d' % (i + 1), r['xy'], u['rack_beaker_bottom_z'], note='z = beaker bottom')
     bench = dict(params=P, stations=st, carousel_rotation_deg=float(u['carousel']['rotation_deg']),
                  x_rails=u['X_rails'], r_bearing=u['r_bearing'], recorded_steps=u['steps'],
-                 tape_datums=u['tape_datums'], source=src)
+                 tape_datums=u['tape_datums'], source=src,
+                 auger_boxes={k: u['carousel'][k] for k in ('auger_post_box', 'auger_head_box', 'auger_rail_E5') if k in u['carousel']})
     return bench
 
 

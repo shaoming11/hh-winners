@@ -61,7 +61,7 @@ quant_counts = 1                            # one count quantisation
 [carousel]
 # TT-04 v4 ring, 4 pockets at r 84 (update13_final + layout_final.py World: pocket walls r 28.3-30.3, Z 58.6-70.6)
 pitch_r = 84.0
-pocket_ids_deg = [220.6, 310.6, 40.6, 130.6]   # pocket angles at deck angle 0 (pick, +90, auger, +270); layout_final.py LAY
+pocket_ids_deg = [116.5, 206.5, 296.5, 26.5]     # TRIAL saddle mount: pocket 0 at the pick spot at deck 0
 pocket_inner_r = 28.3                       # locating ribs (TT-04 v4 STL: r 28.25 over local Z 6.1-9.0)
 pocket_wall_r = 30.3
 pocket_bore_r = 30.6                        # TT-04 v4 STL bore above and below the ribs (benchsim.meshfit profile)

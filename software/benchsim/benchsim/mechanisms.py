@@ -26,7 +26,7 @@ from . import layout
 from .interfaces import MegaError
 
 STATIONS = ('pick', 'auger')
-INITIAL_POCKETS = ('P1', 'P2', None, None)          # demo_process 4 / scene.BEAKERS: P1 pocket 0 (pick), P2 pocket 1
+INITIAL_POCKETS = ('P1', None, 'P2', None)          # TRIAL saddle mount: P1 pocket 0 (pick), P2 opposite in pocket 2 (scene.BEAKERS)
 
 
 # ======================================================================= carousel geometry

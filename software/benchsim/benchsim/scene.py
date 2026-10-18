@@ -18,7 +18,7 @@ from .units import m
 
 ARMS = ('pourer', 'transfer')
 BEAKERS = {                                        # name -> initial station (demo_process 5.2)
-    'P1': 'carousel_pocket_0', 'P2': 'carousel_pocket_1', 'dev': 'rack_1', 'water': 'rack_3',
+    'P1': 'carousel_pocket_0', 'P2': 'carousel_pocket_2', 'dev': 'rack_1', 'water': 'rack_3',
 }
 STATIC, STAGE, CAROUSEL, PAN, ALL = 1, 2, 4, 8, 15
 FINGER, BEAKER = 16, 32
@@ -172,6 +172,19 @@ class Builder:
     def auger(self):
         A = self.P['auger']; C = self.P['carousel']; c = self.st['carousel_centre']['xy']; p = self.st['carousel_auger']['xy']
         wb = self.spec.worldbody
+        ab = self.bench.get('auger_boxes') or {}
+        if 'auger_post_box' in ab and 'auger_head_box' in ab:
+            for nm, (x0, y0, z0, x1, y1, z1), rgba in (('ps01_post', ab['auger_post_box'], PLA), ('dh01_head', ab['auger_head_box'], (0.9, 0.5, 0.2, 1))):
+                self.box(wb, ((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2), ((x1 - x0) / 2, (y1 - y0) / 2, (z1 - z0) / 2), rgba=rgba, name=nm)
+            if 'auger_rail_E5' in ab:
+                x0, y0, x1, y1 = ab['auger_rail_E5']; h = self.P['frame']['section'] / 2
+                self.box(wb, ((x0 + x1) / 2, (y0 + y1) / 2, self.P['frame']['rail_top_z'] - h), ((x1 - x0) / 2, (y1 - y0) / 2, h), rgba=FRAME_RGBA, name='rail_E5')
+            self.cyl(wb, (p[0], p[1], A['outlet_z'] + 4), A['outlet_d'] / 2 + 2, 4, rgba=(0.9, 0.5, 0.2, 1), name='dh01_outlet')
+            wb.add_site(name='auger_outlet', pos=m([p[0], p[1], A['outlet_z']]))
+            self.fid.add('auger PS-01 post + DH-01 head + E5', 'procedural', 'box', 'layout_final carousel.auger_post_box / auger_head_box / auger_rail_E5 (STL extents as placed)',
+                         'bounding boxes of the CAD parts; screw not modelled')
+            self.fid.add('auger dosing', 'analytic', '-', 'g/rev x revolutions with CV, stall rule (electrical.md 6)')
+            return
         u = np.array([p[0] - c[0], p[1] - c[1]]); u /= np.linalg.norm(u)
         ang = math.degrees(math.atan2(u[1], u[0]))
         post = np.array(p) + u * (C['pocket_wall_r'] + 22 + A['post_size'][0] / 2 + 30)
@@ -414,7 +427,7 @@ class Builder:
         cam('top', [520, 400, 1500], [520, 401, 0], 45)
         st = self.st
         cam('foam_cam', [700, 120, 260], [450, st['funnel']['xy'][1] - 97.3, 230], 40)
-        cam('bench_cam', [900, 250, 420], [680, 440, 70], 50)
+        cam('bench_cam', [850, 120, 380], [660, 420, 70], 50)       # trial saddle layout: front-right, clear of the DH-01 head (was [900, 250, 420])
         def orbit(name, target, dist, azimuth, elevation, fovy=45):    # dashboard close-ups, placed like a free camera
             a, e = math.radians(azimuth), math.radians(elevation); f = np.array([math.cos(e) * math.cos(a), math.cos(e) * math.sin(a), math.sin(e)])
             cam(name, np.asarray(target, float) - dist * f, target, fovy)

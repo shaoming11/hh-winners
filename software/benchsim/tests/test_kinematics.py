@@ -1,7 +1,12 @@
 import numpy as np
 import pytest
 
-from benchsim import cadmap, kinematics, poses, trajectories
+from benchsim import cadmap, kinematics, layout, poses, trajectories
+
+# these compare the sim against the arm paths recorded in the original CAD layout (carousel on Y-left); the trial saddle
+# layout moves the carousel, so those recordings no longer describe it. They say nothing about whether the demo works.
+TRIAL_LAYOUT = layout.load_final()['carousel']['mount'].startswith('TRIAL')
+cad_recording = pytest.mark.skipif(TRIAL_LAYOUT, reason='CAD-recorded paths are for the original carousel position (trial saddle layout active)')
 
 
 @pytest.fixture(scope='module')
@@ -10,12 +15,14 @@ def planner(built):
     return poses.Planner(model, b)
 
 
+@cad_recording
 def test_sign_search_unique_all_positive(planner):
     rows = trajectories.sign_search(planner.K, planner.b)
     assert rows[0]['signs'] == [1, 1, 1, 1, 1] and rows[0]['all_in_limits']
     assert rows[1]['mean_err_mm'] > 2 * rows[0]['mean_err_mm']
 
 
+@cad_recording
 def test_mapping_reported_approximate(planner):
     ends = trajectories.endpoint_table(planner.K, planner.b)
     assert max(r['residual_mm'] for r in ends) < 15
@@ -37,6 +44,7 @@ def test_native_transfer_plan_clean(planner):
     assert all(r['margin_ok'] for r in rows)
 
 
+@cad_recording
 def test_top_down_lift_limit(planner):
     rec = planner.rec['T1']['anim_paths'][0]['qs'][0]
     q = np.r_[cadmap.cad_to_mj(rec), planner.q6_wide]
