@@ -70,8 +70,11 @@ SPOT_DZ_MM = {'transfer_carousel_pick': 15.0,   # bench 2026-10-18: the grab was
               'pourer_rack1': 30.0}            # the pourer's peroxide grab 3 cm higher (2 + 1 after the second test)
 OPEN_DEG = {'pourer': 55.0}                    # approach opening per arm (the pourer's side grasp: less wide)
 BACK_MM = {'pourer': 8.0}                      # approach offset per arm
-POUR_DZ_MM = {'2': -20.0}
-POUR_PAN_DEG = {'2': -4.0}                     # and rotated 4 deg further on the base (~2 cm at the gripper, 287 mm reach)                      # bench 2026-10-18: the peroxide pour over the scale 2 cm lower
+SPOT_BACK_MM = {'pourer_scale': 30.0}         # per spot (overrides the arm): P1 on the scale was tipped by an 8 mm approach
+SPOT_CLOSE_DURING = {'pourer_scale'}          # close while advancing so P1's centre stays put (the rack grab closes after)
+PLACE_SHIFT_MM = {'pourer_rack1': (-20.0, 0.0)}   # place-back translation (world x, y): 2 cm to the operator's right
+POUR_DZ_MM = {'2': -10.0}                      # 1 cm lower than the plan (was 2: the gripper touched P1)
+POUR_PAN_DEG = {'2': -1.0}                     # base rotation of the pour (-4 then +3 = 1.5 cm to the right at 287 mm reach)                      # bench 2026-10-18: the peroxide pour over the scale 2 cm lower
 CLOSE_AFTER_ADVANCE = {'pourer'}               # advance with the jaws open, THEN close (closing while moving shoved the beaker)
 CARRY_TUCK_MM, CARRY_RISE_MM, CARRY_N = 30.0, 25.0, 16   # pourer carries arc around its base, closer to the arms
 
@@ -82,7 +85,7 @@ def load_taught():
     except (OSError, ValueError): return {}
 
 
-def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0):
+def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0, spot=None):
     """straight-line top-down pick around a hand-taught touch pose, built RELATIVE to it (sim kinematics give the
     directions; the absolute sim/bench offset at this pose cancels): above-and-back -> straight down (jaws wide) ->
     advance onto the cup while the jaws close -> straight up. Returns four segments (joint, descend, advance, lift)."""
@@ -94,7 +97,7 @@ def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0):
     gpos = lambda n: [K.d.geom_xpos[i] * 1000 for i in range(m.ngeom) if m.geom(i).name == '%s/%s' % (arm, n)][0]
     ff, fm = gpos('finger_fixed'), gpos('finger_moving')
     back = np.r_[(ff - fm)[:2], 0.0]; back /= np.linalg.norm(back)          # away from the cup, toward the fixed finger
-    up = np.array([0.0, 0.0, 1.0]); P = dict(PICK, open_deg=OPEN_DEG.get(arm, PICK['open_deg']), back_mm=BACK_MM.get(arm, PICK['back_mm']))
+    up = np.array([0.0, 0.0, 1.0]); P = dict(PICK, open_deg=OPEN_DEG.get(arm, PICK['open_deg']), back_mm=SPOT_BACK_MM.get(spot, BACK_MM.get(arm, PICK['back_mm'])))
     def solve(pts, seed, grips):
         out = []; q = seed.copy()
         for pt, g in zip(pts, grips):
@@ -106,7 +109,7 @@ def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0):
     A = p0 + P['back_mm'] * back + P['up_mm'] * up; B = p0 + P['back_mm'] * back
     lin = lambda a, c, n: [a + (c - a) * t for t in np.linspace(0, 1, n)]
     descend = solve(lin(A, B, P['n_descend']), q_touch, [P['open_deg']] * P['n_descend'])
-    if arm in CLOSE_AFTER_ADVANCE:                                            # fixed finger onto the cup first, then close
+    if arm in CLOSE_AFTER_ADVANCE and spot not in SPOT_CLOSE_DURING:          # fixed finger onto the cup first, then close
         advance = solve(lin(B, p0, P['n_advance']), np.asarray(descend[-1]), [P['open_deg']] * P['n_advance'])
         advance.append(advance[-1][:5] + [math.radians(grip_close_deg)])
     else:                                                                     # close while advancing (transfer)
@@ -118,13 +121,14 @@ def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0):
             dict(name='lift straight up', phase='carry', kind='cartesian', qs=lift)]
 
 
-def linear_place(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0):
+def linear_place(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0, spot=None):
     """straight-line place around a hand-taught hold pose (relative, like linear_pick): arrive above it with the beaker
     clear of the receiver's lip -> straight down -> open the jaws -> back off -> straight up. Returns (above_q, segments)."""
     K, m = kin(); P = dict(PICK, open_deg=OPEN_DEG.get(arm, PICK['open_deg']), back_mm=BACK_MM.get(arm, PICK['back_mm']))
     q_touch = np.asarray(q_touch, float); q_touch[5] = math.radians(grip_close_deg)
     p0, R0 = K.site(arm, q_touch, site); K.set(arm, q_touch)
-    p0 = p0 + np.array([0.0, 0.0, dz_mm])                                   # height correction for this spot
+    sx, sy = PLACE_SHIFT_MM.get(spot, (0.0, 0.0))
+    p0 = p0 + np.array([sx, sy, dz_mm])                                     # height / place-back correction for this spot
     gpos = lambda n: [K.d.geom_xpos[i] * 1000 for i in range(m.ngeom) if m.geom(i).name == '%s/%s' % (arm, n)][0]
     back = np.r_[(gpos('finger_fixed') - gpos('finger_moving'))[:2], 0.0]; back /= np.linalg.norm(back)
     up = np.array([0.0, 0.0, 1.0])
@@ -200,8 +204,8 @@ def pourer_taught(segs, q_spot, spot, step=None):
     names = [g['name'] for g in segs]
     close = math.degrees(segs[next(i for i, nm in enumerate(names) if nm.startswith('close on'))]['qs'][-1][5])
     dz = SPOT_DZ_MM.get(spot, 0.0)
-    pick = linear_pick('pourer', q_spot, close, site='grasp_side', dz_mm=dz)
-    place = linear_place('pourer', q_spot, close, site='grasp_side', dz_mm=dz)
+    pick = linear_pick('pourer', q_spot, close, site='grasp_side', dz_mm=dz, spot=spot)
+    place = linear_place('pourer', q_spot, close, site='grasp_side', dz_mm=dz, spot=spot)
     i_carry = names.index('carry to above pre-pour'); i_raise = names.index('raise from pre-pour')
     J = lambda name, phase, a, b: dict(name=name, phase=phase, kind='joint', qs=[list(a), list(b)])
     pour = shift_block('pourer', segs[i_carry + 1:i_raise + 1], POUR_DZ_MM.get(step, 0.0))   # lower / tilt / pour / untilt / raise
