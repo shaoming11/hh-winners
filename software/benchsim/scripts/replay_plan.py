@@ -70,7 +70,8 @@ SPOT_DZ_MM = {'transfer_carousel_pick': 15.0,   # bench 2026-10-18: the grab was
               'pourer_rack1': 30.0}            # the pourer's peroxide grab 3 cm higher (2 + 1 after the second test)
 OPEN_DEG = {'pourer': 55.0}                    # approach opening per arm (the pourer's side grasp: less wide)
 BACK_MM = {'pourer': 8.0}                      # approach offset per arm
-POUR_DZ_MM = {'2': -20.0}                      # bench 2026-10-18: the peroxide pour over the scale 2 cm lower
+POUR_DZ_MM = {'2': -20.0}
+POUR_PAN_DEG = {'2': -4.0}                     # and rotated 4 deg further on the base (~2 cm at the gripper, 287 mm reach)                      # bench 2026-10-18: the peroxide pour over the scale 2 cm lower
 CLOSE_AFTER_ADVANCE = {'pourer'}               # advance with the jaws open, THEN close (closing while moving shoved the beaker)
 CARRY_TUCK_MM, CARRY_RISE_MM, CARRY_N = 30.0, 25.0, 16   # pourer carries arc around its base, closer to the arms
 
@@ -204,6 +205,8 @@ def pourer_taught(segs, q_spot, spot, step=None):
     i_carry = names.index('carry to above pre-pour'); i_raise = names.index('raise from pre-pour')
     J = lambda name, phase, a, b: dict(name=name, phase=phase, kind='joint', qs=[list(a), list(b)])
     pour = shift_block('pourer', segs[i_carry + 1:i_raise + 1], POUR_DZ_MM.get(step, 0.0))   # lower / tilt / pour / untilt / raise
+    dpan = math.radians(POUR_PAN_DEG.get(step, 0.0))                        # a pure base rotation of the whole pour
+    if dpan: pour = [dict(g, qs=[[q[0] + dpan] + list(q[1:]) for q in g['qs']]) for g in pour]
     return ([J('park -> above the grab', 'approach', segs[0]['qs'][0], pick[0]['qs'][0])] + pick +
             [carry_arc('pourer', pick[-1]['qs'][-1], pour[0]['qs'][0], name='carry to above pre-pour')] + pour +
             [carry_arc('pourer', pour[-1]['qs'][-1], place[0]['qs'][0], name='carry back above the spot')] + place +
