@@ -28,6 +28,9 @@ PORTS = dict(port_mega=os.environ.get('WLB_MEGA', '/dev/cu.usbserial-1130'),
              port_transfer=os.environ.get('WLB_TRANSFER', '/dev/cu.usbmodem58CD1767761'))
 CAL = os.path.join(paths.SIM_ROOT, 'benchsim', 'config', 'hardware_calibration.bench.json')
 REACH_DEG = 3.0          # a waypoint counts as reached inside this (largest joint error)
+# rest pose: both arms folded back (lift back, elbow folded), where they hold themselves with the power off
+# (measured 2026-10-18 as the mean of both arms resting, pulled just inside the calibrated limits)
+REST_DEG = [-9.0, -99.0, 93.0, -10.0, 0.0, 0.0]
 WAYPOINT_TIMEOUT_S = 8.0
 
 
@@ -68,6 +71,7 @@ def main():
     ap.add_argument('--steps', nargs='*', help='step numbers to run (default all), e.g. 1 4')
     ap.add_argument('--no-mega', action='store_true', help='leave the carousel alone')
     ap.add_argument('--yes', action='store_true', help='do not wait for Enter between steps')
+    ap.add_argument('--rest', action='store_true', help='only send both arms to the rest pose, then torque off')
     ap.add_argument('--check', action='store_true', help='pre-flight only: open the ports read-only, check every waypoint, move nothing')
     a = ap.parse_args()
     plans = json.loads((paths.SIM_ROOT / 'reports' / 'native_plans.json').read_text())['steps']
@@ -89,6 +93,9 @@ def main():
             for q in seg['qs']:
                 try: arms[plans[k]['arm']].check_goal(np.asarray(q, float))
                 except ValueError as e: bad.append('%s / %s: %s' % (k, seg['name'], e))
+    for name, arm in arms.items():
+        try: arm.check_goal(np.radians(REST_DEG))
+        except ValueError as e: bad.append('rest pose / %s: %s' % (name, e))
     if bad:
         print('pre-flight FAILED, nothing moved:'); [print('  ', b) for b in bad[:20]]
         print('  (%d waypoints outside the calibrated limits)' % len(bad)); return 1
@@ -99,6 +106,13 @@ def main():
         for name, arm in arms.items(): arm.set_torque(True); print('%s torque on (holding the present pose)' % name)
         if mega is not None:
             mega.command('CLR', home=True)
+        rest = np.radians(REST_DEG)
+        if a.rest:
+            for name, arm in arms.items():
+                if not a.yes: input('\nEnter: move %s to the rest pose (slow) ' % name)
+                go(arm, rest, min(a.speed, 0.3), 'rest ' + name)
+            for arm in arms.values(): arm.set_torque(False)
+            print('both arms at rest, torque off'); return 0
         # park both arms first, one at a time (the plan assumes the other arm is parked)
         park = {}
         for k in plans:
@@ -121,7 +135,11 @@ def main():
             for seg in s['segments']:
                 print('   %-38s %s' % (seg['name'], seg['phase']), flush=True)
                 play_segment(arm, seg, a.speed)
-        print('\ndone: arms holding their last pose (torque on)')
+        for name, arm in arms.items():
+            if not a.yes: input('\nEnter: return %s to the rest pose ' % name)
+            go(arm, rest, min(a.speed, 0.3), 'rest ' + name)
+        for arm in arms.values(): arm.set_torque(False)
+        print('\ndone: both arms back at rest, torque off')
     except (KeyboardInterrupt, ConnectionError, TimeoutError) as stop_reason:
         print('\nstopping:', type(stop_reason).__name__, stop_reason)
         for name, arm in arms.items():
