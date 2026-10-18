@@ -18,10 +18,27 @@ import time
 
 import numpy as np
 
+class WallClock:
+    """time for the waits below: the wall on the real bench; an emulated bench (--emulate, the backend) swaps in its
+    sim clock so every wait advances the simulated world instead"""
+    def now(self): return time.time()
+    def sleep(self, dt):
+        if dt > 0: time.sleep(dt)
+
+
+CLOCK = WallClock()
 T0 = time.time()
 _print = print
+LOG_HOOKS = []                                   # callables(line): the backend forwards the log to its event store
+STEP_HOOKS = []                                  # callables(step_key, 'start' | 'done')
+SEG_HOOKS = []                                   # callables(step_key, segment, 'start' | 'done'): segments as played (bench_segments)
 def print(*args, **kw):                          # every log line carries the elapsed time
     _print('%6.1fs' % (time.time() - T0), *args, **kw)
+    for h in LOG_HOOKS: h(' '.join(str(x) for x in args).strip())
+
+
+class ReplayStop(Exception):
+    """raised from outside (the backend's stop button) to freeze the arms the way Ctrl-C does"""
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
@@ -267,6 +284,7 @@ WAYPOINT_TIMEOUT_S = 2.0          # last waypoint of a segment
 PASS_TIMEOUT_S = 0.4              # intermediate waypoints
 
 
+USE_TAUGHT = True        # hand-taught poses are real-bench corrections; the emulated bench (the simulator) plays the plan
 MEGA = None              # set in main(); the sled can run in the background while an arm moves
 SLED = {}                # {'seq', 't_end', 'deg'} while a background stage move is running
 
@@ -280,22 +298,22 @@ def mega_tick():
         if 'err' in r: raise MegaError(r)
         if r.get('done'):
             print('   sled at %.0f deg' % r['deg'], flush=True); SLED.clear(); return
-    if time.time() > SLED['t_end']: raise TimeoutError('sled move seq %d not done' % SLED['seq'])
+    if CLOCK.now() > SLED['t_end']: raise TimeoutError('sled move seq %d not done' % SLED['seq'])
 
 
 def nap(seconds):
     """sleep, but keep a background sled move serviced"""
-    t_end = time.time() + seconds
+    t_end = CLOCK.now() + seconds
     while True:
-        mega_tick(); left = t_end - time.time()
+        mega_tick(); left = t_end - CLOCK.now()
         if left <= 0: return
-        time.sleep(min(left, 0.05))
+        CLOCK.sleep(min(left, 0.05))
 
 
 def sled_start(deg, St):
     """send the stage move and return at once (its ack is checked); mega_tick() follows it to done"""
     seq = MEGA.send('ST', deg=float(deg), ms=int(St['move_s'] * 1000)); MEGA.wait(seq, key=('ack',))
-    SLED.update(seq=seq, t_end=time.time() + St['move_s'] + St['timeout_extra_s'] + 3, deg=deg)
+    SLED.update(seq=seq, t_end=CLOCK.now() + St['move_s'] + St['timeout_extra_s'] + 3, deg=deg)
     print('   sled moving to %.0f deg (in parallel with the arm)' % deg, flush=True)
 
 
@@ -348,14 +366,14 @@ def go(arm, q, speed, label='', tol=REACH_DEG, timeout=WAYPOINT_TIMEOUT_S, quiet
     except ConnectionError: span = 90.0
     arm.set_goal(np.asarray(q, float), speed_scale=speed)
     timeout = max(timeout, 3.0 * span / (arm.vmax_deg_s * speed) + (0.0 if quiet else 1.0))   # long moves get the time they need
-    t0 = time.time(); err = float('nan'); misses = 0
-    while time.time() - t0 < timeout:
+    t0 = CLOCK.now(); err = float('nan'); misses = 0
+    while CLOCK.now() - t0 < timeout:
         try:
             err = np.degrees(np.abs(arm.read_positions() - np.asarray(q, float)))[:joints].max(); misses = 0
         except ConnectionError as e:                  # a dropped status packet: the arm keeps its goal, try again
             misses += 1
             if misses >= 10: raise
-            time.sleep(0.05); continue
+            CLOCK.sleep(0.05); continue
         if err < tol: return err
         nap(0.03)
     if not quiet:
@@ -371,7 +389,7 @@ def bench_segments(segs, key=None, arm=None):
     pour manifold cut before its arm-flip region, a drain hold, then the pour retraced back to the 40 deg pose
     (the plan's untilt starts at 40 deg, which made the arm snap back from 105 deg)"""
     out = []; closed = False
-    if key is not None: segs = taught_segments(apply_overrides(segs, key), key)
+    if key is not None and USE_TAUGHT: segs = taught_segments(apply_overrides(segs, key), key)
     for seg in segs:
         seg = dict(seg); qs = [list(q) for q in seg['qs']]
         wide = math.radians(OPEN_DEG.get(arm, APPROACH_GRIP_DEG))
@@ -417,24 +435,49 @@ def main():
     ap.add_argument('--yes', action='store_true', help='do not wait for Enter between steps')
     ap.add_argument('--end-turn', type=float, default=90.0, help='turn the carousel by this many degrees at the very end, relative to where it is (0 = none; default 90)')
     ap.add_argument('--rest', action='store_true', help='only send both arms to the rest pose, then torque off')
+    ap.add_argument('--emulate', action='store_true', help='no USB: the same code on emulated servos and Mega (the simulator)')
     ap.add_argument('--check', action='store_true', help='pre-flight only: open the ports read-only, check every waypoint, move nothing')
     a = ap.parse_args()
-    plans = json.loads((paths.SIM_ROOT / 'reports' / 'native_plans.json').read_text())['steps']
+    if a.emulate:
+        from benchsim.backends.emu import make_emulated_bench
+        global CLOCK
+        sim_bb = make_bench('sim')
+        bb = make_emulated_bench(sim_bb, CAL, dry_run=a.check, with_mega=not a.no_mega)
+        CLOCK = bb.clock
+        print('emulated bench: LeRobotArm + SerialTransport on the simulator (no ports opened)')
+    else:
+        kw = dict(PORTS, calibration_path=CAL, dry_run=a.check)
+        if a.no_mega: kw['port_mega'] = None
+        bb = make_bench('real', allow_hardware=True, **kw)
+    return replay(bb, a)
+
+
+def load_plans():
+    return json.loads((paths.SIM_ROOT / 'reports' / 'native_plans.json').read_text())['steps']
+
+
+def select_steps(plans, steps=None):
+    """the steps to play: the ones named, else the recipe's default route"""
     R = layout.load_params()['recipe']
     if R.get('yeast_in_flask'): default = ('1', '2', '3', '4')          # MVP: peroxide only, yeast-water already in the flask
     elif R.get('premixed_yeast_water'): default = ('1', '2', '3', '4', '6', '8', '9')
     else: default = tuple(k.split()[0] for k in plans)
-    order = [k for k in plans if k.split()[0] in (a.steps or default)]
+    return [k for k in plans if k.split()[0] in (steps or default)]
+
+
+def replay(bb, a):
+    """the dry run on an opened bench (real or emulated); ``a`` carries speed, steps, no_mega, yes, end_turn, rest, check"""
+    global USE_TAUGHT
+    USE_TAUGHT = not getattr(bb, 'emulated', False)
+    plans = load_plans()
+    order = select_steps(plans, a.steps)
     last_funnel = [k for k in order if 'funnel' in k][-1:]                # the sled goes out after the last funnel pour
     bench = layout.load_bench()
-    kw = dict(PORTS, calibration_path=CAL, dry_run=a.check)
-    if a.no_mega: kw['port_mega'] = None
-    bb = make_bench('real', allow_hardware=True, **kw)
     arms = bb.arms
     mega = None if a.no_mega else bb.mega
     global MEGA; MEGA = mega
-    if mega is not None:                          # opening the CH340 port resets the Mega: wait for the boot line
-        time.sleep(2.5)
+    if mega is not None and not getattr(bb, 'emulated', False):   # opening the CH340 port resets the Mega: wait for the boot line
+        CLOCK.sleep(2.5)
         try: bb.transport.read_lines()
         except Exception: pass
     # pre-flight: every planned waypoint must be inside the arm's calibrated limits, or nothing moves
@@ -478,6 +521,7 @@ def main():
             msg = '\nEnter: step %s (%s arm%s) ' % (k, s['arm'], '' if deck is None else ', carousel to %.1f deg first' % deck)
             if a.yes: print(msg)
             else: input(msg)
+            for h in STEP_HOOKS: h(k, 'start')
             if deck is not None and mega is not None:
                 # the four pockets are 90 deg apart: whichever cup sits at the pick spot is the one the operator loaded,
                 # so only nudge to the nearest pocket alignment (never carry the loaded cup away)
@@ -490,7 +534,9 @@ def main():
             for seg in bench_segments(s['segments'], k, s['arm']):
                 fast = funnel and seg['phase'] == 'pour' and not seg['name'].startswith('untilt')   # tilt-in + pour: all at once
                 print('   %-38s %s%s' % (seg['name'], seg['phase'], '  (all at once)' if fast else ''), flush=True)
+                for h in SEG_HOOKS: h(k, seg, 'start')
                 play_segment(arm, seg, 1.0 if fast else a.speed)
+                for h in SEG_HOOKS: h(k, seg, 'done')
                 if k in last_funnel and seg['phase'] == 'drain' and mega is not None:
                     # the pour is done: the sled retracts at once, the arm retraces / retreats meanwhile
                     # (the beaker's lip stays >= 65 mm above the funnel rim through the pour, so the funnel passes under it)
@@ -500,18 +546,21 @@ def main():
             end = s['segments'][-1]['qs'][-1]
             err = go(arm, end, a.speed, 'back at park', tol=8.0, timeout=15.0)
             if not err < 8.0: raise TimeoutError('%s arm did not get back to park (%.0f deg off)' % (s['arm'], err))
+            for h in STEP_HOOKS: h(k, 'done')
         if mega is not None and a.end_turn:             # finale: the carousel turns a.end_turn deg from where it is
             cur = mega.command('PING').get('tt') or 0.0; lo, hi = bench['params']['carousel']['deck_range_deg']
             tgt = cur + a.end_turn
             if not lo <= tgt <= hi: tgt = cur + a.end_turn - math.copysign(360.0, a.end_turn)   # same cup layout, other way round
             r = turn_deck(mega, tgt, bench); print('carousel turned %+.0f deg to %.0f deg (end)' % (a.end_turn, r['deg']), flush=True)
         print('\ndone: both arms at park (up), torque on')      # no folded rest pose: it sat in the other arm's way
-    except (KeyboardInterrupt, ConnectionError, TimeoutError, MegaError) as stop_reason:
+        return 0
+    except (KeyboardInterrupt, ReplayStop, ConnectionError, TimeoutError, MegaError) as stop_reason:
         print('\nstopping:', type(stop_reason).__name__, stop_reason)
         for name, arm in arms.items():
             try: arm.set_goal(arm.read_positions(), 1.0)
             except Exception as e: print(name, 'freeze failed:', e)
         print('\nstopped: both arms frozen in place, torque on')
+        return 2
     finally:
         for name, arm in arms.items():
             try: arm.disconnect()

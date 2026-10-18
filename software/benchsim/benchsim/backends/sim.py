@@ -291,7 +291,8 @@ class SimMega(Plugin):
         except protocol.ProtocolError as e:
             self.emit(dict(seq=seq, err=e.code, detail=e.detail)); return
         if name == 'HB': return
-        if name == 'PING': self.emit(dict(seq=seq, ok=True, fw='benchsim-mega 0.1', sim=True)); return
+        if name == 'PING':                       # like the firmware's reply_ping: the axis angles ride along
+            self.emit(dict(seq=seq, ok=True, fw='benchsim-mega 0.1', sim=True, tt=round(self.tt_deg(), 2), st=round(self.st_deg(), 2))); return
         if name == 'STOP':
             if self.motion and self.motion['cmd'] == 'AUG': self.w.log('auger_stop', revs=self.motion['done_rev'])
             self.motion = None

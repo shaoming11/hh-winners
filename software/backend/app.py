@@ -154,6 +154,14 @@ def get_run(run_id: str):
     return _scrub(json.loads(p.read_text()))
 
 
+@app.get("/api/recordings")
+def recordings():
+    """recorded hardware replays (emulated or on the real bench): play one back with
+    POST /api/command {"kind": "playback", "run_id": ...}"""
+    from backend.hardware import list_recordings
+    return list_recordings(RUNS_DIR)
+
+
 @app.get("/api/alerts")
 def get_alerts(include_resolved: bool = False):
     with store.lock:
