@@ -456,6 +456,22 @@ def nap(seconds):
         CLOCK.sleep(min(left, 0.05))
 
 
+def raw_clock():
+    """the clock without the backend's per-slice mirror tick (backend.hardware.TickClock wraps the real clock as
+    .inner): a mirror tick takes >= 0.25 s, so streaming a smooth path through it sent a waypoint every 0.25 s+
+    (jerky arms). Smooth paths and the pour loop run on this; waits at segment ends still tick the mirror."""
+    return getattr(CLOCK, 'inner', CLOCK)
+
+
+def stream_nap(seconds):
+    """nap() for path streaming: the sled is still serviced, the mirror is not ticked"""
+    c = raw_clock(); t_end = c.now() + seconds
+    while True:
+        mega_tick(); left = t_end - c.now()
+        if left <= 0: return
+        c.sleep(min(left, 0.05))
+
+
 def sled_start(deg, St):
     """send the stage move and return at once (its ack is checked); mega_tick() follows it to done"""
     seq = MEGA.send('ST', deg=float(deg), ms=int(St['move_s'] * 1000)); MEGA.wait(seq, key=('ack',))
@@ -633,7 +649,7 @@ def closed_loop_pour(arm, arm_name, segs, mega, info, speed, reagent='developer'
     cfg = dict(P['pour']); cfg['theta_max_deg'] = min(float(cfg['theta_max_deg']), float(th[-1]))   # the played path ends here
     cfg['theta_start_deg'] = max(float(cfg['theta_start_deg']), min(POUR_START_DEG, float(th[-1]) - 5.0)); cfg['ramp_rate_deg_s'] = POUR_RAMP_DEG_S
     mega.command('STREAM', on=True)
-    base_g = mega.read_mass(32)                          # the receiver as it stands: the dose is what lands on top
+    base_g = mega.read_mass(8, timeout=5.0)   # the scale runs at ~10 Hz on the bench                          # the receiver as it stands: the dose is what lands on top
     def samples():
         return [(x['t'] / 1000.0, x['w'] - base_g) for x in mega.take_samples()]
     pc = PourController(cfg, beaker_cylinder(P), DENSITY[reagent], target, tol, reagent)
@@ -648,13 +664,13 @@ def closed_loop_pour(arm, arm_name, segs, mega, info, speed, reagent='developer'
             print('     %-12s t %5.1f s  tilt %5.1f deg  %s g  %s' % (e['state'], e['t'], e['theta'],
                   '-' if e.get('m') is None else '%.1f' % e['m'], extra), flush=True)
         seen[0] = len(pc.res.events)
-    res = pc.run(CLOCK, samples, set_theta)
+    res = pc.run(raw_clock(), samples, set_theta)        # 40 Hz tilt commands, not 4 Hz through the mirror tick
     theta = tilt.last if tilt.last is not None else 0.0  # back upright along the same path
     while theta > th[0]:
-        theta = max(theta - UNTILT_RATE_DEG_S * 0.025, th[0]); tilt.set_theta(theta); CLOCK.sleep(0.025)
+        theta = max(theta - UNTILT_RATE_DEG_S * 0.025, th[0]); tilt.set_theta(theta); raw_clock().sleep(0.025)
     go(arm, segs[-1]['qs'][-1], speed, 'pre-pour after the closed-loop pour')
     CLOCK.sleep(SETTLE_S)
-    added = mega.read_mass(32) - base_g
+    added = mega.read_mass(8, timeout=5.0) - base_g
     out = dict(res.summary(), added_g=round(added, 2))
     ok = res.outcome in ('OK', 'OVERSHOOT') and abs(added - target) <= tol
     print('   closed loop %s: %s, %.1f g added (target %.0f +- %.1f, error %+.1f g), cut at %s deg, %d top-up pulse(s)%s'
@@ -676,7 +692,7 @@ def play_segment(arm, seg, speed):
         dt = 0.0 if prev is None else float(np.degrees(np.abs(q - prev))[:5].max()) / vmax
         try: arm.set_goal(q, speed_scale=speed)
         except ConnectionError: pass              # a dropped packet: the next waypoint supersedes it
-        nap(max(dt, 0.02)); prev = q
+        stream_nap(max(dt, 0.02)); prev = q
     near = seg['phase'] in ('approach', 'pick', 'place', 'retreat') or seg['name'].startswith('straight down')   # at the cups: finish the move before the jaws open
     grip = seg['phase'] in ('pick', 'place')                                 # the jaws must finish closing / opening
     go(arm, qs[-1], speed, seg['name'], tol=NEAR_DEG if near else REACH_DEG, joints=6 if grip else 5)
