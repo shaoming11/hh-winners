@@ -478,23 +478,32 @@ def mega_start(mega, bench):
 
 
 def turn_deck(mega, deg, bench):
-    """carousel move with one retry: a TT_TIMEOUT that does not reproduce happened once on the bench"""
-    for attempt in (1, 2):
-        cur = mega.command('PING').get('tt')
-        if cur is not None and abs(deg - cur) <= 2.0: return dict(deg=cur)          # already there (inside the noise)
-        cur = cur or 0.0
-        ms = int(max(1000, abs(deg - cur) / 45.0 * 1000 * bench['params']['carousel']['min_s_per_45deg']) + 200)
-        try: return mega.motion('TT', done_timeout=ms / 1000 + 6, deg=float(deg), ms=ms)
+    """carousel move. The closed-loop deck settles big moves within ~1 deg but can stall on a small correction (bench
+    2026-10-18: 5 deg short, the 5 deg retry timed out too), so a miss is retried by backing off 20 deg and coming in
+    again with a full move; within 3 deg counts as there."""
+    lo, hi = bench['params']['carousel']['deck_range_deg']
+    def move(tgt):
+        cur = mega.command('PING').get('tt') or 0.0
+        ms = int(max(1000, abs(tgt - cur) / 45.0 * 1000 * bench['params']['carousel']['min_s_per_45deg']) + 200)
+        try: return mega.motion('TT', done_timeout=ms / 1000 + 6, deg=float(tgt), ms=ms), None
         except MegaError as e:
             p = mega.command('PING')
             mega.command('CLR', home=True) if p.get('pos') == 'unknown' else mega.command('CLR')
-            now = mega.command('PING').get('tt')
-            if now is not None and abs(now - deg) <= 3.0:   # it got there, still hunting at the tolerance edge
-                print('   carousel: %s, but it is at %.1f deg (target %.1f): fine' % (e, now, deg), flush=True)
-                return dict(deg=now)
-            if attempt == 2: raise
-            print('   carousel: %s at %s deg, retrying once' % (e, now), flush=True)
-            continue
+            return None, e
+    for attempt in (1, 2, 3):
+        cur = mega.command('PING').get('tt')
+        if cur is not None and abs(deg - cur) <= 2.0: return dict(deg=cur)          # already there (inside the noise)
+        if attempt > 1:                                                             # back off for a full-size approach
+            back = deg - 20.0 if deg - 20.0 >= lo else deg + 20.0
+            move(back)
+        r, e = move(deg)
+        if r is not None: return r
+        now = mega.command('PING').get('tt')
+        if now is not None and abs(now - deg) <= 3.0:   # it got there, still hunting at the tolerance edge
+            print('   carousel: %s, but it is at %.1f deg (target %.1f): fine' % (e, now, deg), flush=True)
+            return dict(deg=now)
+        if attempt == 3: raise e
+        print('   carousel: %s at %s deg, backing off 20 deg and trying again' % (e, now), flush=True)
 
 
 def deck_for_step(name, bench):
