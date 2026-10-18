@@ -67,8 +67,10 @@ def kin():
 
 SPOT_DZ_MM = {'transfer_carousel_pick': 15.0,   # bench 2026-10-18: the grab was 1-2 cm low (caught the carousel ring)
               'transfer_scale': 10.0,          # and the place on the scale 1 cm low
-              'pourer_rack1': 20.0}            # the pourer's peroxide grab 2 cm higher
+              'pourer_rack1': 30.0}            # the pourer's peroxide grab 3 cm higher (2 + 1 after the second test)
 OPEN_DEG = {'pourer': 55.0}                    # approach opening per arm (the pourer's side grasp: less wide)
+BACK_MM = {'pourer': 8.0}                      # approach offset per arm
+CLOSE_AFTER_ADVANCE = {'pourer'}               # advance with the jaws open, THEN close (closing while moving shoved the beaker)
 CARRY_TUCK_MM, CARRY_RISE_MM, CARRY_N = 30.0, 25.0, 16   # pourer carries arc around its base, closer to the arms
 
 
@@ -90,7 +92,7 @@ def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0):
     gpos = lambda n: [K.d.geom_xpos[i] * 1000 for i in range(m.ngeom) if m.geom(i).name == '%s/%s' % (arm, n)][0]
     ff, fm = gpos('finger_fixed'), gpos('finger_moving')
     back = np.r_[(ff - fm)[:2], 0.0]; back /= np.linalg.norm(back)          # away from the cup, toward the fixed finger
-    up = np.array([0.0, 0.0, 1.0]); P = dict(PICK, open_deg=OPEN_DEG.get(arm, PICK['open_deg']))
+    up = np.array([0.0, 0.0, 1.0]); P = dict(PICK, open_deg=OPEN_DEG.get(arm, PICK['open_deg']), back_mm=BACK_MM.get(arm, PICK['back_mm']))
     def solve(pts, seed, grips):
         out = []; q = seed.copy()
         for pt, g in zip(pts, grips):
@@ -102,8 +104,12 @@ def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0):
     A = p0 + P['back_mm'] * back + P['up_mm'] * up; B = p0 + P['back_mm'] * back
     lin = lambda a, c, n: [a + (c - a) * t for t in np.linspace(0, 1, n)]
     descend = solve(lin(A, B, P['n_descend']), q_touch, [P['open_deg']] * P['n_descend'])
-    adv_g = list(np.linspace(P['open_deg'], grip_close_deg, P['n_advance']))
-    advance = solve(lin(B, p0, P['n_advance']), np.asarray(descend[-1]), adv_g)
+    if arm in CLOSE_AFTER_ADVANCE:                                            # fixed finger onto the cup first, then close
+        advance = solve(lin(B, p0, P['n_advance']), np.asarray(descend[-1]), [P['open_deg']] * P['n_advance'])
+        advance.append(advance[-1][:5] + [math.radians(grip_close_deg)])
+    else:                                                                     # close while advancing (transfer)
+        adv_g = list(np.linspace(P['open_deg'], grip_close_deg, P['n_advance']))
+        advance = solve(lin(B, p0, P['n_advance']), np.asarray(descend[-1]), adv_g)
     lift = solve(lin(p0, p0 + P['lift_mm'] * up, P['n_lift']), np.asarray(advance[-1]), [grip_close_deg] * P['n_lift'])
     return [dict(name='straight down, jaws wide (15 mm back)', phase='approach', kind='cartesian', qs=descend),
             dict(name='advance onto the cup while closing', phase='pick', kind='cartesian', qs=advance),
@@ -113,7 +119,7 @@ def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0):
 def linear_place(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0):
     """straight-line place around a hand-taught hold pose (relative, like linear_pick): arrive above it with the beaker
     clear of the receiver's lip -> straight down -> open the jaws -> back off -> straight up. Returns (above_q, segments)."""
-    K, m = kin(); P = dict(PICK, open_deg=OPEN_DEG.get(arm, PICK['open_deg']))
+    K, m = kin(); P = dict(PICK, open_deg=OPEN_DEG.get(arm, PICK['open_deg']), back_mm=BACK_MM.get(arm, PICK['back_mm']))
     q_touch = np.asarray(q_touch, float); q_touch[5] = math.radians(grip_close_deg)
     p0, R0 = K.site(arm, q_touch, site); K.set(arm, q_touch)
     p0 = p0 + np.array([0.0, 0.0, dz_mm])                                   # height correction for this spot
