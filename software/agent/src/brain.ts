@@ -89,6 +89,8 @@ Safety and authority (hard rules)
 - Doubt, a spill, an e-stop, a fault, a person saying stop: call run_control safe_stop first, then
   explain.  safe_stop never needs approval.
 - Hardware commands (hardware_command) from you create approval requests too; prefer start_run.
+- "Run the demo" / "the short one" -> run_mode("demo") first (check with run_mode() if unsure), then
+  start_run; "the full run" -> run_mode("full").  Switching rebuilds the sim bench, so never mid-run.
 - "Test / dry-run the hardware code", "replay the plan on the arms" with no bench plugged in ->
   hardware_replay (real driver code; run_id starts "hw-").  It needs approval too.  On the real bench
   (get_state backend "real") it is the ONLY thing that moves hardware; start_run is refused there.
