@@ -132,9 +132,9 @@ def test_controller_nominal_pour():
 
 
 def test_controller_pauses_on_low_fill():
-    r, pl = run_synthetic(35.0)
+    r, pl = run_synthetic(18.0)                       # below [pour.developer] low_fill_ml (23.1 mL, half dose)
     assert r.outcome in ('PAUSE_NO_FLOW', 'PAUSE_LOW_FILL')
-    assert r.max_theta_deg < 75.0 and 'DRIP' in states(r)                            # stopped, untilted, dripped before pausing
+    assert r.max_theta_deg < 82.0 and 'DRIP' in states(r)   # the no-flow pause tilt for low_fill_ml 23.1 mL is 79 deg                            # stopped, untilted, dripped before pausing
 
 
 def test_controller_tops_up_after_an_early_cut():

@@ -148,10 +148,10 @@ scale_delta_min_g = 8.0                     # a lift/place must change the scale
 
 [recipe]
 # demo_process 1: targets and design tolerances
-developer_g = 39.0
-developer_tol_g = 2.0
-yeast_g = 7.0
-yeast_tol_g = 0.7
+developer_g = 19.5                          # 2026-10-18: half dose (was 39.0 / 7.0, tolerances halved with them)
+developer_tol_g = 1.0
+yeast_g = 3.5
+yeast_tol_g = 0.35
 water_g = 30.0
 water_tol_g = 2.0
 activate_wait_s = 60.0
@@ -252,7 +252,7 @@ funnel_rate_deg_s = 10.0                    # ramp 40 -> 105 deg: assumed (same 
 funnel_hold_s = 3.0                         # hold at 105 deg so the beaker drains: assumed
 
 [pour.developer]
-low_fill_ml = 46.0                          # 5.2 PAUSE("refill developer") below 1.2 x 38.5 mL
+low_fill_ml = 23.1                          # 5.2 PAUSE("refill developer") below 1.2 x 19.25 mL (half dose, 2026-10-18; was 46.0)
 fill_offset_ml = 9.2                        # 5.2 V_first = V_table(theta_first) + offset. Simulated value from 3 weighed-fill
                                             # pours (python -m benchsim.pour_trials --calibrate: 8.99 / 9.21 / 9.51 mL at
                                             # 60 / 70 / 80 mL), mostly first-drop detection lag. Re-measure on the bench
