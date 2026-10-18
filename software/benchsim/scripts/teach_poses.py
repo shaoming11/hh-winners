@@ -25,6 +25,7 @@ sys.path.insert(0, HERE)
 import replay_plan as rp  # noqa: E402
 
 OK_FILE = '/tmp/claude-501/teach_ok'
+MAX_NUDGE_DEG = 25.0     # bigger corrections are refused: the slow segments around the pose shift by the same offset
 # (step prefix, segment whose END is the pose, what it is)
 KEY_POSES = [
     ('1', 'touch fixed finger to P1', 'transfer: pick P1 at the carousel'),
@@ -43,6 +44,7 @@ def wait_ok(label):
     print('\n>>> %s: torque OFF, move the arm by hand. Then say it is good (teach_ok) or press Enter.' % label, flush=True)
     while True:
         if os.path.exists(OK_FILE): os.remove(OK_FILE); return
+        rp.nap(0.0)
         r, _, _ = select.select([sys.stdin], [], [], 0.2)
         if r: sys.stdin.readline(); return
 
@@ -51,6 +53,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--only', nargs='*', help='step numbers to teach (default: all key poses)')
     ap.add_argument('--clear', action='store_true')
+    ap.add_argument('--from', dest='start', type=int, default=1, help='start at this key pose number (1-%d)' % len(KEY_POSES))
     ap.add_argument('--speed', type=float, default=0.5)
     a = ap.parse_args()
     if a.clear:
@@ -58,7 +61,16 @@ def main():
         print('pose corrections cleared'); return 0
     plans = json.loads((rp.paths.SIM_ROOT / 'reports' / 'native_plans.json').read_text())['steps']
     bench = rp.layout.load_bench()
-    bb = rp.make_bench('real', allow_hardware=True, **dict(rp.PORTS, port_mega=None, calibration_path=rp.CAL, dry_run=False))
+    bb = rp.make_bench('real', allow_hardware=True, **dict(rp.PORTS, calibration_path=rp.CAL, dry_run=False))
+    mega = bb.mega; time.sleep(2.5)                                  # the port open resets the Mega: wait for its boot
+    try: bb.transport.read_lines()
+    except Exception: pass
+    rp.mega_start(mega, bench)                                        # sled out, faults cleared, positions kept
+    rp.MEGA = mega
+    rp.turn_deck(mega, 0.0, bench)
+    cur = mega.command('PING')['tt']                  # a zero-length move where it is: engages the firmware's hold
+    r = mega.motion('TT', done_timeout=6, deg=round(float(cur), 1), ms=1000)
+    print('carousel held at %.1f deg (pick cup at the pick spot)' % r['deg'], flush=True)
     arms = bb.arms
     ov = rp.load_overrides()
     try:
@@ -67,23 +79,30 @@ def main():
         for k in plans:
             if plans[k]['arm'] not in park: park[plans[k]['arm']] = plans[k]['segments'][0]['qs'][0]
         for name, q in park.items(): rp.go(arms[name], q, a.speed, 'park ' + name, tol=8.0, timeout=15.0)
-        for step, seg_name, label in KEY_POSES:
+        for n, (step, seg_name, label) in enumerate(KEY_POSES, 1):
             if a.only and step not in a.only: continue
+            if n < a.start: continue
             key = [k for k in plans if k.split()[0] == step][0]; s = plans[key]; arm = arms[s['arm']]
-            segs = rp.bench_segments(s['segments'], key)            # already includes earlier corrections
+            segs = rp.bench_segments(s['segments'], key, s['arm'])            # already includes earlier corrections
             idx = [i for i, g in enumerate(segs) if g['name'] == seg_name][0]
             print('\n=== %s (%s, step %s)' % (label, s['arm'], key), flush=True)
             for g in segs[:idx + 1]:
                 print('   %-38s %s' % (g['name'], g['phase']), flush=True); rp.play_segment(arm, g, a.speed)
             planned = np.asarray(s['segments'][[g['name'] for g in s['segments']].index(seg_name)]['qs'][-1], float)
             arm.set_torque(False)
-            wait_ok(label)
-            q = arm.read_positions()
-            d = np.degrees(q - planned); d[5] = 0.0                  # the gripper opening is not taught here
+            while True:
+                wait_ok(label)
+                q = arm.read_positions()
+                d = np.degrees(q - planned); d[5] = 0.0              # the gripper opening is not taught here
+                big = np.abs(d[:5]).max()
+                if big <= MAX_NUDGE_DEG: break
+                print('   that is %.0f deg on one joint (%s): a different arm posture, not a nudge. Put it back near the '
+                      'planned pose and adjust it gently.' % (big, ' '.join('%+.0f' % x for x in d[:5])), flush=True)
             ov.setdefault(key, {})[seg_name] = [round(float(x), 2) for x in d]
             rp.save_overrides(ov)
             print('   saved: %s' % ' '.join('%s %+.1f' % (n, x) for n, x in zip(('pan', 'lift', 'elbow', 'wflex', 'wroll', 'grip'), d)), flush=True)
             arm.set_torque(True)                                      # holds the taught pose
+            segs = rp.bench_segments(s['segments'], key, s['arm'])            # back out along the corrected path
             for g in reversed(segs[:idx + 1]):                        # back out the way it came
                 back = dict(g); back['qs'] = g['qs'][::-1]; back['kind'] = 'cartesian' if len(g['qs']) > 2 else g['kind']
                 rp.play_segment(arm, back, a.speed)

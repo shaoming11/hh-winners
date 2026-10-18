@@ -69,6 +69,17 @@ class ReplayModel:
             self.narration[k] = narrate(st) if (narrate and st is not None) else None
             self.groups[k] = self._groups(k, st)
 
+    def _played(self, k):
+        """the segments replay_plan actually plays for step k (taught poses and corrections applied); the signature
+        has grown (segs) -> (segs, key) -> (segs, key, arm), so try the richest first"""
+        segs, arm = self.plans[k]["segments"], self.plans[k]["arm"]
+        for args in ((segs, k, arm), (segs, k), (segs,)):
+            try:
+                return self.rp.bench_segments(*args)
+            except TypeError:
+                continue
+        raise TypeError("replay_plan.bench_segments: unknown signature")
+
     # ---------------------------------------------------------------- what each step moves where
     def roles(self, k, st):
         """(object gripped, where it is picked, where it is set down, what it pours into, reagent)"""
@@ -86,10 +97,7 @@ class ReplayModel:
 
     def _groups(self, k, st):
         """contiguous same-phase segments of the PLAYED path (bench_segments), named and given their criterion"""
-        try:
-            segs = self.rp.bench_segments(self.plans[k]["segments"], k)   # with the hand-taught pose corrections
-        except TypeError:
-            segs = self.rp.bench_segments(self.plans[k]["segments"])
+        segs = self._played(k)
         obj, src, dst, into, reagent = self.roles(k, st)
         arm = self.plans[k]["arm"]
         out, seen = [], {}

@@ -37,6 +37,7 @@ class SimServoBus:
     def __init__(self, sim_arm, arm_cal, ticks_per_rev, sts):
         self.arm = sim_arm; self.cal = arm_cal; self.map = real.JointMap(arm_cal, ticks_per_rev)
         self.tpr = ticks_per_rev; self.sts = sts; self.connected = False
+        self.clipped = []                                  # goals past the MJCF range, clipped (see write)
         fp = arm_cal.get('fingerprint') or {n: [0, 0, ticks_per_rev - 1] for n in real.JOINTS}
         self.regs = {'Homing_Offset': {n: fp[n][0] for n in real.JOINTS},
                      'Min_Position_Limit': {n: fp[n][1] for n in real.JOINTS},
@@ -76,7 +77,14 @@ class SimServoBus:
             if not self.arm.torque_enabled(): return                         # a servo ignores goals with torque off
             goal = self.regs['Goal_Position']
             q = self.map.ticks_to_q({n: goal.get(n, 0) for n in real.JOINTS})
-            self.arm.set_goal(q, speed_scale=self._speed_scale())
+            # the calibrated limits (what the real servo takes) can reach past the MJCF joint range: the sim arm goes
+            # as far as it can instead of refusing a goal the hardware would accept
+            w = self.arm.w; aid = self.arm.aid
+            lo, hi = w.m.actuator_ctrlrange[aid, 0], w.m.actuator_ctrlrange[aid, 1]
+            qc = np.clip(q, lo, hi)
+            if np.any(np.abs(qc - q) > 1e-6):
+                self.clipped.append([round(float(np.degrees(v)), 1) for v in q])
+            self.arm.set_goal(qc, speed_scale=self._speed_scale())
 
     def _speed_scale(self):
         """Goal_Velocity (steps/s per joint) as the SimArm's speed_scale: the fastest joint against the sim's max speed"""

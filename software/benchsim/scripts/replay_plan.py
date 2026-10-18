@@ -63,6 +63,196 @@ def save_overrides(ov):
     with open(OVERRIDES, 'w') as f: json.dump(ov, f, indent=1)
 
 
+TAUGHT = os.path.join(paths.SIM_ROOT, 'benchsim', 'config', 'taught_poses.json')   # absolute hand-taught grasp poses
+PICK = dict(back_mm=15.0, up_mm=70.0, lift_mm=60.0, n_descend=12, n_advance=8, n_lift=8, open_deg=85.0)
+_KIN = {}
+
+
+def kin():
+    if not _KIN:
+        from benchsim import scene
+        from benchsim.kinematics import Kin
+        m, b = scene.build(); K = Kin(m)
+        cal = json.load(open(CAL))['arms']                 # IK bounds = the arms' calibrated (physical) limits, not the MJCF's
+        names = ('shoulder_pan', 'shoulder_lift', 'elbow_flex', 'wrist_flex', 'wrist_roll')
+        for arm in K.range:
+            for j, n in enumerate(names):
+                J = cal[arm]['joints'][n]; K.range[arm][j] = [math.radians(J['min_deg']), math.radians(J['max_deg'])]
+        _KIN['K'] = K; _KIN['m'] = m
+    return _KIN['K'], _KIN['m']
+
+
+SPOT_DZ_MM = {'transfer_carousel_pick': 15.0,   # bench 2026-10-18: the grab was 1-2 cm low (caught the carousel ring)
+              'transfer_scale': 10.0,          # and the place on the scale 1 cm low
+              'pourer_rack1': 30.0}            # the pourer's peroxide grab 3 cm higher (2 + 1 after the second test)
+OPEN_DEG = {'pourer': 55.0}                    # approach opening per arm (the pourer's side grasp: less wide)
+BACK_MM = {'pourer': 8.0}                      # approach offset per arm
+SPOT_BACK_MM = {'pourer_scale': 30.0}         # per spot (overrides the arm): P1 on the scale was tipped by an 8 mm approach
+SPOT_CLOSE_DURING = {'pourer_scale'}          # close while advancing so P1's centre stays put (the rack grab closes after)
+PLACE_SHIFT_MM = {'pourer_rack1': (-20.0, 0.0)}   # place-back translation (world x, y): 2 cm to the operator's right
+POUR_DZ_MM = {'2': -10.0}                      # 1 cm lower than the plan (was 2: the gripper touched P1)
+POUR_PAN_DEG = {'2': -1.0}                     # base rotation of the pour (-4 then +3 = 1.5 cm to the right at 287 mm reach)                      # bench 2026-10-18: the peroxide pour over the scale 2 cm lower
+CLOSE_AFTER_ADVANCE = {'pourer'}               # advance with the jaws open, THEN close (closing while moving shoved the beaker)
+CARRY_TUCK_MM, CARRY_RISE_MM, CARRY_N = 30.0, 25.0, 16   # pourer carries arc around its base, closer to the arms
+
+
+def load_taught():
+    try:
+        with open(TAUGHT) as f: return json.load(f)
+    except (OSError, ValueError): return {}
+
+
+def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0, spot=None):
+    """straight-line top-down pick around a hand-taught touch pose, built RELATIVE to it (sim kinematics give the
+    directions; the absolute sim/bench offset at this pose cancels): above-and-back -> straight down (jaws wide) ->
+    advance onto the cup while the jaws close -> straight up. Returns four segments (joint, descend, advance, lift)."""
+    K, m = kin()
+    q_touch = np.asarray(q_touch, float)
+    p0, R0 = K.site(arm, q_touch, site)
+    K.set(arm, q_touch)
+    p0 = p0 + np.array([0.0, 0.0, dz_mm])                                   # height correction for this spot
+    gpos = lambda n: [K.d.geom_xpos[i] * 1000 for i in range(m.ngeom) if m.geom(i).name == '%s/%s' % (arm, n)][0]
+    ff, fm = gpos('finger_fixed'), gpos('finger_moving')
+    back = np.r_[(ff - fm)[:2], 0.0]; back /= np.linalg.norm(back)          # away from the cup, toward the fixed finger
+    up = np.array([0.0, 0.0, 1.0]); P = dict(PICK, open_deg=OPEN_DEG.get(arm, PICK['open_deg']), back_mm=SPOT_BACK_MM.get(spot, BACK_MM.get(arm, PICK['back_mm'])))
+    def solve(pts, seed, grips):
+        out = []; q = seed.copy()
+        for pt, g in zip(pts, grips):
+            qs, perr, aerr = K.ik(arm, site, pt, z_axis=R0[:, 2], q0=q[:5].tolist() + [q[5]], w_ori=20.0)   # straight line first; the tool may tilt (<= ~15 deg at the top: the wrist flex limit)
+            q = np.r_[np.asarray(qs, float)[:5], math.radians(g)]
+            if perr > 4.0: raise ValueError('pick IK: %.1f mm off at %s' % (perr, np.round(pt, 1)))
+            out.append(q.tolist())
+        return out
+    A = p0 + P['back_mm'] * back + P['up_mm'] * up; B = p0 + P['back_mm'] * back
+    lin = lambda a, c, n: [a + (c - a) * t for t in np.linspace(0, 1, n)]
+    descend = solve(lin(A, B, P['n_descend']), q_touch, [P['open_deg']] * P['n_descend'])
+    if arm in CLOSE_AFTER_ADVANCE and spot not in SPOT_CLOSE_DURING:          # fixed finger onto the cup first, then close
+        advance = solve(lin(B, p0, P['n_advance']), np.asarray(descend[-1]), [P['open_deg']] * P['n_advance'])
+        advance.append(advance[-1][:5] + [math.radians(grip_close_deg)])
+    else:                                                                     # close while advancing (transfer)
+        adv_g = list(np.linspace(P['open_deg'], grip_close_deg, P['n_advance']))
+        advance = solve(lin(B, p0, P['n_advance']), np.asarray(descend[-1]), adv_g)
+    lift = solve(lin(p0, p0 + P['lift_mm'] * up, P['n_lift']), np.asarray(advance[-1]), [grip_close_deg] * P['n_lift'])
+    return [dict(name='straight down, jaws wide (15 mm back)', phase='approach', kind='cartesian', qs=descend),
+            dict(name='advance onto the cup while closing', phase='pick', kind='cartesian', qs=advance),
+            dict(name='lift straight up', phase='carry', kind='cartesian', qs=lift)]
+
+
+def linear_place(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0, spot=None):
+    """straight-line place around a hand-taught hold pose (relative, like linear_pick): arrive above it with the beaker
+    clear of the receiver's lip -> straight down -> open the jaws -> back off -> straight up. Returns (above_q, segments)."""
+    K, m = kin(); P = dict(PICK, open_deg=OPEN_DEG.get(arm, PICK['open_deg']), back_mm=BACK_MM.get(arm, PICK['back_mm']))
+    q_touch = np.asarray(q_touch, float); q_touch[5] = math.radians(grip_close_deg)
+    p0, R0 = K.site(arm, q_touch, site); K.set(arm, q_touch)
+    sx, sy = PLACE_SHIFT_MM.get(spot, (0.0, 0.0))
+    p0 = p0 + np.array([sx, sy, dz_mm])                                     # height / place-back correction for this spot
+    gpos = lambda n: [K.d.geom_xpos[i] * 1000 for i in range(m.ngeom) if m.geom(i).name == '%s/%s' % (arm, n)][0]
+    back = np.r_[(gpos('finger_fixed') - gpos('finger_moving'))[:2], 0.0]; back /= np.linalg.norm(back)
+    up = np.array([0.0, 0.0, 1.0])
+    def solve(pts, seed, grips):
+        out = []; q = seed.copy()
+        for pt, g in zip(pts, grips):
+            qs, perr, aerr = K.ik(arm, site, pt, z_axis=R0[:, 2], q0=q[:5].tolist() + [q[5]], w_ori=20.0)
+            q = np.r_[np.asarray(qs, float)[:5], math.radians(g)]
+            if perr > 4.0: raise ValueError('place IK: %.1f mm off at %s' % (perr, np.round(pt, 1)))
+            out.append(q.tolist())
+        return out
+    lin = lambda a, c, n: [a + (c - a) * t for t in np.linspace(0, 1, n)]
+    above = p0 + P['up_mm'] * up
+    down = solve(lin(above, p0, P['n_descend']), q_touch, [grip_close_deg] * P['n_descend'])
+    release = [down[-1][:5] + [math.radians(grip_close_deg)], down[-1][:5] + [math.radians(P['open_deg'])]]
+    off = solve(lin(p0, p0 + P['back_mm'] * back, P['n_advance']), np.asarray(release[-1]), [P['open_deg']] * P['n_advance'])
+    rise = solve(lin(p0 + P['back_mm'] * back, p0 + P['back_mm'] * back + P['lift_mm'] * up, P['n_lift']), np.asarray(off[-1]),
+                 [P['open_deg']] * P['n_lift'])
+    return [dict(name='straight down into the receiver', phase='carry', kind='cartesian', qs=down),
+            dict(name='release', phase='place', kind='grip', qs=release),
+            dict(name='back off the cup', phase='retreat', kind='cartesian', qs=off),
+            dict(name='straight up', phase='retreat', kind='cartesian', qs=rise)]
+
+
+TRANSFER_STEPS = {'1': ('transfer_carousel_pick', 'transfer_scale'), '4': ('transfer_scale', 'transfer_carousel_pick')}
+POURER_STEPS = {'2': 'pourer_rack1', '3': 'pourer_scale'}
+
+
+def carry_arc(arm, q_from, q_to, site='grasp_side', name='carry'):
+    """carry a held beaker upright along an arc around the arm's base, CARRY_TUCK_MM closer in and CARRY_RISE_MM higher
+    than the nearer of the two ends (a straight joint move swings it out over the flask)"""
+    K, m = kin()
+    from benchsim import layout
+    base = np.asarray(layout.load_bench()['stations'][arm + '_base']['xy'], float)
+    qa, qb = np.asarray(q_from, float), np.asarray(q_to, float)
+    pa, Ra = K.site(arm, qa, site); pb, _ = K.site(arm, qb, site)
+    ang = lambda p: math.atan2(p[1] - base[1], p[0] - base[0])
+    ta, tb = ang(pa), ang(pb); dt = (tb - ta + math.pi) % (2 * math.pi) - math.pi
+    r = min(np.hypot(*(pa[:2] - base)), np.hypot(*(pb[:2] - base))) - CARRY_TUCK_MM
+    z = max(pa[2], pb[2]) + CARRY_RISE_MM
+    arc = [np.r_[base + r * np.array([math.cos(ta + dt * t), math.sin(ta + dt * t)]), z] for t in np.linspace(0, 1, CARRY_N)]
+    blend = lambda a, b, k: [a + (b - a) * t for t in np.linspace(0, 1, k + 1)[1:]]
+    pts = blend(pa, arc[0], 5) + arc[1:] + blend(arc[-1], pb, 5)[:-1]   # ease in and out (no posture jump)
+    out = [qa.tolist()]; q = qa.copy()
+    for pt in pts:
+        qs, perr, aerr = K.ik(arm, site, pt, z_axis=Ra[:, 2], q0=q[:5].tolist() + [q[5]], w_ori=40.0, max_dev=0.3)   # upright, same posture
+        q = np.r_[np.asarray(qs, float)[:5], qa[5]]
+        if perr > 6.0: raise ValueError('carry arc IK: %.1f mm off' % perr)
+        out.append(q.tolist())
+    out.append(qb.tolist())
+    return dict(name=name + ' (arc, close to the arms)', phase='carry', kind='cartesian', qs=out)
+
+
+def shift_block(arm, block, dz_mm, site='grasp_side'):
+    """the same poses dz_mm lower/higher: every waypoint re-solved with its full gripper orientation kept"""
+    if not dz_mm: return block
+    K, m = kin(); out = []
+    for g in block:
+        qs = []
+        for q in g['qs']:
+            q = np.asarray(q, float); p, R = K.site(arm, q, site)
+            sol, perr, aerr = K.ik(arm, site, p + np.array([0.0, 0.0, dz_mm]), z_axis=R[:, 2], x_axis=R[:, 0],
+                                   q0=q[:5].tolist() + [q[5]], w_ori=100.0, max_dev=0.25)
+            if perr > 3.0 or aerr > 3.0: raise ValueError('pour shift: %.1f mm / %.1f deg off' % (perr, aerr))
+            qs.append(np.r_[np.asarray(sol, float)[:5], q[5]].tolist())
+        out.append(dict(g, qs=qs))
+    return out
+
+
+def pourer_taught(segs, q_spot, spot, step=None):
+    """pourer step with a hand-taught grab spot: straight-line grab there, the plan's carry / pour / raise in between,
+    and the beaker put back on the same spot with a straight-line place"""
+    names = [g['name'] for g in segs]
+    close = math.degrees(segs[next(i for i, nm in enumerate(names) if nm.startswith('close on'))]['qs'][-1][5])
+    dz = SPOT_DZ_MM.get(spot, 0.0)
+    pick = linear_pick('pourer', q_spot, close, site='grasp_side', dz_mm=dz, spot=spot)
+    place = linear_place('pourer', q_spot, close, site='grasp_side', dz_mm=dz, spot=spot)
+    i_carry = names.index('carry to above pre-pour'); i_raise = names.index('raise from pre-pour')
+    J = lambda name, phase, a, b: dict(name=name, phase=phase, kind='joint', qs=[list(a), list(b)])
+    pour = shift_block('pourer', segs[i_carry + 1:i_raise + 1], POUR_DZ_MM.get(step, 0.0))   # lower / tilt / pour / untilt / raise
+    dpan = math.radians(POUR_PAN_DEG.get(step, 0.0))                        # a pure base rotation of the whole pour
+    if dpan: pour = [dict(g, qs=[[q[0] + dpan] + list(q[1:]) for q in g['qs']]) for g in pour]
+    return ([J('park -> above the grab', 'approach', segs[0]['qs'][0], pick[0]['qs'][0])] + pick +
+            [carry_arc('pourer', pick[-1]['qs'][-1], pour[0]['qs'][0], name='carry to above pre-pour')] + pour +
+            [carry_arc('pourer', pour[-1]['qs'][-1], place[0]['qs'][0], name='carry back above the spot')] + place +
+            [J('return to park', 'park', place[-1]['qs'][-1], segs[-1]['qs'][-1])])
+
+
+def taught_segments(segs, key):
+    """transfer steps whose pick and place spots are both hand-taught: park -> straight-line pick -> carry with the
+    beaker clear above the receiver -> straight-line place -> park (the plan's slide / channel moves are not used)"""
+    T = load_taught()
+    pour = POURER_STEPS.get(key.split()[0])
+    if pour and pour in T: return pourer_taught(segs, T[pour], pour, key.split()[0])
+    spots = TRANSFER_STEPS.get(key.split()[0])
+    if not spots or not all(sp in T for sp in spots): return segs
+    names = [g['name'] for g in segs]
+    close = math.degrees(segs[names.index('close on P1')]['qs'][-1][5])
+    park0, park1 = segs[0]['qs'][0], segs[-1]['qs'][-1]
+    pick = linear_pick('transfer', T[spots[0]], close, dz_mm=SPOT_DZ_MM.get(spots[0], 0.0))
+    place = linear_place('transfer', T[spots[1]], close, dz_mm=SPOT_DZ_MM.get(spots[1], 0.0))
+    J = lambda name, phase, a, b: dict(name=name, phase=phase, kind='joint', qs=[list(a), list(b)])
+    return ([J('park -> above the pick', 'approach', park0, pick[0]['qs'][0])] + pick +
+            [J('carry, beaker clear above the receiver', 'carry', pick[-1]['qs'][-1], place[0]['qs'][0])] + place +
+            [J('return to park', 'park', place[-1]['qs'][-1], park1)])
+
+
 def apply_overrides(segs, key, ov=None):
     """hand-taught corrections (deg per joint) for poses of step ``key``: the taught segment and the slow (non-joint)
     segments touching it shift by the offset; the neighbouring joint moves end / start at the shifted pose"""
@@ -130,6 +320,17 @@ def sled_wait():
     while SLED: nap(0.05)
 
 
+def mega_start(mega, bench):
+    """clear faults WITHOUT forgetting where the axes are (CLR home only when the Mega has lost track: it declares the
+    axes at home without moving them), then bring the sled out to WORK, the start position of every run"""
+    p = mega.command('PING')
+    mega.command('CLR', home=True) if p.get('pos') == 'unknown' else mega.command('CLR')
+    St = bench['params']['stage']; st = mega.command('PING').get('st')
+    if st is None or abs(st - St['work_deg']) > 2.0:
+        r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['work_deg']), ms=int(St['move_s'] * 1000))
+        print('sled out to %.0f deg (start position)' % r['deg'], flush=True)
+
+
 def turn_deck(mega, deg, bench):
     """carousel move with one retry: a TT_TIMEOUT that does not reproduce happened once on the bench"""
     for attempt in (1, 2):
@@ -139,8 +340,15 @@ def turn_deck(mega, deg, bench):
         ms = int(max(1000, abs(deg - cur) / 45.0 * 1000 * bench['params']['carousel']['min_s_per_45deg']) + 200)
         try: return mega.motion('TT', done_timeout=ms / 1000 + 6, deg=float(deg), ms=ms)
         except MegaError as e:
+            p = mega.command('PING')
+            mega.command('CLR', home=True) if p.get('pos') == 'unknown' else mega.command('CLR')
+            now = mega.command('PING').get('tt')
+            if now is not None and abs(now - deg) <= 3.0:   # it got there, still hunting at the tolerance edge
+                print('   carousel: %s, but it is at %.1f deg (target %.1f): fine' % (e, now, deg), flush=True)
+                return dict(deg=now)
             if attempt == 2: raise
-            print('   carousel: %s, re-homing and retrying once' % e, flush=True); mega.command('CLR', home=True)
+            print('   carousel: %s at %s deg, retrying once' % (e, now), flush=True)
+            continue
 
 
 def deck_for_step(name, bench):
@@ -175,17 +383,18 @@ def go(arm, q, speed, label='', tol=REACH_DEG, timeout=WAYPOINT_TIMEOUT_S, quiet
     return err
 
 
-def bench_segments(segs, key=None):
+def bench_segments(segs, key=None, arm=None):
     """the plan's segments, adjusted for the bench: jaws wide open while approaching a cup (until they close); the
     pour manifold cut before its arm-flip region, a drain hold, then the pour retraced back to the 40 deg pose
     (the plan's untilt starts at 40 deg, which made the arm snap back from 105 deg)"""
     out = []; closed = False
-    if key is not None: segs = apply_overrides(segs, key)
+    if key is not None: segs = taught_segments(apply_overrides(segs, key), key)
     for seg in segs:
         seg = dict(seg); qs = [list(q) for q in seg['qs']]
-        if seg['phase'] == 'pick': qs[0][5] = math.radians(APPROACH_GRIP_DEG); closed = True
+        wide = math.radians(OPEN_DEG.get(arm, APPROACH_GRIP_DEG))
+        if seg['phase'] == 'pick': qs[0][5] = max(qs[0][5], wide) if seg['name'].startswith('advance') else wide; closed = True
         elif seg['phase'] == 'approach' and not closed:
-            for q in qs: q[5] = math.radians(APPROACH_GRIP_DEG)
+            for q in qs: q[5] = wide
         if seg['name'].startswith('pour manifold'):
             d = np.degrees(np.abs(np.diff(np.array(qs), axis=0)))[:, :4].max(axis=1)
             cut = next((i for i, x in enumerate(d) if x > POUR_JUMP_DEG), len(qs) - 1)
@@ -223,7 +432,7 @@ def main():
     ap.add_argument('--steps', nargs='*', help='step numbers to run (default all), e.g. 1 4')
     ap.add_argument('--no-mega', action='store_true', help='leave the carousel alone')
     ap.add_argument('--yes', action='store_true', help='do not wait for Enter between steps')
-    ap.add_argument('--end-turn', type=float, default=90.0, help='carousel angle at the very end (0 = no turn; default 90)')
+    ap.add_argument('--end-turn', type=float, default=90.0, help='turn the carousel by this many degrees at the very end, relative to where it is (0 = none; default 90)')
     ap.add_argument('--rest', action='store_true', help='only send both arms to the rest pose, then torque off')
     ap.add_argument('--check', action='store_true', help='pre-flight only: open the ports read-only, check every waypoint, move nothing')
     ap.add_argument('--emulate', action='store_true', help='no USB: the same code on emulated servos and Mega (the simulator)')
@@ -271,7 +480,7 @@ def replay(bb, a):
     # pre-flight: every planned waypoint must be inside the arm's calibrated limits, or nothing moves
     bad = []
     for k in order + [x for x in plans if x not in order][:0]:
-        for seg in bench_segments(plans[k]['segments'], k):
+        for seg in bench_segments(plans[k]['segments'], k, plans[k]['arm']):
             for q in seg['qs']:
                 try: arms[plans[k]['arm']].check_goal(np.asarray(q, float))
                 except ValueError as e: bad.append('%s / %s: %s' % (k, seg['name'], e))
@@ -288,12 +497,7 @@ def replay(bb, a):
         for name, arm in arms.items(): arm.set_torque(True); print('%s torque on (holding the present pose)' % name)
         rest = np.radians(REST_DEG)
         if mega is not None:
-            mega.command('CLR', home=True)
-            St = bench['params']['stage']               # the sled starts out (flask under the funnel); it retracts only
-            st = mega.command('PING').get('st')         # after the last pour, and stays retracted until the next run
-            if st is None or abs(st - St['work_deg']) > 2.0:
-                r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['work_deg']), ms=int(St['move_s'] * 1000))
-                print('sled out to %.0f deg (start position)' % r['deg'], flush=True)
+            mega_start(mega, bench)                     # sled out (it retracts only after the last pour, until the next run)
         if a.rest:
             for name, arm in arms.items():
                 if not a.yes: input('\nEnter: move %s to the rest pose (slow) ' % name)
@@ -316,10 +520,15 @@ def replay(bb, a):
             else: input(msg)
             for h in STEP_HOOKS: h(k, 'start')
             if deck is not None and mega is not None:
+                # the four pockets are 90 deg apart: whichever cup sits at the pick spot is the one the operator loaded,
+                # so only nudge to the nearest pocket alignment (never carry the loaded cup away)
+                cur = mega.command('PING').get('tt') or 0.0; C = bench['params']['carousel']
+                cands = [deck + 90.0 * n for n in range(-4, 5) if C['deck_range_deg'][0] <= deck + 90.0 * n <= C['deck_range_deg'][1]]
+                deck = min(cands, key=lambda d: abs(d - cur))
                 r = turn_deck(mega, deck, bench)
                 print('   carousel at %.1f deg' % r['deg'], flush=True)
             funnel = 'funnel' in k
-            for seg in bench_segments(s['segments'], k):
+            for seg in bench_segments(s['segments'], k, s['arm']):
                 fast = funnel and seg['phase'] == 'pour' and not seg['name'].startswith('untilt')   # tilt-in + pour: all at once
                 print('   %-38s %s%s' % (seg['name'], seg['phase'], '  (all at once)' if fast else ''), flush=True)
                 for h in SEG_HOOKS: h(k, seg, 'start')
@@ -335,13 +544,12 @@ def replay(bb, a):
             err = go(arm, end, a.speed, 'back at park', tol=8.0, timeout=15.0)
             if not err < 8.0: raise TimeoutError('%s arm did not get back to park (%.0f deg off)' % (s['arm'], err))
             for h in STEP_HOOKS: h(k, 'done')
-        if mega is not None and a.end_turn:             # finale: the next cup comes round to the pick spot
-            r = turn_deck(mega, a.end_turn, bench); print('carousel turned to %.0f deg (end)' % r['deg'], flush=True)
-        for name, arm in arms.items():
-            if not a.yes: input('\nEnter: return %s to the rest pose ' % name)
-            go(arm, rest, min(a.speed, 0.3), 'rest ' + name)
-        for arm in arms.values(): arm.set_torque(False)
-        print('\ndone: both arms back at rest, torque off')
+        if mega is not None and a.end_turn:             # finale: the carousel turns a.end_turn deg from where it is
+            cur = mega.command('PING').get('tt') or 0.0; lo, hi = bench['params']['carousel']['deck_range_deg']
+            tgt = cur + a.end_turn
+            if not lo <= tgt <= hi: tgt = cur + a.end_turn - math.copysign(360.0, a.end_turn)   # same cup layout, other way round
+            r = turn_deck(mega, tgt, bench); print('carousel turned %+.0f deg to %.0f deg (end)' % (a.end_turn, r['deg']), flush=True)
+        print('\ndone: both arms at park (up), torque on')      # no folded rest pose: it sat in the other arm's way
         return 0
     except (KeyboardInterrupt, ReplayStop, ConnectionError, TimeoutError, MegaError) as stop_reason:
         print('\nstopping:', type(stop_reason).__name__, stop_reason)

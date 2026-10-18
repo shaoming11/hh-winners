@@ -24,7 +24,7 @@ def test_every_route_step_gets_a_meaning_and_subgoals():
         assert row.type in ("TRANSFER", "POUR_TO_SCALE", "POUR_TO_FUNNEL"), row.name
         names = [s.name for s in row.subgoals]
         assert any(n.startswith("grip ") for n in names) and any(n.startswith("set ") for n in names), (row.name, names)
-        assert sum(len(g["segs"]) for g in m.groups[row.name]) == len(rp.bench_segments(plans[row.name]["segments"], row.name))
+        assert sum(len(g["segs"]) for g in m.groups[row.name]) == len(m._played(row.name))
         if row.type == "POUR_TO_SCALE":
             pour = next(s for s in row.subgoals if s.name.startswith("pour "))
             assert "g on the scale" in pour.expect
