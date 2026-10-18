@@ -575,6 +575,8 @@ def bench_segments(segs, key=None, arm=None):
 
 # ---------------------------------------------------------------- step 2: the peroxide pour onto P1, closed loop by weight
 CLOSED_LOOP_STEPS = ('2',)       # route steps whose pour runs on the scale (benchsim.process.pour.PourController)
+POUR_START_DEG = 50.0            # bench: straight to here fast (was 40): even an 80 mL fill first drips at ~54 deg
+POUR_RAMP_DEG_S = 5.0            # then this fast until the first drop (was 3: a half-full beaker took ~8 s to start)
 UNTILT_RATE_DEG_S = 60.0         # after the controller is done: back to upright at this rate (demo_run's untilt)
 SETTLE_S = 1.5                   # then let the scale settle before the final reading
 
@@ -629,6 +631,7 @@ def closed_loop_pour(arm, arm_name, segs, mega, info, speed, reagent='developer'
     q6 = float(segs[0]['qs'][0][5])                      # the jaw stays where the grip commanded it
     tilt = ManifoldTilt(_Paced(arm, speed), th, qs, q6)
     cfg = dict(P['pour']); cfg['theta_max_deg'] = min(float(cfg['theta_max_deg']), float(th[-1]))   # the played path ends here
+    cfg['theta_start_deg'] = max(float(cfg['theta_start_deg']), min(POUR_START_DEG, float(th[-1]) - 5.0)); cfg['ramp_rate_deg_s'] = POUR_RAMP_DEG_S
     mega.command('STREAM', on=True)
     base_g = mega.read_mass(32)                          # the receiver as it stands: the dose is what lands on top
     def samples():
