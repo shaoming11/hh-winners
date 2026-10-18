@@ -50,7 +50,7 @@ def go(arm, q, speed, label='', tol=REACH_DEG, timeout=WAYPOINT_TIMEOUT_S, quiet
     try: span = np.degrees(np.abs(arm.read_positions() - np.asarray(q, float)))[:5].max()
     except ConnectionError: span = 90.0
     arm.set_goal(np.asarray(q, float), speed_scale=speed)
-    timeout = max(timeout, 1.5 * span / (arm.vmax_deg_s * speed) + (0.0 if quiet else 1.0))   # long moves get the time they need
+    timeout = max(timeout, 3.0 * span / (arm.vmax_deg_s * speed) + (0.0 if quiet else 1.0))   # long moves get the time they need
     t0 = time.time(); err = float('nan'); misses = 0
     while time.time() - t0 < timeout:
         try:
@@ -126,7 +126,8 @@ def main():
             if plans[k]['arm'] not in park: park[plans[k]['arm']] = plans[k]['segments'][0]['qs'][0]
         for name, q in park.items():
             if not a.yes: input('\nEnter: move %s to the park pose ' % name)
-            go(arms[name], q, a.speed, 'park ' + name)
+            err = go(arms[name], q, a.speed, 'park ' + name, tol=8.0, timeout=15.0)
+            if not err < 8.0: raise TimeoutError('%s did not reach park (%.0f deg off)' % (name, err))
         for k in order:
             s = plans[k]; arm = arms[s['arm']]
             deck = deck_for_step(k, bench)
@@ -141,6 +142,10 @@ def main():
             for seg in s['segments']:
                 print('   %-38s %s' % (seg['name'], seg['phase']), flush=True)
                 play_segment(arm, seg, a.speed)
+            # never start the next step (maybe the other arm) before this arm is really back at park
+            end = s['segments'][-1]['qs'][-1]
+            err = go(arm, end, a.speed, 'back at park', tol=8.0, timeout=15.0)
+            if not err < 8.0: raise TimeoutError('%s arm did not get back to park (%.0f deg off)' % (s['arm'], err))
         for name, arm in arms.items():
             if not a.yes: input('\nEnter: return %s to the rest pose ' % name)
             go(arm, rest, min(a.speed, 0.3), 'rest ' + name)
