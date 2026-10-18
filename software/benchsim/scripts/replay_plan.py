@@ -323,10 +323,15 @@ def turn_deck(mega, deg, bench):
         ms = int(max(1000, abs(deg - cur) / 45.0 * 1000 * bench['params']['carousel']['min_s_per_45deg']) + 200)
         try: return mega.motion('TT', done_timeout=ms / 1000 + 6, deg=float(deg), ms=ms)
         except MegaError as e:
-            if attempt == 2: raise
-            print('   carousel: %s, retrying once' % e, flush=True)
-            p = mega.command('PING')                    # clear only: the sled stays where it is
+            p = mega.command('PING')
             mega.command('CLR', home=True) if p.get('pos') == 'unknown' else mega.command('CLR')
+            now = mega.command('PING').get('tt')
+            if now is not None and abs(now - deg) <= 3.0:   # it got there, still hunting at the tolerance edge
+                print('   carousel: %s, but it is at %.1f deg (target %.1f): fine' % (e, now, deg), flush=True)
+                return dict(deg=now)
+            if attempt == 2: raise
+            print('   carousel: %s at %s deg, retrying once' % (e, now), flush=True)
+            continue
 
 
 def deck_for_step(name, bench):
