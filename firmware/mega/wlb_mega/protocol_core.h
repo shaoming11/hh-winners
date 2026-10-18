@@ -145,7 +145,9 @@ struct Config {
     uint16_t tt_us_stop;       // continuous servo stop centre
     uint16_t tt_us_db;         // the servo ignores pulses within this of tt_us_stop: any drive starts just past it
     float tt_kp;               // us per deg of error
-    float tt_kd;               // us per deg/s of measured speed
+    float tt_kd;               // us per deg/s of speed error (profile speed - measured speed)
+    float tt_kff;              // feedforward: us per deg/s of profile speed (the servo's speed curve, past the deadband)
+    float tt_hold_deg;         // after a move the loop keeps holding: it corrects once the deck drifts past this
     uint16_t tt_max_off;       // largest pulse offset from the stop centre
     float tt_tol_deg;          // done when within this for settle_ms after the profile
     float tt_db_deg;           // after the profile, no drive inside this error (stops the hunting)
@@ -226,6 +228,9 @@ private:
     void start_auger(int32_t seq, float rev, int8_t dir, uint32_t now);
     void axis_tick(uint32_t now);
     void tt_closed_tick(uint32_t now, float el, float s);
+    void tt_hold_tick(uint32_t now);
+    void tt_meas_update(uint32_t now, float meas);
+    float tt_pulse(float u) const;
     void auger_tick(uint32_t now, uint16_t adc);
     void begin_reverse(uint32_t now, uint8_t after);
     float fb_angle(uint16_t adc) const;
@@ -263,7 +268,7 @@ private:
     uint16_t tt_adc_;
     float tt_prev_meas_, tt_vel_;
     uint32_t tt_prev_t_, tt_tol_since_;
-    bool tt_tol_on_;
+    bool tt_tol_on_, tt_holding_;
 
     Axis ax_[2];
     AxisMove mv_;

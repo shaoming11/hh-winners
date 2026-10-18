@@ -386,7 +386,7 @@ void default_config(Config& c) {
     memset(&c, 0, sizeof c);
     // protocol.Limits (bench_params.toml) and protocol.validate constants
     c.tt_lo_deg = -110.0f; c.tt_hi_deg = 250.0f;       // [carousel] deck_range_deg
-    c.tt_ms_per_45 = 2000.0f;                         // [carousel] min_s_per_45deg = 2.0
+    c.tt_ms_per_45 = 1000.0f;                         // [carousel] min_s_per_45deg = 1.0 (2026-10-18, faster on the closed-loop servo)
     c.tt_slack_ms = 50.0f;                            // protocol.validate: ms < need - 50
     c.st_lo_deg = -2.0f; c.st_hi_deg = 152.0f;        // [stage] work_deg 0 / erupt_deg 150, -+2 (protocol.Limits)
     c.st_ms_min = 2000.0f;                            // protocol.Limits.st_ms_min
@@ -421,7 +421,7 @@ void default_config(Config& c) {
 #ifdef WLB_TT_OPEN_LOOP
     c.tt_closed = 0;                                  // build flag: the old position servo (M45CHW) on D6, open loop
 #endif
-    c.tt_kp = 3.0f; c.tt_kd = 0.0f; c.tt_max_off = 60; c.tt_tol_deg = 2.0f; c.tt_db_deg = 1.0f;                                 // [mega] tt_release: deck held by friction between moves (2026-10-17)
+    c.tt_kp = 3.0f; c.tt_kd = 0.0f; c.tt_max_off = 60; c.tt_tol_deg = 2.0f; c.tt_db_deg = 1.0f; c.tt_kff = 0.0f; c.tt_hold_deg = 2.0f;                                 // [mega] tt_release: deck held by friction between moves (2026-10-17)
     c.aug_timed = 1;                                  // [mega] aug_timed: the A2 feedback wire is not fitted yet
     c.aug_rev_per_s = 0.37f;                          // [mega] aug_rev_per_s: fit 2026-10-17, turns = 0.37 * s + 0.19 (4 doses)
     c.aug_start_ms = 0;                               // [mega] aug_start_ms
@@ -457,7 +457,7 @@ void Core::begin(const Config& cfg, uint32_t now, const Persist* restored, EmitF
     line_n_ = 0; overflow_ = false; unsorted_ = 0;
     faults_ = 0; motion_ = M_NONE; armed_ = false; last_rx_ = now; now_ = now;
     estop_low_valid_ = false; estop_low_since_ = now; estop_in_ = false; adc_ = 0;
-    tt_adc_ = 0; tt_prev_meas_ = 0.0f; tt_vel_ = 0.0f; tt_prev_t_ = now; tt_tol_since_ = now; tt_tol_on_ = false;
+    tt_adc_ = 0; tt_prev_meas_ = 0.0f; tt_vel_ = 0.0f; tt_prev_t_ = now; tt_tol_since_ = now; tt_tol_on_ = false; tt_holding_ = false;
     float home[2] = {cfg.home_tt_deg, cfg.home_st_deg};
     for (int i = 0; i < 2; i++) {
         ax_[i].rest_deg = ax_[i].cur_deg = home[i];
@@ -693,29 +693,44 @@ void Core::start_axis(int i, int32_t seq, float deg, float ms, uint32_t now) {
     save();
 }
 
-void Core::tt_closed_tick(uint32_t now, float el, float s) {
-    Axis& x = ax_[0];
-    float target = mv_.deg0 + (mv_.deg1 - mv_.deg0) * s;
-    float meas = tt_measured();
+void Core::tt_meas_update(uint32_t now, float meas) {
     uint32_t dt = (uint32_t)(now - tt_prev_t_);
     if (dt >= 20) {                                     // speed estimate every >= 20 ms, low-passed
-        float v = (meas - tt_prev_meas_) * 1000.0f / (float)dt;
-        tt_vel_ += 0.3f * (v - tt_vel_);
+        float dm = meas - tt_prev_meas_;
+        if (dm > 180.0f) dm -= 360.0f; else if (dm < -180.0f) dm += 360.0f;
+        tt_vel_ += 0.4f * (dm * 1000.0f / (float)dt - tt_vel_);
         tt_prev_meas_ = meas; tt_prev_t_ = now;
     }
-    float err = target - meas;
-    bool profile_done = el >= mv_.dur_ms;
-    float u = cfg_.tt_kp * err - cfg_.tt_kd * tt_vel_;
-    if (profile_done && fabsf(err) < cfg_.tt_db_deg) u = 0.0f;
+}
+
+float Core::tt_pulse(float u) const {                   // u in us past the deadband (signed), limited
     float lim = (float)cfg_.tt_max_off;
     if (u > lim) u = lim; else if (u < -lim) u = -lim;
-    float off = u > 0.0f ? (float)cfg_.tt_us_db + u : (u < 0.0f ? -(float)cfg_.tt_us_db + u : 0.0f);   // skip the deadband
-    x.us = (float)cfg_.tt_us_stop + (float)cfg_.tt_dir_sign * off;
+    float off = u > 0.0f ? (float)cfg_.tt_us_db + u : (u < 0.0f ? -(float)cfg_.tt_us_db + u : 0.0f);
+    return (float)cfg_.tt_us_stop + (float)cfg_.tt_dir_sign * off;
+}
+
+// Move: the target follows the smooth profile (slow start, slow stop); feedforward drives at the profile's speed,
+// P corrects the position lag, D the speed error. Done once inside tt_tol_deg for settle_ms.
+void Core::tt_closed_tick(uint32_t now, float el, float s) {
+    Axis& x = ax_[0];
+    float span = mv_.deg1 - mv_.deg0;
+    float target = mv_.deg0 + span * s;
+    float xr = mv_.dur_ms > 0.0f ? el / mv_.dur_ms : 1.0f;
+    float vref = (xr > 0.0f && xr < 1.0f) ? span * 6.0f * xr * (1.0f - xr) * 1000.0f / mv_.dur_ms : 0.0f;
+    float meas = tt_measured();
+    tt_meas_update(now, meas);
+    float err = target - meas;
+    bool profile_done = el >= mv_.dur_ms;
+    float u = cfg_.tt_kff * vref + cfg_.tt_kp * err + cfg_.tt_kd * (vref - tt_vel_);
+    if (profile_done && fabsf(err) < cfg_.tt_db_deg) u = 0.0f;
+    x.us = tt_pulse(u);
     x.cur_deg = meas;
     if (profile_done && fabsf(mv_.deg1 - meas) <= cfg_.tt_tol_deg) {
         if (!tt_tol_on_) { tt_tol_on_ = true; tt_tol_since_ = now; }
         if ((uint32_t)(now - tt_tol_since_) >= cfg_.settle_ms) {
-            x.rest_deg = mv_.deg1; x.known = true; x.driven = false;   // continuous servo: no pulses = stopped
+            x.rest_deg = mv_.deg1; x.known = true;      // keep driving: tt_hold_tick holds the target from here
+            tt_holding_ = false;
             motion_ = M_NONE;
             save();
             Writer w;
@@ -725,6 +740,18 @@ void Core::tt_closed_tick(uint32_t now, float el, float s) {
             send(w);
         }
     } else tt_tol_on_ = false;
+}
+
+// Between moves: stop pulse inside the band; past tt_hold_deg, P(D) back to rest until inside tt_db_deg again.
+void Core::tt_hold_tick(uint32_t now) {
+    Axis& x = ax_[0];
+    float meas = tt_measured();
+    tt_meas_update(now, meas);
+    x.cur_deg = meas;
+    float err = x.rest_deg - meas;
+    if (!tt_holding_ && fabsf(err) > cfg_.tt_hold_deg) tt_holding_ = true;
+    if (tt_holding_ && fabsf(err) < cfg_.tt_db_deg) tt_holding_ = false;
+    x.us = tt_holding_ ? tt_pulse(cfg_.tt_kp * err - cfg_.tt_kd * tt_vel_) : (float)cfg_.tt_us_stop;
 }
 
 void Core::axis_tick(uint32_t now) {
@@ -900,6 +927,7 @@ void Core::tick(uint32_t now, bool estop_open, uint16_t aug_adc) {
     if ((streaming_ || tare_pending_) && !(faults_ & F_HX_TIMEOUT) && (uint32_t)(now - hx_ref_) > hx_timeout_ms())
         fault(F_HX_TIMEOUT, now);
     if (motion_ == M_TT || motion_ == M_ST) axis_tick(now);
+    if (cfg_.tt_closed && motion_ != M_TT && ax_[0].driven && ax_[0].known && !faults_) tt_hold_tick(now);
     else if (motion_ == M_AUG) auger_tick(now, aug_adc);
     if (estop_open) all_off();                          // the D2 interrupt has already cut the PWM
 }

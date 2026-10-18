@@ -65,7 +65,8 @@ def test_carousel_station_angles(fresh):
     for (k, s), a in tab.items():                     # the compiled model puts that pocket on the update13_final station
         d.qpos[qa] = math.radians(a); mujoco.mj_kinematics(model, d)
         assert np.linalg.norm(mm(d.site('pocket%d' % k).xpos[:2]) - st['carousel_' + s]['xy']) < 0.2, (k, s)
-    assert travel_ms(180.0, C) == 8000 and travel_ms(45.0, C) == 2000 and travel_ms(0.0, C) == 0
+    k = C['min_s_per_45deg'] * 1000.0                 # ms per 45 deg (1.0 s since the closed-loop servo, 2026-10-18)
+    assert travel_ms(180.0, C) == round(4 * k) and travel_ms(45.0, C) == round(k) and travel_ms(0.0, C) == 0
 
 
 def test_pocket_bookkeeping():

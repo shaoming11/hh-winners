@@ -574,7 +574,7 @@ def firmware_config_expected(P=None):
         'stall_min_deg': A['stall_min_deg'], 'max_stalls': A['max_stalls'], 'reverse_deg': A['reverse_rev'] * 360.0,
         'fb_max_step_deg': M['aug_fb_max_step_deg'], 'fb_glitch_resync': M['aug_fb_glitch_resync'],
         'aug_timed': 1.0 if M['aug_timed'] else 0.0, 'tt_release': 1.0 if M['tt_release'] else 0.0, 'tt_closed': 1.0 if M['tt_closed'] else 0.0,
-        **{k: float(M[k]) for k in ('tt_adc_min', 'tt_adc_max', 'tt_fb_sign', 'tt_dir_sign', 'tt_fb_zero_deg', 'tt_us_stop', 'tt_us_db', 'tt_kp', 'tt_kd', 'tt_max_off', 'tt_tol_deg', 'tt_db_deg')}, 'aug_rev_per_s': M['aug_rev_per_s'], 'aug_start_ms': M['aug_start_ms'], 'aug_coast_rev': M['aug_coast_rev'],
+        **{k: float(M[k]) for k in ('tt_adc_min', 'tt_adc_max', 'tt_fb_sign', 'tt_dir_sign', 'tt_fb_zero_deg', 'tt_us_stop', 'tt_us_db', 'tt_kp', 'tt_kd', 'tt_kff', 'tt_hold_deg', 'tt_max_off', 'tt_tol_deg', 'tt_db_deg')}, 'aug_rev_per_s': M['aug_rev_per_s'], 'aug_start_ms': M['aug_start_ms'], 'aug_coast_rev': M['aug_coast_rev'],
     }
 
 
@@ -693,7 +693,7 @@ def firmware_test_script(P=None):
     S.cmd('STREAM', 'ok', on=True); S.cmd('TARE', 'ok', run=150); S.cmd('STREAM', 'ok', on=False)
     S.run(3600); S.add('expect_done %d 1' % s1); S.add('fw expect_known tt 1'); S.add('fw expect_out tt on'); S.add('fw expect_out st off')
     S.add('fw expect_persist tt 1 90.0')
-    S.cmd('TT', 'err:RANGE', deg=0.0, ms=3000)                    # 90 deg back needs >= 4000 - 50 ms
+    S.cmd('TT', 'err:RANGE', deg=0.0, ms=int(1500 * P['carousel']['min_s_per_45deg']))   # 90 deg back needs >= 2 x min_s_per_45deg s
     s = S.cmd('ST', 'ack', deg=150.0, ms=2500); S.run(3000); S.add('expect_done %d 1' % s); S.add('fw expect_out st on')
     s = S.cmd('ST', 'ack', deg=0.0, ms=2500); S.run(3000); S.add('expect_done %d 1' % s); S.add('fw expect_out aug off')
 
