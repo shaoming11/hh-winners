@@ -409,6 +409,8 @@ class LeRobotArm:
             present = self.read_ticks()
             self._write('Goal_Position', present)                                # never snap on enable
             self._write('Acceleration', {n: self._accel_reg() for n in JOINTS})
+            if self.cal.get('p_coefficient'):               # stiffer position loop (less gravity sag than LeRobot's 16)
+                self._write('P_Coefficient', {n: int(self.cal['p_coefficient']) for n in JOINTS})
             v = max(1, int(round(self.vmax_deg_s * self.tpr / 360.0 / self.sts['goal_velocity_unit_ticks_s'])))
             self._write('Goal_Velocity', {n: v for n in JOINTS})
             self._write('Torque_Enable', {n: 1 for n in JOINTS})
