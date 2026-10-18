@@ -277,7 +277,7 @@ static const Field FIELDS[] = {
     F('f', counts_per_g), F('f', tt.us_at_zero), F('f', tt.us_per_deg), F('f', st.us_at_zero), F('f', st.us_per_deg),
     F('h', us_min), F('h', us_max), F('f', home_tt_deg), F('f', home_st_deg), F('h', aug_us_stop), F('h', aug_us_offset),
     F('c', aug_dir_sign), F('c', aug_fb_sign), F('h', aug_adc_min), F('h', aug_adc_max), F('u', stall_window_ms),
-    F('f', stall_min_deg), F('b', max_stalls), F('f', reverse_deg), F('f', fb_max_step_deg), F('b', fb_glitch_resync), F('b', aug_timed), F('f', aug_rev_per_s), F('u', aug_start_ms), F('f', aug_coast_rev), F('b', tt_release),
+    F('f', stall_min_deg), F('b', max_stalls), F('f', reverse_deg), F('f', fb_max_step_deg), F('b', fb_glitch_resync), F('b', aug_timed), F('f', aug_rev_per_s), F('u', aug_start_ms), F('f', aug_coast_rev), F('b', tt_release), F('b', tt_closed), F('h', tt_adc_min), F('h', tt_adc_max), F('c', tt_fb_sign), F('c', tt_dir_sign), F('f', tt_fb_zero_deg), F('h', tt_us_stop), F('f', tt_kp), F('f', tt_kd), F('h', tt_max_off), F('f', tt_tol_deg), F('f', tt_db_deg),
 };
 #undef F
 
@@ -374,7 +374,8 @@ static void run_script(std::istream& in) {
     Rig rig;
     Config base;
     default_config(base);
-    base.tt_release = 0;                            // the shared script checks TT holding; release is a bench option
+    base.tt_release = 0;
+    base.tt_closed = 0;                             // closed-loop carousel is a bench option with its own feedback                            // the shared script checks TT holding; release is a bench option
     base.aug_timed = 0;                             // the shared script exercises the feedback mode; timed mode has fw-only checks
     Config cfg = base;
     double plant_rev_s = 1.2;
@@ -515,6 +516,7 @@ static int live(double grams) {
     Config cfg;
     default_config(cfg);
     cfg.tt_release = 0;
+    cfg.tt_closed = 0;
     cfg.aug_timed = 0;                              // the live plant simulates the feedback wire
     Plant plant;
     plant.grams = grams;

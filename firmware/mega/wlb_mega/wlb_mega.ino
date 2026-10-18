@@ -38,6 +38,7 @@
 #define AUG_BIT _BV(PH5)            // D8 = PH5 / OC4C: auger FB5311M-360
 #define SERVO_BITS (TT_BIT | ST_BIT | AUG_BIT)
 #define AUG_FB_PIN A2               // A2 = PF2 / ADC2: auger position feedback (AVcc reference)
+#define TT_FB_PIN A3                // A3 = PF3 / ADC3: carousel continuous-servo position feedback (tt_closed)
 
 #define COM_TT _BV(COM4A1)
 #define COM_ST _BV(COM4B1)
@@ -206,6 +207,7 @@ void loop() {
         estop_isr = false;
         estop = true;
     }
+    core.set_tt_adc((uint16_t)analogRead(TT_FB_PIN));
     core.tick(millis(), estop, (uint16_t)analogRead(AUG_FB_PIN));
     apply_outputs(estop);
 }

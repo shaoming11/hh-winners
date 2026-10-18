@@ -413,7 +413,10 @@ void default_config(Config& c) {
     c.home_st_deg = 0.0f;                             // [stage] work_deg
     // FB5311M-360 auger ([mega] aug_*; [auger] stall rule)
     c.aug_us_stop = 1500; c.aug_us_offset = 200;
-    c.tt_release = 1;                                 // [mega] tt_release: deck held by friction between moves (2026-10-17)
+    c.tt_release = 1;
+    c.tt_closed = 0;                                  // [mega] tt_closed: set to 1 once the A3 feedback is calibrated
+    c.tt_adc_min = 0; c.tt_adc_max = 1023; c.tt_fb_sign = 1; c.tt_dir_sign = 1; c.tt_fb_zero_deg = 0.0f;
+    c.tt_us_stop = 1500; c.tt_kp = 4.0f; c.tt_kd = 0.0f; c.tt_max_off = 150; c.tt_tol_deg = 1.5f; c.tt_db_deg = 1.0f;                                 // [mega] tt_release: deck held by friction between moves (2026-10-17)
     c.aug_timed = 1;                                  // [mega] aug_timed: the A2 feedback wire is not fitted yet
     c.aug_rev_per_s = 0.37f;                          // [mega] aug_rev_per_s: fit 2026-10-17, turns = 0.37 * s + 0.19 (4 doses)
     c.aug_start_ms = 0;                               // [mega] aug_start_ms
@@ -449,6 +452,7 @@ void Core::begin(const Config& cfg, uint32_t now, const Persist* restored, EmitF
     line_n_ = 0; overflow_ = false; unsorted_ = 0;
     faults_ = 0; motion_ = M_NONE; armed_ = false; last_rx_ = now; now_ = now;
     estop_low_valid_ = false; estop_low_since_ = now; estop_in_ = false; adc_ = 0;
+    tt_adc_ = 0; tt_prev_meas_ = 0.0f; tt_vel_ = 0.0f; tt_prev_t_ = now; tt_tol_since_ = now; tt_tol_on_ = false;
     float home[2] = {cfg.home_tt_deg, cfg.home_st_deg};
     for (int i = 0; i < 2; i++) {
         ax_[i].rest_deg = ax_[i].cur_deg = home[i];
@@ -485,7 +489,18 @@ void Core::feed(char c, uint32_t now) {
     else overflow_ = true;
 }
 
+float Core::tt_measured() const {
+    float span = (float)cfg_.tt_adc_max - (float)cfg_.tt_adc_min;
+    float a = span > 0.0f ? ((float)tt_adc_ - (float)cfg_.tt_adc_min) / span * 360.0f : 0.0f;
+    a = (float)cfg_.tt_fb_sign * a - cfg_.tt_fb_zero_deg;
+    float lo = 0.5f * (cfg_.tt_lo_deg + cfg_.tt_hi_deg) - 180.0f;   // one turn centred on the deck range
+    while (a < lo) a += 360.0f;
+    while (a >= lo + 360.0f) a -= 360.0f;
+    return a;
+}
+
 bool Core::current_deg(int i, float& deg) const {
+    if (i == 0 && cfg_.tt_closed) { deg = tt_measured(); return true; }   // the feedback always knows
     if ((motion_ == M_TT && i == 0) || (motion_ == M_ST && i == 1)) { deg = ax_[i].cur_deg; return true; }
     if (ax_[i].known) { deg = ax_[i].rest_deg; return true; }
     return false;
@@ -532,7 +547,7 @@ int Core::validate(const FlatObject& o, uint8_t& cmd, char* detail) {
             return E_RANGE;
         }
         float us = deg_to_us(i, deg);                   // firmware-only: the pulse must be a servo pulse
-        if (!(us >= cfg_.us_min && us <= cfg_.us_max)) { d.s(nm).s(" pulse ").f(us, 0).s(" us outside the servo range"); return E_RANGE; }
+        if (!(i == 0 && cfg_.tt_closed) && !(us >= cfg_.us_min && us <= cfg_.us_max)) { d.s(nm).s(" pulse ").f(us, 0).s(" us outside the servo range"); return E_RANGE; }
         if (i == 0) {
             float cur;
             float span = current_deg(0, cur) ? fabsf(deg - cur) : 0.0f;
@@ -662,10 +677,48 @@ void Core::start_axis(int i, int32_t seq, float deg, float ms, uint32_t now) {
     mv_.us1 = deg_to_us(i, deg);
     x.cur_deg = x.rest_deg;
     x.us = mv_.us0;                                     // the first pulse is the rest position: no snap
+    if (i == 0 && cfg_.tt_closed) {
+        mv_.deg0 = x.cur_deg = tt_measured();
+        x.us = (float)cfg_.tt_us_stop;
+        tt_prev_meas_ = mv_.deg0; tt_prev_t_ = now; tt_vel_ = 0.0f; tt_tol_on_ = false;
+    }
     x.driven = true;
     x.known = false;                                    // persisted: a reset during the move boots unknown
     motion_ = i ? M_ST : M_TT;
     save();
+}
+
+void Core::tt_closed_tick(uint32_t now, float el, float s) {
+    Axis& x = ax_[0];
+    float target = mv_.deg0 + (mv_.deg1 - mv_.deg0) * s;
+    float meas = tt_measured();
+    uint32_t dt = (uint32_t)(now - tt_prev_t_);
+    if (dt >= 20) {                                     // speed estimate every >= 20 ms, low-passed
+        float v = (meas - tt_prev_meas_) * 1000.0f / (float)dt;
+        tt_vel_ += 0.3f * (v - tt_vel_);
+        tt_prev_meas_ = meas; tt_prev_t_ = now;
+    }
+    float err = target - meas;
+    bool profile_done = el >= mv_.dur_ms;
+    float u = cfg_.tt_kp * err - cfg_.tt_kd * tt_vel_;
+    if (profile_done && fabsf(err) < cfg_.tt_db_deg) u = 0.0f;
+    float lim = (float)cfg_.tt_max_off;
+    if (u > lim) u = lim; else if (u < -lim) u = -lim;
+    x.us = (float)cfg_.tt_us_stop + (float)cfg_.tt_dir_sign * u;
+    x.cur_deg = meas;
+    if (profile_done && fabsf(mv_.deg1 - meas) <= cfg_.tt_tol_deg) {
+        if (!tt_tol_on_) { tt_tol_on_ = true; tt_tol_since_ = now; }
+        if ((uint32_t)(now - tt_tol_since_) >= cfg_.settle_ms) {
+            x.rest_deg = mv_.deg1; x.known = true; x.driven = false;   // continuous servo: no pulses = stopped
+            motion_ = M_NONE;
+            save();
+            Writer w;
+            w.begin(out_, OUT_MAX);
+            w.str("cmd", "TT"); w.num("deg", meas, 2); w.boolean("done", true);
+            w.integer("seq", mv_.seq); w.uinteger("t", now);
+            send(w);
+        }
+    } else tt_tol_on_ = false;
 }
 
 void Core::axis_tick(uint32_t now) {
@@ -674,6 +727,7 @@ void Core::axis_tick(uint32_t now) {
     float el = (float)(uint32_t)(now - mv_.t0);
     if (el > mv_.timeout_ms) { fault(i ? F_ST_TIMEOUT : F_TT_TIMEOUT, now); return; }
     float s = mv_.dur_ms > 0.0f ? smooth_(el / mv_.dur_ms) : 1.0f;
+    if (i == 0 && cfg_.tt_closed) { tt_closed_tick(now, el, s); return; }
     x.us = mv_.us0 + (mv_.us1 - mv_.us0) * s;
     x.cur_deg = mv_.deg0 + (mv_.deg1 - mv_.deg0) * s;
     if (el >= mv_.dur_ms + (float)cfg_.settle_ms) {    // open loop: done once the profile ended and settled
@@ -914,6 +968,7 @@ void Core::reply_ping(int32_t seq, uint32_t now) {
     if (kst) w.num("st", st, 2); else w.null("st");
     w.uinteger("t", now);
     if (ktt) w.num("tt", tt, 2); else w.null("tt");
+    if (cfg_.tt_closed) w.integer("tt_adc", tt_adc_);   // firmware-only: raw A3, for calibrating the feedback
     send(w);
 }
 

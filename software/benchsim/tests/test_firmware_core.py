@@ -155,6 +155,7 @@ extern volatile uint16_t TCNT4, ICR4, OCR4A, OCR4B, OCR4C;
 enum { PB5 = 5, PC6 = 6, PE3 = 3, PE4 = 4, PE5 = 5, PG5 = 5, PH3 = 3, PH4 = 4, PH5 = 5, COM4A1 = 7, COM4A0 = 6, COM4B1 = 5, COM4B0 = 4, COM4C1 = 3,
        COM4C0 = 2, WGM41 = 1, WGM43 = 4, WGM42 = 3, CS41 = 1, TOV4 = 0, TOIE4 = 0 };
 #define A2 56
+#define A3 57
 #define INPUT_PULLUP 2
 #define RISING 3
 #define DEFAULT 1

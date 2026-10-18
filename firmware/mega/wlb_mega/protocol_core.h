@@ -131,8 +131,22 @@ struct Config {
     uint8_t aug_timed;         // 1 = no feedback wire: progress from time at aug_rev_per_s, no stall rule
     float aug_rev_per_s;       // measured auger speed at aug_us_offset (timed mode)
     uint32_t aug_start_ms;     // timed mode: spin-up time not counted as progress at the start of each dose
-    float aug_coast_rev;
-    uint8_t tt_release;        // 1 = stop the TT pulses once a move is done (heavy deck: the servo's own loop hunts while holding)       // timed mode: turns the screw coasts after the stop pulse; credited at the start of a dose
+    float aug_coast_rev;       // timed mode: turns the screw coasts after the stop pulse; credited at the start of a dose
+    uint8_t tt_release;        // 1 = stop the TT pulses once a move is done (heavy deck: the servo's own loop hunts while holding)
+    // closed-loop carousel (tt_closed = 1): continuous servo on D6 + its analog position feedback on A3.
+    // deck angle = tt_fb_sign * feedback angle - tt_fb_zero_deg (wrapped into the deck range); the target follows the
+    // same smooth profile as the open-loop move; pulse = tt_us_stop + tt_dir_sign * clamp(kp*err - kd*vel, +-tt_max_off)
+    uint8_t tt_closed;
+    uint16_t tt_adc_min, tt_adc_max; // feedback ADC over one turn
+    int8_t tt_fb_sign;         // +1: feedback angle grows with the deck angle
+    int8_t tt_dir_sign;        // +1: a pulse above tt_us_stop turns the deck toward + deg
+    float tt_fb_zero_deg;      // feedback angle (after tt_fb_sign) at deck 0
+    uint16_t tt_us_stop;       // continuous servo stop centre
+    float tt_kp;               // us per deg of error
+    float tt_kd;               // us per deg/s of measured speed
+    uint16_t tt_max_off;       // largest pulse offset from the stop centre
+    float tt_tol_deg;          // done when within this for settle_ms after the profile
+    float tt_db_deg;           // after the profile, no drive inside this error (stops the hunting)
     uint16_t aug_adc_min, aug_adc_max;
     uint32_t stall_window_ms;
     float stall_min_deg;
@@ -165,6 +179,8 @@ public:
     void handle_line(const char* line, size_t n, uint32_t now);
     void hx_sample(int32_t raw, uint32_t now);
     void tick(uint32_t now, bool estop_open, uint16_t aug_adc);
+    void set_tt_adc(uint16_t adc) { tt_adc_ = adc; }   // closed-loop carousel feedback (A3); call before tick()
+    float tt_measured() const;                          // deck angle from the A3 feedback
 
     uint16_t tt_us() const { return ax_[0].driven ? (uint16_t)(ax_[0].us + 0.5f) : 0; }
     uint16_t st_us() const { return ax_[1].driven ? (uint16_t)(ax_[1].us + 0.5f) : 0; }
@@ -207,6 +223,7 @@ private:
     void start_axis(int axis, int32_t seq, float deg, float ms, uint32_t now);
     void start_auger(int32_t seq, float rev, int8_t dir, uint32_t now);
     void axis_tick(uint32_t now);
+    void tt_closed_tick(uint32_t now, float el, float s);
     void auger_tick(uint32_t now, uint16_t adc);
     void begin_reverse(uint32_t now, uint8_t after);
     float fb_angle(uint16_t adc) const;
@@ -241,6 +258,10 @@ private:
     uint32_t estop_low_since_;
     bool estop_in_;
     uint16_t adc_;
+    uint16_t tt_adc_;
+    float tt_prev_meas_, tt_vel_;
+    uint32_t tt_prev_t_, tt_tol_since_;
+    bool tt_tol_on_;
 
     Axis ax_[2];
     AxisMove mv_;

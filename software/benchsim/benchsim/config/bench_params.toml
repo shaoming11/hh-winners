@@ -314,6 +314,18 @@ st_us_per_deg = 7.407407                    # assumed: 2000/270
 # FB5311M-360 auger (electrical.md 4 and 6, software_architecture.md 6)
 aug_us_stop = 1500                          # architecture 6: about 1500 us = stop; measure the exact centre (E8)
 aug_us_offset = 200                         # architecture 6: dosing pulse 1500 +- 200 us
+tt_closed = false                           # carousel on a continuous servo + A3 feedback with the firmware's own P(D) loop; on after the A3 calibration
+tt_adc_min = 0                              # A3 feedback ADC over one turn (calibrate)
+tt_adc_max = 1023
+tt_fb_sign = 1
+tt_dir_sign = 1
+tt_fb_zero_deg = 0.0
+tt_us_stop = 1500
+tt_kp = 4.0                                 # us of pulse offset per deg of error
+tt_kd = 0.0                                 # us per deg/s
+tt_max_off = 150
+tt_tol_deg = 1.5
+tt_db_deg = 1.0
 tt_release = true                           # 2026-10-17: the deck's inertia makes the TT servo hunt while holding; firmware stops its pulses after each move
 aug_timed = true                            # 2026-10-17: A2 feedback wire not fitted; firmware doses by time, no stall rule
 aug_rev_per_s = 0.37                        # fit 2026-10-17 to 4 empty doses seen by eye: turns = 0.37 * s + 0.19 (2.21 s -> 1.0, 4.17 -> 1.75, 4.76 -> 1.825, 5.09 -> 2.125)
