@@ -59,6 +59,19 @@ def demo_protocol(recipe=None):
     ]
 
 
+def flask_demo_protocol(recipe=None):
+    """the live-demo slot (about 80 s at real time): the operator mixes the yeast with the warm water beforehand and pours
+    it into the flask, so the auger dose, the water pour and the activation wait drop out. The developer is still weighed
+    closed loop on the scale, and its funnel pour meets the yeast and erupts."""
+    r = recipe or dict(developer_g=39.0, developer_tol_g=2.0)
+    return [
+        Step('TRANSFER', dict(beaker='P1', src='carousel_pick', dst='scale_pan'), '1 P1 carousel -> scale'),
+        Step('POUR_TO_SCALE', dict(reagent='developer', beaker='P1', target_g=r['developer_g'], tol_g=r['developer_tol_g'], relative=False),
+             '2 developer onto P1'),
+        Step('POUR_TO_FUNNEL', dict(beaker='P1', erupt=True), '3 P1 -> funnel, then ERUPT (yeast already in the flask)'),
+    ]
+
+
 def validate(steps, initial=None):
     """deterministic check of a step list. Simulates where each beaker is and what it holds (estimated masses) and
     returns (ok, problems: list of str). ``initial``: dict beaker -> location (default demo loading)."""

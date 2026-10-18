@@ -34,9 +34,29 @@ function toast(msg) {
 
 // ------------------------------------------------------------------ render
 function render(s) {
-  renderBar(s); renderSpeeds(s); renderCams(s); renderCaption(s); renderRun(s); renderChem(s); renderTwin(s);
+  renderBar(s); renderSpeeds(s); renderModes(s); renderCams(s); renderCaption(s); renderRun(s); renderChem(s); renderTwin(s);
   renderWire(s); renderErrors(s);
 }
+
+// Run mode (the backend only): the full process, or the live-demo slot with the yeast pre-mixed in the flask
+const MODES = { full: ['full run', 'the whole process: auger dose, water pour, activation wait'],
+                demo: ['demo', 'live-demo slot: yeast pre-mixed in the flask; weigh the peroxide, pour it, erupt (about 80 s)'] };
+let modeKey = '';
+function renderModes(s) {
+  const r = s.probes && s.probes.runner;
+  const modes = r && r.plan_modes;
+  $('plan-modes').hidden = $('plan-modes-div').hidden = !modes;
+  if (!modes) return;
+  const idle = r.phase === 'ready' || r.phase === 'finished';
+  const key = r.plan_mode + '|' + idle;
+  if (key === modeKey) return;
+  modeKey = key;
+  $('plan-modes').innerHTML = modes.map((m) => '<button data-mode="' + esc(m) + '" class="pill' + (m === r.plan_mode ? ' active' : '') + '"' +
+    (idle ? '' : ' disabled') + ' title="' + esc((MODES[m] || [m, ''])[1]) + '">' + esc((MODES[m] || [m])[0]) + '</button>').join('');
+}
+$('plan-modes').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-mode]'); if (b && !b.classList.contains('active')) command('mode/' + b.dataset.mode);
+});
 
 const SPEEDS = [0.5, 1, 2, 4, 8];
 let speedKey = '';

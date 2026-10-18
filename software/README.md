@@ -43,6 +43,11 @@ Useful environment variables: `WLB_RENDER=0` (headless, no camera), `WLB_FX=0` (
 the liquids, pour streams and foam: the bare MuJoCo scene), `WLB_RT=0` (run flat out instead of
 wall-clock pacing; the default is `1`), `WLB_BACKEND=real` (hardware).
 
+The dashboard's **full run | demo** switch picks the preset the Start button runs. *Full run* is the whole
+process (11 steps). *Demo* is the live-demo slot (3 steps, about 80 s to the eruption): the operator mixes
+the yeast with the warm water beforehand and pours it into the flask, and the bench weighs the peroxide,
+pours it and erupts. Switching rebuilds the simulated bench (`POST /api/mode/full`, `POST /api/mode/demo`).
+
 ## Running the bench without the backend
 
 benchsim stands alone, and its README is the detailed reference for the simulation itself

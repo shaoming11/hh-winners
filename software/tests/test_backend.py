@@ -317,6 +317,22 @@ def test_runner_reset_gives_fresh_bench(rig):
     assert s.bench_t < 1.0
 
 
+def test_runner_demo_mode_premixes_the_flask(rig):
+    rig.reset()
+    assert rig.runner.feed_control("mode/nope") == (False, "mode must be one of full, demo")
+    ok, msg = rig.runner.feed_control("mode/demo")
+    assert ok and "3 steps" in msg
+    plan = rig.runner.preset_plan()
+    assert [s.type for s in plan.steps] == ["TRANSFER", "POUR_TO_SCALE", "POUR_TO_FUNNEL"]
+    assert rig.runner.validate_plan(plan).ok
+    s = rig.store.snapshot()
+    assert s.mode == "idle" and s.vessels["flask"].contents_g.get("yeast") == pytest.approx(7.0)
+    assert rig.runner.feed.last["probes"]["runner"]["plan_mode"] == "demo"
+    ok, msg = rig.runner.feed_control("mode/full")              # back, for the tests below
+    assert ok and len(rig.runner.preset_plan().steps) == 11
+    assert not rig.store.snapshot().vessels["flask"].contents_g.get("yeast")
+
+
 def test_runner_only_one_excludes_erupt_and_motion_is_busy(rig):
     rig.reset()
     rep = rig.start(["1"])

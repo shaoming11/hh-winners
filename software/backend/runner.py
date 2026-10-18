@@ -63,16 +63,18 @@ class BenchRunner:
     IDLE_WALL_DT = 0.25       # wall seconds between idle nudges
     IDLE_STEP_S = 0.05        # bench seconds advanced per idle nudge
     SPEEDS = (0.5, 1.0, 2.0, 4.0, 8.0)
+    PLAN_MODES = ("full", "demo")
 
     def __init__(self, store: Store, cfg=None, backend: str = "sim", seed: int = 0,
                  render: bool = True, realtime: float = 1.0, out_root: Path | None = None,
-                 dev: bool = False, record: bool = True, fx: bool = True):
+                 dev: bool = False, record: bool = True, fx: bool = True, plan_mode: str = "full"):
         self.store = store
         self.cfg = cfg
         self.backend = backend
         self.seed = seed
         self.render = render
         self.fx = fx                          # the camera look (benchsim.fx: room, liquids, streams, foam)
+        self.plan_mode = plan_mode            # full: the whole process | demo: the live slot, yeast pre-mixed in the flask
         self.realtime = float(realtime)
         self.dev = dev
         self.record = record
@@ -153,6 +155,9 @@ class BenchRunner:
         self.run_obj = r = make_run(out_root, self.seed, dev=self.dev)
         self.b = r.bb
         w = r.bb.world
+        if self.plan_mode == "demo" and hasattr(r, "premix_flask"):
+            rec = Recipe()
+            r.premix_flask(rec.yeast_g, rec.water_g)
         self.pacer = Pacer(r.bb.clock, self.realtime if self.realtime > 0 else 0.0)
         probes = dict(r.probes, runner=self._info)
         if self.render:
@@ -162,7 +167,7 @@ class BenchRunner:
                                            cameras=self.video.cameras(), view=self.video.view())
         twin = Twin(w.m) if w is not None else None
         self.feed = Feed(r.bb, self._publish_snap, ledger=r.ledger, twin=twin, probes=probes).attach(r.seq)
-        self.feed.plan(r.steps)
+        self.feed.plan(self._steps_from_plan(self.preset_plan()) if self.plan_mode == "demo" else r.steps)
         r.seq.ctx.on_tick_hooks.append(self._gate)
         if w is not None:
             w.frame_hooks += [self._gate, self.pacer]
@@ -194,7 +199,11 @@ class BenchRunner:
 
     def _info(self) -> dict:
         """probes.runner - what the dashboard's header and speed buttons read"""
-        return dict(name=getattr(self.run_obj, "name", "benchsim"), phase=self.phase,
+        name = getattr(self.run_obj, "name", "benchsim")
+        if self.plan_mode == "demo":
+            name = "live demo, yeast pre-mixed in the flask (benchsim.demo_run)"
+        return dict(name=name, phase=self.phase,
+                    plan_mode=self.plan_mode, plan_modes=list(self.PLAN_MODES),
                     speed=self.pacer.speed if self.pacer else self.realtime,
                     rtf=self.pacer.rtf if self.pacer else None,
                     out=str(self.run_obj.rl.dir) if self.run_obj is not None else "")
@@ -331,6 +340,13 @@ class BenchRunner:
     def preset_plan(self, recipe: Recipe | None = None) -> PlanSchema:
         from benchsim.process import steps as S
         r = recipe or Recipe()
+        if self.plan_mode == "demo":
+            # The live-demo slot: the yeast and warm water were mixed by hand and are already in the flask
+            # (_build loads them in the sim), so only the developer is weighed and poured, and that pour erupts.
+            steps = S.flask_demo_protocol(dict(developer_g=r.developer_g, developer_tol_g=2.0))
+            return PlanSchema(title="elephant toothpaste (preset) - live demo, yeast pre-mixed in the flask",
+                              source="preset",
+                              steps=[PlanStep(type=s.type, params=s.params, label=s.label) for s in steps])
         steps = S.demo_protocol(dict(developer_g=r.developer_g, developer_tol_g=2.0, yeast_g=r.yeast_g,
                                      yeast_tol_g=0.7, water_g=r.water_g, water_tol_g=2.0,
                                      activate_wait_s=r.activate_s))
@@ -537,6 +553,31 @@ class BenchRunner:
             return HardwareReply(id=rid, ok=False, err="VALIDATION", message="use set_speed(x)")
         return HardwareReply(id=rid, ok=False, err="UNKNOWN", message=f"unknown action {action}")
 
+    def set_plan_mode(self, mode: str, by: str = "operator") -> HardwareReply:
+        """full | demo: which preset the next run uses.  The sim bench is rebuilt, so the flask holds the
+        pre-mixed yeast in demo mode and not in full mode."""
+        rid = f"mode-{int(time.time() * 1000)}"
+        if mode not in self.PLAN_MODES:
+            return HardwareReply(id=rid, ok=False, err="VALIDATION",
+                                 message="mode must be one of " + ", ".join(self.PLAN_MODES))
+        if self.running() or self.phase == "building":
+            return HardwareReply(id=rid, ok=False, err="BUSY", message=f"cannot change the run mode while {self.phase}")
+        if mode == self.plan_mode:
+            return HardwareReply(id=rid, ok=True, message=f"already in {mode} mode")
+        previous, self.plan_mode = self.plan_mode, mode
+        if self.backend == "sim":
+            rep = self.control("reset", by=by)
+            if not rep.ok:
+                self.plan_mode = previous
+                return rep
+        elif self.feed is not None:
+            self.feed.plan(self._steps_from_plan(self.preset_plan()))
+        n = len(self.preset_plan().steps)
+        self.store.event("command", f"run mode set to {mode} by {by}")
+        return HardwareReply(id=rid, ok=True,
+                             message=f"demo mode: {n} steps, yeast pre-mixed in the flask" if mode == "demo"
+                             else f"full run: {n} steps")
+
     def set_speed(self, x: float, by: str = "operator") -> HardwareReply:
         rid = f"spd-{int(time.time() * 1000)}"
         if x not in self.SPEEDS:
@@ -728,7 +769,7 @@ class BenchRunner:
 
     # ================================================================== the dashboard's control verbs
     def feed_control(self, cmd: str, by: str = "someone at the bench") -> tuple[bool, str]:
-        """POST /api/<cmd> from the dashboard page: start | stop | reset | speed/<x> | camera/<name>"""
+        """POST /api/<cmd> from the dashboard page: start | stop | reset | speed/<x> | camera/<name> | mode/<full|demo>"""
         if cmd == "start":
             if self.phase != "ready":
                 return False, f"cannot start while {self.phase} (reset first)"
@@ -753,6 +794,9 @@ class BenchRunner:
             return rep.ok, rep.message
         if cmd.startswith("camera/"):
             rep = self.set_camera(cmd.split("/", 1)[1])
+            return rep.ok, rep.message
+        if cmd.startswith("mode/"):
+            rep = self.set_plan_mode(cmd.split("/", 1)[1], by=by)
             return rep.ok, rep.message
         return False, f"unknown command {cmd}"
 

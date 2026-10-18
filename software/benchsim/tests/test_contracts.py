@@ -10,6 +10,14 @@ def test_demo_protocol_validates():
     assert ok, problems
 
 
+def test_flask_demo_protocol_validates():
+    demo = steps.flask_demo_protocol()
+    ok, problems = steps.validate(demo)
+    assert ok, problems
+    assert [s.type for s in demo] == ['TRANSFER', 'POUR_TO_SCALE', 'POUR_TO_FUNNEL'] and demo[-1].params['erupt'] is True
+    assert not {'DOSE_YEAST', 'VERIFY_MASS', 'WAIT'} & {s.type for s in demo}
+
+
 def test_validator_rejects_bad_orders():
     bad = steps.demo_protocol(); bad.insert(0, steps.Step('STAGE', dict(position='ERUPT')))
     ok, problems = steps.validate(bad)

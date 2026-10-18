@@ -62,6 +62,9 @@ class DemoRun:
         self.seq = sequencer.Sequencer(d.bb, d.make_skills(), d.rl, safe_stop=skills.safe_stop(d.bb, state.park_q()), precheck=d.precheck)
         self.probes = dict(foam=d.foam.state, hopper_g=lambda: round(d.L.mass('hopper'), 2))
 
+    def premix_flask(self, yeast_g, water_g):
+        self.d.premix_flask(yeast_g, water_g)
+
     def run(self):
         self.d.frame('overview', 'start'); self._t_wall = time.time()
         return self.seq.run(self.steps, approved_by='operator (dashboard)')

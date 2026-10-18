@@ -81,6 +81,10 @@ class SimDemo:
 
     def scale(self, n=24): return self.bb.mega.read_mass(n)
 
+    def premix_flask(self, yeast_g, water_g):
+        """live-demo loading (steps.flask_demo_protocol): the operator has mixed the yeast with the warm water and poured it into the flask"""
+        self.L.add('flask', 'yeast', yeast_g); self.L.add('flask', 'water', water_g); self.L.update_visuals()
+
     # ------------------------------------------------------------------ skills
     def make_skills(self):
         base = SK.make_skills(self.bb, self, self.params['gripper'], state.park_q(), self.params)

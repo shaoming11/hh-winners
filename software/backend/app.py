@@ -357,7 +357,7 @@ async def set_view(v: View):
 
 @app.post("/api/{cmd:path}")
 async def feed_command(cmd: str, request: Request):
-    """the dashboard's verbs: start | stop | reset | speed/<x> | camera/<name>"""
+    """the dashboard's verbs: start | stop | reset | speed/<x> | camera/<name> | mode/<full|demo>"""
     ok, msg = await asyncio.get_running_loop().run_in_executor(None, runner.feed_control, cmd)
     return JSONResponse({"ok": ok, "message": msg}, status_code=200 if ok else 409)
 

@@ -54,6 +54,10 @@ def describe(step):
             out['title'] = 'Pouring the hydrogen peroxide into the flask'
             out['chemical'] = REAGENT['developer']
         out['detail'] = 'Pourer arm empties %s through the funnel. Soap and dye are already in the flask.' % p['beaker']
+        if p.get('erupt') and p['beaker'] != 'P2':
+            # the live-demo plan (steps.flask_demo_protocol): the yeast went into the flask by hand, so the peroxide starts it
+            out['science'] = REACTION
+            out['detail'] = 'Pourer arm empties %s through the funnel. Soap, dye and the yeast mixed with warm water are already in the flask.' % p['beaker']
         if p.get('erupt'):
             out['title'] = out['title'].split(':')[0] + ', then ERUPTION: the sled carries the flask toward you'
             out['detail'] += (' As soon as the arm has lifted the beaker clear, a crank slides the flask 97 mm toward the audience; '
