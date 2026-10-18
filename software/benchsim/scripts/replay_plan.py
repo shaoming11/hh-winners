@@ -96,7 +96,7 @@ SPOT_SHIFT_MM = {}   # (spot: x, y) moves both the pick and the place there
 PLACE_SHIFT_MM = {'pourer_rack1': (-20.0, 0.0),
                   'transfer_scale': (-11.2, 9.9)}   # set P1 down 10 mm right + 10 mm toward the arm; the pan ring re-centres it, so step 4 picks at the taught spot   # place-back translation (world x, y): 2 cm to the operator's right
 POUR_DZ_MM = {'2': -10.0}                      # 1 cm lower than the plan (was 2: the gripper touched P1)
-POUR_PAN_DEG = {'2': -1.0}                     # base rotation of the pour (-4 then +3 = 1.5 cm to the right at 287 mm reach)                      # bench 2026-10-18: the peroxide pour over the scale 2 cm lower
+POUR_PAN_DEG = {'2': 3.0}                      # base rotation of the peroxide pour; 1 deg = 5 mm at the 287 mm reach, + = operator's left (2026-10-18: +4 = 2 cm left, was off-centre)
 SPOT_UP_MM = {'transfer_scale_side': 40.0}    # above the scale: 3 cm higher than the first side-grip run (top of the line may drift, see SPOT_IK_TOL)
 SPOT_IK_TOL = {'transfer_scale_side': 10.0, 'transfer_scale': 10.0}   # transfer_scale: the top of the empty-jaw lift-off drifts ~5 mm  # at the elbow limit the line cannot stay vertical: ~1 mm off 10 mm up, ~4 mm at 20, ~8 mm at 40
 SPOT_W_ORI = {}
@@ -419,7 +419,6 @@ GRIP_HOLD_S = 0.4        # after the jaws close or open
 APPROACH_GRIP_DEG = 85.0 # jaws almost fully open on every approach: the widest margin for a cup that is a bit off
 POUR_JUMP_DEG = 3.0      # the planned pour manifold swings the arm through ~17 deg/sample near 84-96 deg tilt: stop before
 POUR_DRAIN_S = 1.5       # hold at the deepest smooth tilt so the beaker empties
-SLED_RETURN_DELAY_S = 10.0   # end of run -> sled back out to WORK
 GRAB_HELD_DEG = 1.5      # jaws stopped this far short of the closed command = a beaker is in them (side grip: held 2.9-3.4, missed 0.2-0.5)
 GRABS = []               # (step, held, deg short) for the run summary
 PASS_DEG = 12.0          # intermediate waypoints: move on once inside this (the arm flows through them)
@@ -586,7 +585,7 @@ def play_segment(arm, seg, speed):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--speed', type=float, default=0.48, help='fraction of the calibration max speed (default 0.48)')
-    ap.add_argument('--cycles', type=int, default=1, help='repeat the whole run (the 4-step demo resets itself; use --end-turn 0)')
+    ap.add_argument('--cycles', type=int, default=1, help='repeat the whole run (the 4-step demo resets itself)')
     ap.add_argument('--steps', nargs='*', help='step numbers to run (default all), e.g. 1 4')
     ap.add_argument('--no-mega', action='store_true', help='leave the carousel alone')
     ap.add_argument('--yes', action='store_true', help='do not wait for Enter between steps')
@@ -714,9 +713,7 @@ def replay(bb, a):
                 tgt = cur + a.end_turn
                 if not lo <= tgt <= hi: tgt = cur - a.end_turn     # past the range end: the short way back (not a 270 deg swing)
                 r = turn_deck(mega, tgt, bench); print('carousel turned %+.0f deg to %.0f deg (end)' % (tgt - cur, r['deg']), flush=True)
-            if mega is not None:                            # and the sled back out to WORK, ready for the next run, after
-                print('sled back out in %.0f s (the foam settles)' % SLED_RETURN_DELAY_S, flush=True)
-                nap(SLED_RETURN_DELAY_S)                    # the reaction has had time to finish at the ERUPT end
+            if mega is not None:                            # and the sled back out to WORK, ready for the next run
                 St = bench['params']['stage']
                 r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['work_deg']), ms=int(St['move_s'] * 1000))
                 print('sled back out to %.0f deg (end)' % r['deg'], flush=True)
