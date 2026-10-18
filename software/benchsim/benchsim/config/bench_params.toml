@@ -40,7 +40,7 @@ od = 56.0
 height = 74.0
 wall = 1.2
 floor = 1.2
-empty_mass_g = 18.0                         # assumed
+empty_mass_g = 19.94                        # measured 2026-10-17 on the calibrated scale
 lip_radius = 28.0
 
 [scale]
