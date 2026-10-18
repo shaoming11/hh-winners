@@ -13,8 +13,12 @@ def test_full_demo_passes_every_step():
     assert d['summary']['state'] == 'DONE' and d['summary']['failed'] == 0 and d['summary']['skipped'] == 0
     m = {s['label']: s['measured'] for s in d['steps']}
     assert abs(m['2 developer onto P1']['added_g'] - 39.0) <= 2.0
-    assert abs(m['6 verify yeast']['content_g'] - 7.0) <= 0.7
-    assert abs(m['7 water onto P2']['added_g'] - 30.0) <= 2.0
+    if '6 verify yeast' in m:                           # the full protocol (auger + water pour)
+        assert abs(m['6 verify yeast']['content_g'] - 7.0) <= 0.7
+        assert abs(m['7 water onto P2']['added_g'] - 30.0) <= 2.0
+    else:                                               # pre-mixed yeast-water: P2 empties into the funnel
+        p2 = [v for k, v in m.items() if k.startswith('8 P2')][0]
+        assert abs(p2['left_in_beaker_g']) <= 2.0
     assert (run / 'notebook.html').exists() and (run / 'scale.csv').exists()
 
 

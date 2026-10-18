@@ -155,6 +155,8 @@ yeast_tol_g = 0.7
 water_g = 30.0
 water_tol_g = 2.0
 activate_wait_s = 60.0
+premixed_yeast_water = true                 # 2026-10-18: P2 is loaded already holding yeast_g yeast in water_g warm water (mixed by
+                                            # hand beforehand); the demo skips the yeast dose, the water pour and the wait
 
 [vision]
 # Shared image checks (benchsim.vision), applied identically to sim renders and webcam frames. Calibrated on the sim

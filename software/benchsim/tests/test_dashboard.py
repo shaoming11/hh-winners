@@ -154,9 +154,9 @@ def test_full_demo_through_the_dashboard_runner(tmp_path):
     hub = server.Hub(); snaps = []; pub = hub.publish
     hub.publish = lambda s: (snaps.append(s), pub(s))
     r = R.Runner(hub, make_run=R.make_run, speed=0, out_root=tmp_path); r.build()
-    assert isinstance(r.run_obj, R.DemoRun) and len(snaps[-1]['steps']) == 11
+    assert isinstance(r.run_obj, R.DemoRun) and len(snaps[-1]['steps']) == len(S.demo_protocol())
     r.control('start'); r._start()
-    assert r.result['state'] == 'DONE' and r.result['passed'] == 11, [(x['label'], x['reason']) for x in r.result['steps'] if x['status'] != 'passed']
+    assert r.result['state'] == 'DONE' and r.result['passed'] == len(S.demo_protocol()), [(x['label'], x['reason']) for x in r.result['steps'] if x['status'] != 'passed']
     reaction = [x for x in r.result['steps'] if x['type'] == 'POUR_TO_FUNNEL' and x['params']['erupt']][0]
     assert reaction['measured']['erupt_crank_deg'] > 140 and reaction['measured']['erupt_done_s'] < reaction['t_end']   # pushed before the return
     last = snaps[-1]
@@ -164,7 +164,9 @@ def test_full_demo_through_the_dashboard_runner(tmp_path):
     assert last['probes']['foam']['peak_mm'] > 0 and last['probes']['runner']['phase'] == 'finished'
     pours = [s['current'] for s in snaps if s['current'] and s['current']['type'] == 'POUR_TO_SCALE']
     assert pours and all(p['scale_start_g'] is not None for p in pours)
-    assert any('"cmd":"AUG"' in w['text'] for s in snaps for w in s['wire']) and any('"cmd":"ST"' in w['text'] for s in snaps for w in s['wire'])
+    premixed = __import__('benchsim.layout', fromlist=['x']).load_params()['recipe'].get('premixed_yeast_water', False)
+    assert premixed or any('"cmd":"AUG"' in w['text'] for s in snaps for w in s['wire'])      # no auger with pre-mixed yeast-water
+    assert any('"cmd":"ST"' in w['text'] for s in snaps for w in s['wire'])
     assert (r.run_obj.rl.dir / 'run_log.json').exists()
 
 
