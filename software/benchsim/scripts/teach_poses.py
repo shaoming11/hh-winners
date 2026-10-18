@@ -83,7 +83,7 @@ def main():
             if a.only and step not in a.only: continue
             if n < a.start: continue
             key = [k for k in plans if k.split()[0] == step][0]; s = plans[key]; arm = arms[s['arm']]
-            segs = rp.bench_segments(s['segments'], key)            # already includes earlier corrections
+            segs = rp.bench_segments(s['segments'], key, s['arm'])            # already includes earlier corrections
             idx = [i for i, g in enumerate(segs) if g['name'] == seg_name][0]
             print('\n=== %s (%s, step %s)' % (label, s['arm'], key), flush=True)
             for g in segs[:idx + 1]:
@@ -102,7 +102,7 @@ def main():
             rp.save_overrides(ov)
             print('   saved: %s' % ' '.join('%s %+.1f' % (n, x) for n, x in zip(('pan', 'lift', 'elbow', 'wflex', 'wroll', 'grip'), d)), flush=True)
             arm.set_torque(True)                                      # holds the taught pose
-            segs = rp.bench_segments(s['segments'], key)            # back out along the corrected path
+            segs = rp.bench_segments(s['segments'], key, s['arm'])            # back out along the corrected path
             for g in reversed(segs[:idx + 1]):                        # back out the way it came
                 back = dict(g); back['qs'] = g['qs'][::-1]; back['kind'] = 'cartesian' if len(g['qs']) > 2 else g['kind']
                 rp.play_segment(arm, back, a.speed)
