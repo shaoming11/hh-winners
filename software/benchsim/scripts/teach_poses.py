@@ -52,6 +52,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--only', nargs='*', help='step numbers to teach (default: all key poses)')
     ap.add_argument('--clear', action='store_true')
+    ap.add_argument('--from', dest='start', type=int, default=1, help='start at this key pose number (1-%d)' % len(KEY_POSES))
     ap.add_argument('--speed', type=float, default=0.5)
     a = ap.parse_args()
     if a.clear:
@@ -68,8 +69,9 @@ def main():
         for k in plans:
             if plans[k]['arm'] not in park: park[plans[k]['arm']] = plans[k]['segments'][0]['qs'][0]
         for name, q in park.items(): rp.go(arms[name], q, a.speed, 'park ' + name, tol=8.0, timeout=15.0)
-        for step, seg_name, label in KEY_POSES:
+        for n, (step, seg_name, label) in enumerate(KEY_POSES, 1):
             if a.only and step not in a.only: continue
+            if n < a.start: continue
             key = [k for k in plans if k.split()[0] == step][0]; s = plans[key]; arm = arms[s['arm']]
             segs = rp.bench_segments(s['segments'], key)            # already includes earlier corrections
             idx = [i for i, g in enumerate(segs) if g['name'] == seg_name][0]

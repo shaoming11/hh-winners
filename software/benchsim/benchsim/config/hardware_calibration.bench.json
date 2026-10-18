@@ -5,7 +5,7 @@
     "convention": "q_rad = sign * (ticks - tick_at_zero) * 2 pi / ticks_per_rev; q is the upstream so101_new_calib MJCF joint angle",
     "tick_at_zero": "Present_Position at LeRobot 0 deg = (range_min + range_max) / 2 of the LeRobot calibration; the bench check put both arms at LeRobot 0 and they matched the MJCF zero pose, + directions match the sim on every joint",
     "gripper": "tick_closed = LeRobot range_min (TPU fin-ray fingertips just touching), 1 deg per 4096/360 ticks; deg_open 100 at tick_closed + 1138",
-    "limits": "min_deg/max_deg default to the MJCF joint ranges rounded inward; narrow them to the bench's safe range",
+    "limits": "2026-10-18: each joint's measured LeRobot range minus 3 deg (the MJCF ranges were tighter than the arms and blocked hand-taught poses)",
     "fingerprint": "null until recorded: {joint: [Homing_Offset, Min_Position_Limit, Max_Position_Limit]} read with LeRobotArm.read_fingerprint(); a mismatch refuses the arm (wrong port or swapped arms)",
     "speeds": "2026-10-18: 120 deg/s, 600 deg/s^2 (60/300 bring-up values were sluggish); replay_plan runs at 60 % by default"
   },
@@ -53,8 +53,8 @@
           "id": 1,
           "tick_at_zero": 2144.0,
           "sign": 1,
-          "min_deg": -109.9,
-          "max_deg": 110.0
+          "min_deg": -117.2,
+          "max_deg": 117.2
         },
         "shoulder_lift": {
           "id": 2,
@@ -74,8 +74,8 @@
           "id": 4,
           "tick_at_zero": 2046.0,
           "sign": 1,
-          "min_deg": -95.0,
-          "max_deg": 94.9
+          "min_deg": -100.7,
+          "max_deg": 100.7
         },
         "wrist_roll": {
           "id": 5,
@@ -137,15 +137,15 @@
           "id": 1,
           "tick_at_zero": 2105.5,
           "sign": 1,
-          "min_deg": -109.9,
-          "max_deg": 110.0
+          "min_deg": -117.1,
+          "max_deg": 117.1
         },
         "shoulder_lift": {
           "id": 2,
           "tick_at_zero": 2092.5,
           "sign": 1,
-          "min_deg": -99.9,
-          "max_deg": 100.0
+          "min_deg": -111.4,
+          "max_deg": 111.4
         },
         "elbow_flex": {
           "id": 3,
@@ -158,8 +158,8 @@
           "id": 4,
           "tick_at_zero": 1925.5,
           "sign": 1,
-          "min_deg": -95.0,
-          "max_deg": 94.9
+          "min_deg": -100.9,
+          "max_deg": 100.9
         },
         "wrist_roll": {
           "id": 5,
