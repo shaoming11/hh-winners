@@ -131,7 +131,8 @@ def main():
     a = ap.parse_args()
     plans = json.loads((paths.SIM_ROOT / 'reports' / 'native_plans.json').read_text())['steps']
     premixed = layout.load_params()['recipe'].get('premixed_yeast_water', False)
-    order = [k for k in plans if (k.split()[0] in a.steps) if a.steps else not (premixed and k.startswith('7 '))]   # pre-mixed P2: no water pour
+    if a.steps: order = [k for k in plans if k.split()[0] in a.steps]
+    else: order = [k for k in plans if not (premixed and k.startswith('7 '))]   # pre-mixed P2: no water pour
     bench = layout.load_bench()
     kw = dict(PORTS, calibration_path=CAL, dry_run=a.check)
     if a.no_mega: kw['port_mega'] = None
