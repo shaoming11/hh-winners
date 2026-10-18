@@ -7,7 +7,8 @@
     "gripper": "tick_closed = LeRobot range_min (TPU fin-ray fingertips just touching), 1 deg per 4096/360 ticks; deg_open 100 at tick_closed + 1138",
     "limits": "2026-10-18: each joint's measured LeRobot range minus 3 deg (the MJCF ranges were tighter than the arms and blocked hand-taught poses)",
     "fingerprint": "null until recorded: {joint: [Homing_Offset, Min_Position_Limit, Max_Position_Limit]} read with LeRobotArm.read_fingerprint(); a mismatch refuses the arm (wrong port or swapped arms)",
-    "speeds": "2026-10-18: 120 deg/s, 600 deg/s^2 (60/300 bring-up values were sluggish); replay_plan runs at 60 % by default"
+    "speeds": "2026-10-18: 120 deg/s, 600 deg/s^2 (60/300 bring-up values were sluggish); replay_plan runs at 60 % by default",
+    "p_coefficient": "STS3215 P_Coefficient written at torque-on. 16 = LeRobot default; 32 was tried 2026-10-18 and made every move jerky"
   },
   "ticks_per_rev": 4096,
   "arms": {
@@ -93,7 +94,8 @@
           "min_deg": 0.0,
           "max_deg": 99.9
         }
-      }
+      },
+      "p_coefficient": 16
     },
     "transfer": {
       "lerobot_id": "wlb_transfer",
@@ -177,7 +179,8 @@
           "min_deg": 0.0,
           "max_deg": 99.9
         }
-      }
+      },
+      "p_coefficient": 16
     }
   }
 }
