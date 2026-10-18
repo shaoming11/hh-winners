@@ -4,7 +4,7 @@ scripts/replay_plan.py plays joint paths: it knows segment names and phases, not
 for.  This module gives a replay the same understanding a sequencer run has, without changing how the arms move:
 
 - **step meaning**: each route step ("2 developer pour") is matched to the process step of the same number
-  (benchsim.process.steps: POUR_TO_SCALE developer -> P1, 39 g +- 2), so it carries a type, params, a target and
+  (benchsim.process.steps: POUR_TO_SCALE developer -> P1, 19.5 g +- 1), so it carries a type, params, a target and
   the dashboard's narration;
 - **subgoals**: the step's segments, as played (replay_plan.bench_segments), grouped by phase into named parts -
   "reach P1 at carousel_pick", "grip P1", "lift P1 from carousel_pick", "pour developer into P1", "set P1 down
@@ -54,8 +54,8 @@ class ReplayModel:
         R = dict(params.get("recipe") or {})
         proto = []
         if R.get("yeast_in_flask"):
-            proto += S.flask_demo_protocol(dict(developer_g=R.get("developer_g", 39.0), developer_tol_g=R.get("developer_tol_g", 2.0)))
-        full = dict(developer_g=39.0, developer_tol_g=2.0, yeast_g=7.0, yeast_tol_g=0.7, water_g=30.0, water_tol_g=2.0,
+            proto += S.flask_demo_protocol(dict(developer_g=R.get("developer_g", 19.5), developer_tol_g=R.get("developer_tol_g", 1.0)))
+        full = dict(developer_g=19.5, developer_tol_g=1.0, yeast_g=3.5, yeast_tol_g=0.35, water_g=30.0, water_tol_g=2.0,
                     activate_wait_s=60.0)
         full.update({k: v for k, v in R.items() if k in full})
         proto += S.demo_protocol(full)

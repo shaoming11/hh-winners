@@ -326,7 +326,7 @@ def test_runner_demo_mode_premixes_the_flask(rig):
     assert [s.type for s in plan.steps] == ["TRANSFER", "POUR_TO_SCALE", "POUR_TO_FUNNEL"]
     assert rig.runner.validate_plan(plan).ok
     s = rig.store.snapshot()
-    assert s.mode == "idle" and s.vessels["flask"].contents_g.get("yeast") == pytest.approx(7.0)
+    assert s.mode == "idle" and s.vessels["flask"].contents_g.get("yeast") == pytest.approx(3.5)
     assert rig.runner.feed.last["probes"]["runner"]["plan_mode"] == "demo"
     ok, msg = rig.runner.feed_control("mode/full")              # back, for the tests below
     assert ok and len(rig.runner.preset_plan().steps) == 11

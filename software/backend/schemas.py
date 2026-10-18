@@ -138,8 +138,8 @@ class Plan(Strict):
 
 
 class Recipe(Strict):
-    developer_g: float = 39.0
-    yeast_g: float = 7.0
+    developer_g: float = 19.5        # half dose (2026-10-18; was 39 / 7)
+    yeast_g: float = 3.5
     water_g: float = 30.0
     activate_s: float = 60.0
     quick: bool = Field(False, description="demo-slot plan: the same chemistry minus the yeast re-weigh and the "
@@ -309,7 +309,7 @@ class StepState(Strict):
     narration: dict | None = Field(None, description="benchsim.dashboard.narration.describe(): title, detail, "
                                                      "arm, chemical, amount_g, tol_g, science, clearance. "
                                                      "`title` is the friendly prose for this step "
-                                                     "('Weighing out 39 g of hydrogen peroxide'); `name` stays terse.")
+                                                     "('Weighing out 19.5 g of hydrogen peroxide'); `name` stays terse.")
     t0: float | None = Field(None, description="bench seconds")
     t1: float | None = None
     subgoals: list[Subgoal] = Field(default_factory=list, description="hardware replay only: the step's phases and their checks")
