@@ -410,7 +410,7 @@ def main():
     ap.add_argument('--steps', nargs='*', help='step numbers to run (default all), e.g. 1 4')
     ap.add_argument('--no-mega', action='store_true', help='leave the carousel alone')
     ap.add_argument('--yes', action='store_true', help='do not wait for Enter between steps')
-    ap.add_argument('--end-turn', type=float, default=90.0, help='carousel angle at the very end (0 = no turn; default 90)')
+    ap.add_argument('--end-turn', type=float, default=0.0, help='carousel angle at the very end (0 = no turn, the default)')
     ap.add_argument('--rest', action='store_true', help='only send both arms to the rest pose, then torque off')
     ap.add_argument('--check', action='store_true', help='pre-flight only: open the ports read-only, check every waypoint, move nothing')
     a = ap.parse_args()
@@ -474,6 +474,11 @@ def main():
             if a.yes: print(msg)
             else: input(msg)
             if deck is not None and mega is not None:
+                # the four pockets are 90 deg apart: whichever cup sits at the pick spot is the one the operator loaded,
+                # so only nudge to the nearest pocket alignment (never carry the loaded cup away)
+                cur = mega.command('PING').get('tt') or 0.0; C = bench['params']['carousel']
+                cands = [deck + 90.0 * n for n in range(-4, 5) if C['deck_range_deg'][0] <= deck + 90.0 * n <= C['deck_range_deg'][1]]
+                deck = min(cands, key=lambda d: abs(d - cur))
                 r = turn_deck(mega, deck, bench)
                 print('   carousel at %.1f deg' % r['deg'], flush=True)
             funnel = 'funnel' in k
