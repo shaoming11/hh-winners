@@ -404,7 +404,7 @@ void default_config(Config& c) {
     c.hx_timeout_intervals = 4;                       // [mega] hx_timeout_intervals (electrical.md 7)
     c.tare_samples = 8;                               // [mega] tare_samples
     c.hx_nominal_ms = 12.5f;                          // [scale] rate_hz = 80
-    c.counts_per_g = 420.0f;                          // [scale] counts_per_g
+    c.counts_per_g = 689.384f;                        // [scale] counts_per_g: measured 2026-10-17, 3 toonies = 21.14 g
     // M45CHW pulses ([mega] tt_/st_us_at_zero, tt_/st_us_per_deg; assumed until commissioning)
     c.tt.us_at_zero = 1134.4828f; c.tt.us_per_deg = 5.440613f;
     c.st.us_at_zero = 914.8149f; c.st.us_per_deg = 7.407407f;

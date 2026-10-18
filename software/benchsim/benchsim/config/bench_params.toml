@@ -55,7 +55,7 @@ stiffness_n_per_m = 20000.0                 # 1 kg bar cell, ~0.5 mm at full sca
 damping_ratio = 0.25                        # assumed
 rate_hz = 80.0                              # electrical.md 5 (RATE mod)
 noise_g = 0.07                              # electrical.md 5: 0.05-0.1 g at 80 SPS
-counts_per_g = 420.0                        # HX711 at gain 128 with a 1 kg cell, typical: assumed
+counts_per_g = 689.384                      # measured 2026-10-17: 3 Canadian $2 coins (2 x 6.92 + 7.30 = 21.14 g) -> 14573.5 counts; noise 0.03 g
 quant_counts = 1                            # one count quantisation
 
 [carousel]
