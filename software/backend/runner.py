@@ -98,6 +98,8 @@ class BenchRunner:
         self._run_steps: list = []
         self._out_root = out_root
         self._mech_fallback = None
+        self._replay = None                   # scripts/replay_plan.py while an emulated hardware replay holds the bench
+        self._observer = None                 # the last replay's ReplayObserver (beaker locations until the next build)
 
     # ================================================================== lifecycle
     def connect(self) -> None:
@@ -151,6 +153,7 @@ class BenchRunner:
         self.paused = False
         self._stop_request = None
         self._current_step = None
+        self._observer = None
         out_root = self._out_root or (self.store.dir / "runs")   # beside the store, so WLB_BACKEND_DIR moves run folders too
         self.run_obj = r = make_run(out_root, self.seed, dev=self.dev)
         self.b = r.bb
@@ -212,6 +215,9 @@ class BenchRunner:
     def _gate(self, *a) -> None:
         """pause / safe-stop, on the thread that is stepping the world.  Only BenchFault-equivalent
         stops may raise out of a hook, so a stop goes through the sequencer's own request_stop."""
+        if self._replay is not None:
+            self._replay_gate()
+            return
         ctx = self.run_obj.seq.ctx if self.run_obj is not None else None
         if self._stop_request and ctx is not None and ctx.stop_reason is None:
             reason, self._stop_request = self._stop_request, None
@@ -229,7 +235,7 @@ class BenchRunner:
 
     def _publish_snap(self, snap: dict) -> None:
         """the Feed's publish callback: the dashboard's view and the agents' view, from one poll"""
-        self.hub.publish(snap)
+        self.hub.publish(self._replay_view(snap))
         try:
             self._project(snap)
         except Exception as e:  # noqa: BLE001 - never break the feed over a projection bug
@@ -242,9 +248,56 @@ class BenchRunner:
             except Exception as e:  # noqa: BLE001
                 self.store.event("log", f"watchdog error ({type(e).__name__}: {e})", level="warning")
 
+    STEP_GLYPH = {"ok": "passed", "fault": "failed", "error": "failed", "running": "running", "skipped": "skipped"}
+    SUB_MARK = {"ok": "✓", "warning": "!", "failed": "✗", "unchecked": "?", "skipped": "–", "running": "▸", "pending": "·"}
+
+    def _replay_view(self, snap: dict) -> dict:
+        """while a hardware replay is (or was last) on the bench, the dashboard's run panel, caption and checks show
+        the replay - its steps, the subgoal being played and the failed checks - instead of the idle sequencer's plan.
+        A shallow copy: the agents' projection still reads the feed's own snapshot."""
+        if self._observer is None:
+            return snap
+        with self.store.lock:
+            run = self.store.state.run
+            run = run.model_copy(deep=True) if run is not None and run.kind == "hw_replay" else None
+        if run is None:
+            return snap
+        out = dict(snap)
+        out["steps"] = [dict(index=st.index, label=st.name, type=st.type or "TRANSFER",
+                             status=self.STEP_GLYPH.get(st.status, "pending"),
+                             reason=st.detail if st.status in ("fault", "error") else "") for st in run.steps]
+        active = self._replay is not None
+        out["seq_state"] = "RUNNING" if active else {"complete": "DONE", "SAFE_STOP": "SAFE_STOP"}.get(run.outcome, "FAILED")
+        if run.outcome == "SAFE_STOP" and run.faults:
+            out["stop_reason"] = run.faults[0]
+        out["errors"] = list(self._observer.failures)
+        cur = run.steps[run.current_step] if active and run.current_step is not None else None
+        if cur is not None and cur.status == "running":
+            sub = next((g for g in reversed(cur.subgoals) if g.status == "running"), None)   # a pour stays running until weighed
+            nar = dict(cur.narration or dict(title=cur.name, arm=None, science=None))
+            nar["title"] = f"{nar.get('title') or cur.name}" + (f" — {sub.name}" if sub else "")
+            nar["detail"] = "  ".join(f"{self.SUB_MARK.get(g.status, '·')} {g.name}" + (f" ({g.result})" if g.status in ("failed", "warning") else "")
+                                      for g in cur.subgoals)
+            nar["science"] = None
+            out["current"] = dict(index=cur.index, of=len(run.steps), type=cur.type or "", label=cur.name,
+                                  params=cur.params, elapsed_s=round((run.bench_seconds or 0) - (cur.t0 or 0), 2) if cur.t0 else 0.0,
+                                  remaining_s=None, narration=nar,
+                                  scale_start_g=self._observer.pour0 if cur.type == "POUR_TO_SCALE" else None)
+        else:
+            out["current"] = None
+        probes = dict(out.get("probes") or {})
+        r = dict(probes.get("runner") or {})
+        r["name"] = "hardware replay (replay_plan.py on emulated USB servos + Mega)"
+        r["phase"] = "running" if active else "finished"
+        probes["runner"] = r
+        out["probes"] = probes
+        return out
+
     def _project(self, snap: dict) -> None:
         seq = getattr(self.run_obj, "seq", None)
         locations = (seq.ctx.state.get("beakers") if seq is not None else None) or {}
+        if self._observer is not None and (self._replay is not None or self.phase == "finished"):
+            locations = self._observer.locations          # a replay's own bookkeeping (the sequencer did not run)
         p = project.project(snap, self.b, getattr(self.run_obj, "ledger", None), locations)
         rows = project.steps_from(snap)
         pending = any(a.status == "pending" for a in self.store.approvals.values())
@@ -259,6 +312,8 @@ class BenchRunner:
                     s.mode = mode
                 return
             s.mode = mode
+            if self._replay is not None or s.run.run_id.startswith("hw-"):
+                return                        # the replay keeps its own step rows (the feed shows the idle sequencer's)
             s.run.bench_seconds = p.bench_t
             cur = snap.get("current") or {}
             by_index = {r["index"]: r for r in rows}
@@ -617,6 +672,14 @@ class BenchRunner:
     def command(self, cmd: HardwareCommand, approved: bool = False) -> HardwareReply:
         if cmd.kind == "run_plan":
             return self.start_run(cmd)
+        if cmd.kind == "hw_replay":
+            if cmd.source == "agent" and not approved:
+                req = self.store.request_approval("hardware_command", cmd.model_dump(), _brief(cmd), cmd.source,
+                                                  person=cmd.requested_by or "")
+                return HardwareReply(id=cmd.id, ok=False, err="NEEDS_APPROVAL",
+                                     message="a human must approve the hardware replay",
+                                     data={"request_id": req.id})
+            return self.start_hw_replay(cmd)
         if cmd.kind == "run_control":
             return self.control(cmd.action, by=f"{cmd.source}:{cmd.note or '-'}")
         if cmd.kind == "approval":
@@ -741,6 +804,145 @@ class BenchRunner:
             except Exception as e:  # noqa: BLE001
                 return {"ok": True, "estop": bool(pressed), "warning": f"{type(e).__name__}: {e}"}
         return {"ok": True, "estop": bool(pressed), "faults": sorted(getattr(self.b.mega_device, "faults", []))}
+
+    # ================================================================== emulated hardware replay
+    REPLAY_SCRIPT = SOFTWARE / "benchsim" / "scripts" / "replay_plan.py"
+
+    def _replay_module(self):
+        """scripts/replay_plan.py, imported once (it is a script, not a package module)"""
+        mod = sys.modules.get("benchsim_replay_plan")
+        if mod is None:
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("benchsim_replay_plan", self.REPLAY_SCRIPT)
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules["benchsim_replay_plan"] = mod
+            spec.loader.exec_module(mod)
+        return mod
+
+    def start_hw_replay(self, cmd) -> HardwareReply:
+        """replay_plan.py's dry run, unchanged above the bus: LeRobotArm + MegaClient/SerialTransport, with the
+        servos and the Mega emulated by this bench's world (benchsim.backends.emu).  Live on the dashboard and in
+        ExperimentState like a run; safe_stop freezes the arms the way Ctrl-C does on the real bench."""
+        if self.b is None or getattr(self.b, "world", None) is None:
+            return HardwareReply(id=cmd.id, ok=False, err="NOT_CONNECTED", message="needs the sim bench")
+        if self.running():
+            return HardwareReply(id=cmd.id, ok=False, err="BUSY", message="a run is already active")
+        if self.phase == "finished":
+            return HardwareReply(id=cmd.id, ok=False, err="STATE",
+                                 message="the bench has already run; reset it before the replay")
+        rp = self._replay_module()
+        plans = rp.load_plans()
+        keys = rp.select_steps(plans, cmd.steps)
+        if not keys:
+            return HardwareReply(id=cmd.id, ok=False, err="VALIDATION",
+                                 message=f"no planned steps match {cmd.steps}; steps are {[k.split()[0] for k in plans]}")
+        run_id = "hw-" + time.strftime("%Y%m%d_%H%M%S")
+        from benchsim.dashboard import narration
+        from benchsim.layout import load_params
+        from backend.replay_observer import ReplayModel
+        model = ReplayModel(rp, plans, keys, load_params(), narrate=lambda st: _narrate(narration, st))
+        rows = model.rows()
+        who = cmd.requested_by or cmd.source
+        rs = RunState(run_id=run_id, backend=self.backend, kind="hw_replay", started_at=now_iso(), operator=who,
+                      requested_by=cmd.requested_by,
+                      protocol_text=f"hardware replay (emulated USB) of native_plans.json at {cmd.speed:.0%} speed",
+                      plan=PlanSchema(title="hardware replay (emulated)", steps=[], source="manual",
+                                      notes="scripts/replay_plan.py on LeRobotArm + SerialTransport; servos and Mega "
+                                            "emulated by the simulator"),
+                      approved_by=who, approved_at=now_iso(), steps=rows, outcome="running")
+        if self.wd is not None:
+            self.wd.reset()
+        self.store.update(lambda s: (s.__setattr__("run", rs), s.__setattr__("mode", "running")))
+        self.store.event("command", f"hardware replay {run_id} started: {len(keys)} steps at {cmd.speed:.0%} speed, "
+                                    f"emulated servos + Mega; by {who}", source=cmd.source, run_id=run_id)
+        self.phase = "running"                # before the job runs, so a second request is refused BUSY
+        self._jobs.put(_Job(lambda: self._do_hw_replay(cmd, rs, keys, model), f"replay-{run_id}"))
+        return HardwareReply(id=cmd.id, ok=True, message="hardware replay started", data={"run_id": run_id})
+
+    def _replay_gate(self) -> None:
+        """frame hook while replaying: a stop raises ReplayStop out of the arm's wait (replay_plan freezes both arms);
+        pause holds the world inside the hook"""
+        rp = self._replay
+        if self._stop_request:
+            reason, self._stop_request = self._stop_request, None
+            raise rp.ReplayStop(reason)
+        if self.paused:
+            self.store.update(lambda s: s.__setattr__("mode", "paused"))
+            while self.paused and not self._closing and not self._stop_request:
+                time.sleep(0.05)
+            self.store.update(lambda s: s.__setattr__("mode", "running"))
+            if self._stop_request:
+                reason, self._stop_request = self._stop_request, None
+                raise rp.ReplayStop(reason)
+
+    def _do_hw_replay(self, cmd, rs: RunState, keys, model) -> None:
+        """on the bench thread"""
+        import types
+        from benchsim.backends.emu import make_emulated_bench
+        from backend.replay_observer import ReplayObserver
+        rp = self._replay_module()
+        w = self.b.world
+        last_line = [""]
+
+        def on_log(line):
+            if not line or line.startswith("Enter:"):
+                return
+            if line.startswith("stopping:") or " off after " not in line and not last_line[0].startswith("stopping:"):
+                last_line[0] = line.replace("stopping: ReplayStop ", "").replace("stopping: ", "")
+            level = "warning" if (" off after " in line or line.startswith("stopping")) else "info"
+            self.store.event("log", f"replay: {line}", level=level, run_id=rs.run_id, bench_t=round(w.time, 2))
+
+        self.paused = False
+        self._stop_request = None
+        self.pacer.reset()
+        rc, err = None, None
+        hw = None
+        obs = None
+        try:
+            hw = make_emulated_bench(self.b, rp.CAL)
+            rp.CLOCK = hw.clock
+            obs = self._observer = ReplayObserver(model, self.store, rs.run_id, hw, now=lambda: w.time)
+            rp.LOG_HOOKS[:] = [on_log]
+            rp.STEP_HOOKS[:] = [obs.on_step]
+            rp.SEG_HOOKS[:] = [obs.on_seg]
+            self._replay = rp
+            obs.start()
+            args = types.SimpleNamespace(speed=float(cmd.speed), steps=cmd.steps, no_mega=False, yes=True,
+                                         end_turn=90.0, rest=False, check=False)     # replay_plan's own defaults
+            rc = rp.replay(hw, args)
+        except Exception as e:  # noqa: BLE001
+            err = e
+            self.store.event("fault", f"hardware replay crashed: {type(e).__name__}: {e}\n{traceback.format_exc()}",
+                             level="error", run_id=rs.run_id)
+        finally:
+            self._replay = None
+            if obs is not None:
+                obs.close()
+            rp.LOG_HOOKS[:] = []
+            rp.STEP_HOOKS[:] = []
+            rp.SEG_HOOKS[:] = []
+            rp.CLOCK = rp.WallClock()
+            self.phase = "finished"           # the world has moved: reset before a run or another replay
+            self.feed.flush()
+        outcome = "complete" if rc == 0 else "SAFE_STOP" if rc == 2 else "aborted"
+        detail = str(err) if err else ("" if rc == 0 else last_line[0])
+
+        def fin(s):
+            if s.run is None or s.run.run_id != rs.run_id:
+                return
+            s.run.finished_at, s.run.outcome = now_iso(), outcome
+            s.run.bench_seconds = round(w.time, 2)
+            for st in s.run.steps:
+                if st.status == "running":
+                    st.status, st.detail = "fault", detail or "stopped"
+            if detail:
+                s.run.faults.append(detail)
+            s.run.faults.extend(obs.failures if obs is not None else [])
+            s.run.current_subgoal = None
+            s.mode = {"complete": "complete", "SAFE_STOP": "safe_stop"}.get(outcome, "error")
+        self.store.update(fin)
+        self.store.event("state", f"hardware replay {rs.run_id} {outcome}" + (f": {detail}" if detail else ""),
+                         level="info" if outcome == "complete" else "warning", run_id=rs.run_id)
 
     # ================================================================== approvals
     def decide(self, request_id: str, decision: str, by: str) -> HardwareReply:

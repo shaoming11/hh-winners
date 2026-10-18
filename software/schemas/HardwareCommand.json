@@ -448,6 +448,81 @@
    "title": "GripperCmd",
    "type": "object"
   },
+  "HwReplayCmd": {
+   "additionalProperties": false,
+   "description": "Replay the planned arm paths (benchsim/reports/native_plans.json) through the REAL hardware code -\nLeRobotArm on a Feetech bus, MegaClient over a serial port, scripts/replay_plan.py's step logic - with the\nUSB devices emulated by this bench's simulator.  The dry run of the physical bench, without the bench.",
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "hw_replay",
+     "default": "hw_replay",
+     "title": "Kind",
+     "type": "string"
+    },
+    "speed": {
+     "default": 0.6,
+     "description": "fraction of the calibrated max arm speed (replay_plan --speed)",
+     "exclusiveMinimum": 0,
+     "maximum": 1.0,
+     "title": "Speed",
+     "type": "number"
+    },
+    "steps": {
+     "anyOf": [
+      {
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "step numbers to run, e.g. ['1', '4']; default all planned steps",
+     "title": "Steps"
+    },
+    "requested_by": {
+     "default": "",
+     "title": "Requested By",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id"
+   ],
+   "title": "HwReplayCmd",
+   "type": "object"
+  },
   "MegaSimpleCmd": {
    "additionalProperties": false,
    "description": "the parameterless commands of the benchsim/firmware protocol (benchsim.protocol).\nWeight and mechanism positions are not asked for: they arrive on the sample stream and in\nExperimentState.",
@@ -993,6 +1068,7 @@
    "auger": "#/$defs/AugerCmd",
    "carousel": "#/$defs/CarouselCmd",
    "gripper": "#/$defs/GripperCmd",
+   "hw_replay": "#/$defs/HwReplayCmd",
    "mega": "#/$defs/MegaSimpleCmd",
    "run_control": "#/$defs/RunControlCmd",
    "run_plan": "#/$defs/RunPlanCmd",
@@ -1041,6 +1117,9 @@
   },
   {
    "$ref": "#/$defs/ApprovalCmd"
+  },
+  {
+   "$ref": "#/$defs/HwReplayCmd"
   }
  ],
  "$schema": "https://json-schema.org/draft/2020-12/schema",

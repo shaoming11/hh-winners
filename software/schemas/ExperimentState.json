@@ -970,6 +970,29 @@
      "title": "Backend",
      "type": "string"
     },
+    "kind": {
+     "default": "sequencer",
+     "description": "sequencer = the closed-loop process; hw_replay = the planned arm paths played through the hardware code",
+     "enum": [
+      "sequencer",
+      "hw_replay"
+     ],
+     "title": "Kind",
+     "type": "string"
+    },
+    "current_subgoal": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "hw_replay: 'step name / subgoal name' being played now",
+     "title": "Current Subgoal"
+    },
     "started_at": {
      "anyOf": [
       {
@@ -1434,6 +1457,14 @@
      ],
      "default": null,
      "title": "T1"
+    },
+    "subgoals": {
+     "description": "hardware replay only: the step's phases and their checks",
+     "items": {
+      "$ref": "#/$defs/Subgoal"
+     },
+     "title": "Subgoals",
+     "type": "array"
     }
    },
    "required": [
@@ -1441,6 +1472,96 @@
     "name"
    ],
    "title": "StepState",
+   "type": "object"
+  },
+  "Subgoal": {
+   "additionalProperties": false,
+   "description": "One phase of a step as the arm plays it (approach, grip, lift, pour, set down, ...), with what it\nshould achieve and what the bench measured.  Filled by the hardware replay (backend/replay_observer.py).",
+   "properties": {
+    "index": {
+     "title": "Index",
+     "type": "integer"
+    },
+    "name": {
+     "description": "what this part of the step is for: 'grip P1', 'pour developer into P1'",
+     "title": "Name",
+     "type": "string"
+    },
+    "phase": {
+     "description": "the plan's segment phase: approach | pick | carry | pour | drain | pour_back | place | retreat | park",
+     "title": "Phase",
+     "type": "string"
+    },
+    "status": {
+     "default": "pending",
+     "enum": [
+      "pending",
+      "running",
+      "ok",
+      "warning",
+      "failed",
+      "unchecked",
+      "skipped"
+     ],
+     "title": "Status",
+     "type": "string"
+    },
+    "expect": {
+     "default": "",
+     "description": "the success criterion, in words",
+     "title": "Expect",
+     "type": "string"
+    },
+    "result": {
+     "default": "",
+     "description": "what was measured",
+     "title": "Result",
+     "type": "string"
+    },
+    "code": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "check code when not ok: GRASP_MISS, LIFT_NOT_SEEN, PLACE_NOT_SEEN, DROPPED, REACH_SHORT, SCALE_DISTURBED, DOSE_ERROR, FUNNEL_NOT_EMPTIED",
+     "title": "Code"
+    },
+    "t0": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "T0"
+    },
+    "t1": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "T1"
+    }
+   },
+   "required": [
+    "index",
+    "name",
+    "phase"
+   ],
+   "title": "Subgoal",
    "type": "object"
   },
   "Validation": {

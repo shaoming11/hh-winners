@@ -178,11 +178,21 @@ def build(store: Store, runner) -> MCPServer:
         return runner.control(action, by=by).model_dump()
 
     @mcp.tool(description="Send one HardwareCommand (see get_schema('HardwareCommand')): carousel/stage/auger/"
-                          "tare/stream/mega(status|weight|ver|stop|clr)/arm_goals/gripper/arm_station/arm_torque. "
+                          "tare/stream/mega(status|weight|ver|stop|clr)/arm_goals/gripper/arm_station/arm_torque/hw_replay. "
                           "Read-only and stop commands run at once; motion is refused during a run and, from an "
                           "agent, creates an approval request.")
     def hardware_command(command: dict[str, Any]) -> dict:
         return _cmd(command, "agent")
+
+    @mcp.tool(description="Dry-run the PHYSICAL bench's code with no USB attached: replays the planned arm paths "
+                          "(native_plans.json, the steps scripts/replay_plan.py plays on the real SO-101 arms and "
+                          "carousel) through the real driver code - LeRobotArm on the Feetech bus, MegaClient over "
+                          "the serial port - with the servos and the Mega emulated by the simulator. Progress shows "
+                          "in get_state like a run (run_id starts 'hw-'), log lines in get_events. From the agent "
+                          "it creates an approval request first. steps like ['1','4']; speed 0-1 (default 0.6).")
+    def hardware_replay(speed: float = 0.6, steps: list[str] | None = None, requested_by: str = "") -> dict:
+        return _cmd({"kind": "hw_replay", "speed": speed, "steps": steps, "requested_by": requested_by,
+                     "note": f"requested over chat by {requested_by}" if requested_by else ""}, "agent")
 
     @mcp.tool(description="Sim only: press or release the e-stop to rehearse the safety path.")
     def simulate_estop(pressed: bool = True) -> dict:

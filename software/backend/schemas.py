@@ -160,6 +160,16 @@ class RunPlanCmd(_Cmd):
     idempotency_key: str | None = Field(None, description="e.g. the chat message id; a repeat returns the first reply instead of a second request")
 
 
+class HwReplayCmd(_Cmd):
+    """Replay the planned arm paths (benchsim/reports/native_plans.json) through the REAL hardware code -
+    LeRobotArm on a Feetech bus, MegaClient over a serial port, scripts/replay_plan.py's step logic - with the
+    USB devices emulated by this bench's simulator.  The dry run of the physical bench, without the bench."""
+    kind: Literal["hw_replay"] = "hw_replay"
+    speed: float = Field(0.6, gt=0, le=1.0, description="fraction of the calibrated max arm speed (replay_plan --speed)")
+    steps: list[str] | None = Field(None, description="step numbers to run, e.g. ['1', '4']; default all planned steps")
+    requested_by: str = ""
+
+
 class RunControlCmd(_Cmd):
     kind: Literal["run_control"] = "run_control"
     action: Literal["pause", "resume", "safe_stop", "abort", "reset"]
@@ -175,7 +185,7 @@ class ApprovalCmd(_Cmd):
 HardwareCommand = Annotated[
     Union[CarouselCmd, StageCmd, AugerCmd, MegaSimpleCmd, StreamCmd, TareCmd,
           ArmGoalsCmd, ArmTorqueCmd, GripperCmd, ArmStationCmd,
-          RunPlanCmd, RunControlCmd, ApprovalCmd],
+          RunPlanCmd, RunControlCmd, ApprovalCmd, HwReplayCmd],
     Field(discriminator="kind"),
 ]
 
@@ -264,6 +274,21 @@ class Dose(Strict):
     rev_first_pass: float | None = None
 
 
+class Subgoal(Strict):
+    """One phase of a step as the arm plays it (approach, grip, lift, pour, set down, ...), with what it
+    should achieve and what the bench measured.  Filled by the hardware replay (backend/replay_observer.py)."""
+    index: int
+    name: str = Field(..., description="what this part of the step is for: 'grip P1', 'pour developer into P1'")
+    phase: str = Field(..., description="the plan's segment phase: approach | pick | carry | pour | drain | pour_back | place | retreat | park")
+    status: Literal["pending", "running", "ok", "warning", "failed", "unchecked", "skipped"] = "pending"
+    expect: str = Field("", description="the success criterion, in words")
+    result: str = Field("", description="what was measured")
+    code: str | None = Field(None, description="check code when not ok: GRASP_MISS, LIFT_NOT_SEEN, PLACE_NOT_SEEN, "
+                                               "DROPPED, REACH_SHORT, SCALE_DISTURBED, DOSE_ERROR, FUNNEL_NOT_EMPTIED")
+    t0: float | None = None
+    t1: float | None = None
+
+
 class StepState(Strict):
     index: int
     name: str
@@ -277,6 +302,7 @@ class StepState(Strict):
                                                      "('Weighing out 39 g of hydrogen peroxide'); `name` stays terse.")
     t0: float | None = Field(None, description="bench seconds")
     t1: float | None = None
+    subgoals: list[Subgoal] = Field(default_factory=list, description="hardware replay only: the step's phases and their checks")
 
 
 class Validation(Strict):
@@ -288,6 +314,9 @@ class Validation(Strict):
 class RunState(Strict):
     run_id: str
     backend: Backend
+    kind: Literal["sequencer", "hw_replay"] = Field("sequencer", description="sequencer = the closed-loop process; "
+                                                   "hw_replay = the planned arm paths played through the hardware code")
+    current_subgoal: str | None = Field(None, description="hw_replay: 'step name / subgoal name' being played now")
     started_at: str | None = None
     finished_at: str | None = None
     operator: str = Field("", description="the human who approved / started it")
