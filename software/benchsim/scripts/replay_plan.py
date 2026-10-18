@@ -96,7 +96,7 @@ SPOT_SHIFT_MM = {}   # (spot: x, y) moves both the pick and the place there
 PLACE_SHIFT_MM = {'pourer_rack1': (-20.0, 0.0),
                   'transfer_scale': (-11.2, 9.9)}   # set P1 down 10 mm right + 10 mm toward the arm; the pan ring re-centres it, so step 4 picks at the taught spot   # place-back translation (world x, y): 2 cm to the operator's right
 POUR_DZ_MM = {'2': -10.0}                      # 1 cm lower than the plan (was 2: the gripper touched P1)
-POUR_PAN_DEG = {'2': 3.0}                      # base rotation of the peroxide pour; 1 deg = 5 mm at the 287 mm reach, + = operator's left (2026-10-18: +4 = 2 cm left, was off-centre)
+POUR_PAN_DEG = {'2': -5.0}                     # base rotation of the peroxide pour; 1 deg = ~5 mm, NEGATIVE = operator's left (sim: +4 deg moves the beaker 17 mm right). 2026-10-18: 2 cm left of -1
 SPOT_UP_MM = {'transfer_scale_side': 40.0}    # above the scale: 3 cm higher than the first side-grip run (top of the line may drift, see SPOT_IK_TOL)
 SPOT_IK_TOL = {'transfer_scale_side': 10.0, 'transfer_scale': 10.0}   # transfer_scale: the top of the empty-jaw lift-off drifts ~5 mm  # at the elbow limit the line cannot stay vertical: ~1 mm off 10 mm up, ~4 mm at 20, ~8 mm at 40
 SPOT_W_ORI = {}
