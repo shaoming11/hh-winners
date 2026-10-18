@@ -486,11 +486,7 @@ def main():
             if not err < 8.0: raise TimeoutError('%s arm did not get back to park (%.0f deg off)' % (s['arm'], err))
         if mega is not None and a.end_turn:             # finale: the next cup comes round to the pick spot
             r = turn_deck(mega, a.end_turn, bench); print('carousel turned to %.0f deg (end)' % r['deg'], flush=True)
-        for name, arm in arms.items():
-            if not a.yes: input('\nEnter: return %s to the rest pose ' % name)
-            go(arm, rest, min(a.speed, 0.3), 'rest ' + name)
-        for arm in arms.values(): arm.set_torque(False)
-        print('\ndone: both arms back at rest, torque off')
+        print('\ndone: both arms at park (up), torque on')      # no folded rest pose: it sat in the other arm's way
     except (KeyboardInterrupt, ConnectionError, TimeoutError, MegaError) as stop_reason:
         print('\nstopping:', type(stop_reason).__name__, stop_reason)
         for name, arm in arms.items():

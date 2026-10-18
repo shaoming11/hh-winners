@@ -27,9 +27,12 @@ def main():
     park = np.asarray(segs[0]['qs'][0], float)
     bb = rp.make_bench('real', allow_hardware=True, **dict(rp.PORTS, port_mega=None, calibration_path=rp.CAL, dry_run=False))
     arm = bb.arms[arm_name]
+    parks = {}
+    for k in plans:                                    # each arm's park pose (up): the other arm must be out of the way
+        if plans[k]['arm'] not in parks: parks[plans[k]['arm']] = plans[k]['segments'][0]['qs'][0]
     try:
-        arm.set_torque(True)
-        rp.go(arm, park, 0.5, 'park', tol=8.0, timeout=15.0)
+        for nm, a in bb.arms.items():
+            a.set_torque(True); rp.go(a, parks[nm], 0.5, 'park ' + nm, tol=8.0, timeout=15.0)
         rp.go(arm, above, 0.4, 'above the spot', tol=4.0, timeout=10.0)
         arm.set_torque(False)
         tp.wait_ok('%s: move it down so it would hold the beaker where it rests' % name)
@@ -44,7 +47,7 @@ def main():
     except KeyboardInterrupt:
         arm.set_torque(True); arm.set_goal(arm.read_positions(), 1.0); print('stopped: holding')
     finally:
-        arm.disconnect()
+        for a in bb.arms.values(): a.disconnect()
 
 
 if __name__ == '__main__':
