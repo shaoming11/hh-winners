@@ -61,15 +61,26 @@ def go(arm, q, speed, label='', tol=REACH_DEG, timeout=WAYPOINT_TIMEOUT_S, quiet
             time.sleep(0.05); continue
         if err < tol: return err
         time.sleep(0.03)
-    if not quiet: print('   %s: %.1f deg off after %.1f s, continuing' % (label, err, timeout), flush=True)
+    if not quiet:
+        try: d = np.degrees(arm.read_positions() - np.asarray(q, float))
+        except ConnectionError: d = np.full(6, np.nan)
+        names = ('pan', 'lift', 'elbow', 'wflex', 'wroll', 'grip')
+        print('   %s: %.1f deg off after %.1f s, continuing (%s)' % (label, err, timeout, ' '.join('%s %+.0f' % (k, v) for k, v in zip(names, d))), flush=True)
     return err
 
 
 def play_segment(arm, seg, speed):
     qs = seg['qs']
     if seg['kind'] == 'joint' and len(qs) == 2: qs = qs[1:]          # joint moves: straight to the end
-    for q in qs[:-1]: go(arm, q, speed, seg['name'], PASS_DEG, PASS_TIMEOUT_S, quiet=True)
-    go(arm, qs[-1], speed, seg['name'])
+    vmax = arm.vmax_deg_s * speed
+    prev = None
+    for q in qs[:-1]:                             # stream the path on a clock: each waypoint after its planned spacing
+        q = np.asarray(q, float)
+        dt = 0.0 if prev is None else float(np.degrees(np.abs(q - prev))[:5].max()) / vmax
+        try: arm.set_goal(q, speed_scale=speed)
+        except ConnectionError: pass              # a dropped packet: the next waypoint supersedes it
+        time.sleep(max(dt, 0.02)); prev = q
+    go(arm, qs[-1], speed, seg['name'])           # the segment end is waited for
 
 
 def main():
