@@ -181,3 +181,23 @@ test("alerts: a stop the person asked for is not announced to them, and not call
   assert.equal(sends.filter((s) => s.text === undefined).length, 0, "no camera still for a requested stop");
   w.close();
 });
+
+// Regression (2026-10-17, caught on a live phone): the case above used "safe_stop requested by op",
+// which runner.py never writes.  For safe_stop/abort it writes "stopped by <who>" (runner.py:517,
+// deliberately phrased the way a colleague would say it), so requestedBy() missed it, the stop read
+// as unexpected, and the person who texted "stop" was told "the bench stopped itself" - quoting
+// their own number back at them.  This runs the SAME assertions against the real wording.
+test("alerts: a requested stop in runner.py's own wording ('stopped by X') is not 'stopped itself'", async () => {
+  const w = watcher();
+  push(mkState({ mode: "running", run: mkRun("running") }));
+  await sleep(20);
+  const run = { ...mkRun("SAFE_STOP"), faults: ["stopped by +15550004"] };
+  push(mkState({ mode: "safe_stop", run, alerts: [mkAlert({ id: "f2", code: "FAULT", message: "SAFE_STOP: stopped by +15550004", step: "3 P1 -> funnel" })] }));
+  await until(() => notified.length >= 1);
+  await sleep(60);
+  const t = texts();
+  assert.ok(t.every((x) => !/stopped itself/.test(x)), "not the bench's doing");
+  assert.ok(t.every((x) => !/\+15550004/.test(x)), "never quotes the requester's own number back at them");
+  assert.equal(sends.filter((s) => s.text === undefined).length, 0, "no camera still for a requested stop");
+  w.close();
+});

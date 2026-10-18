@@ -17,7 +17,10 @@ export type Sender = {
   reach(target: { personId?: string; memo?: SpaceMemo }): Promise<null | { send(content: unknown): Promise<void>; memo: SpaceMemo; channel: string }>;
 };
 
-const REQUESTED_BY = /requested by (\S+)/i;
+// runner.py writes the human-facing wording: "stopped by X" for safe_stop/abort,
+// "pause|resume|reset by X", and "requested by X" elsewhere.  Match them all - missing one
+// makes a human-requested stop look unexpected and texts them "the bench stopped itself".
+const REQUESTED_BY = /\b(?:requested|stopped|safe_stop|abort(?:ed)?|paused?|resumed?|reset) by (\S+)/i;
 export const requestedBy = (text: string): string | null => REQUESTED_BY.exec(text)?.[1]?.replace(/[.,;:]$/, "") ?? null;
 
 export class AlertWatcher {
