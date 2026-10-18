@@ -410,7 +410,7 @@ def main():
     ap.add_argument('--steps', nargs='*', help='step numbers to run (default all), e.g. 1 4')
     ap.add_argument('--no-mega', action='store_true', help='leave the carousel alone')
     ap.add_argument('--yes', action='store_true', help='do not wait for Enter between steps')
-    ap.add_argument('--end-turn', type=float, default=0.0, help='carousel angle at the very end (0 = no turn, the default)')
+    ap.add_argument('--end-turn', type=float, default=90.0, help='turn the carousel by this many degrees at the very end, relative to where it is (0 = none; default 90)')
     ap.add_argument('--rest', action='store_true', help='only send both arms to the rest pose, then torque off')
     ap.add_argument('--check', action='store_true', help='pre-flight only: open the ports read-only, check every waypoint, move nothing')
     a = ap.parse_args()
@@ -495,8 +495,11 @@ def main():
             end = s['segments'][-1]['qs'][-1]
             err = go(arm, end, a.speed, 'back at park', tol=8.0, timeout=15.0)
             if not err < 8.0: raise TimeoutError('%s arm did not get back to park (%.0f deg off)' % (s['arm'], err))
-        if mega is not None and a.end_turn:             # finale: the next cup comes round to the pick spot
-            r = turn_deck(mega, a.end_turn, bench); print('carousel turned to %.0f deg (end)' % r['deg'], flush=True)
+        if mega is not None and a.end_turn:             # finale: the carousel turns a.end_turn deg from where it is
+            cur = mega.command('PING').get('tt') or 0.0; lo, hi = bench['params']['carousel']['deck_range_deg']
+            tgt = cur + a.end_turn
+            if not lo <= tgt <= hi: tgt = cur + a.end_turn - math.copysign(360.0, a.end_turn)   # same cup layout, other way round
+            r = turn_deck(mega, tgt, bench); print('carousel turned %+.0f deg to %.0f deg (end)' % (a.end_turn, r['deg']), flush=True)
         print('\ndone: both arms at park (up), torque on')      # no folded rest pose: it sat in the other arm's way
     except (KeyboardInterrupt, ConnectionError, TimeoutError, MegaError) as stop_reason:
         print('\nstopping:', type(stop_reason).__name__, stop_reason)
