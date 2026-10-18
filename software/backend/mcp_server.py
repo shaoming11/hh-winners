@@ -194,6 +194,18 @@ def build(store: Store, runner) -> MCPServer:
         return _cmd({"kind": "hw_replay", "speed": speed, "steps": steps, "requested_by": requested_by,
                      "note": f"requested over chat by {requested_by}" if requested_by else ""}, "agent")
 
+    @mcp.tool(description="Recorded hardware replays, newest first: run_id, where it ran (emulated / usb / usb-fake), "
+                          "outcome, steps, failed checks. Every hardware_replay is recorded.")
+    def list_recordings() -> list[dict]:
+        from backend.hardware import list_recordings as _list
+        return _list(store.dir / "runs")
+
+    @mcp.tool(description="Play a recorded hardware replay back in the SIM (nothing on the bench moves): the arms "
+                          "follow the recorded joint angles and the steps/subgoals/checks change when they did. Shows "
+                          "in get_state as a run with kind 'playback'. speed 1 = as recorded.")
+    def play_recording(run_id: str, speed: float = 1.0, requested_by: str = "") -> dict:
+        return _cmd({"kind": "playback", "run_id": run_id, "speed": speed, "requested_by": requested_by}, "agent")
+
     @mcp.tool(description="Sim only: press or release the e-stop to rehearse the safety path.")
     def simulate_estop(pressed: bool = True) -> dict:
         return runner.simulate_estop(pressed)

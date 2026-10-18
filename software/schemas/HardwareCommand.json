@@ -654,6 +654,71 @@
    "title": "PlanStep",
    "type": "object"
   },
+  "PlaybackCmd": {
+   "additionalProperties": false,
+   "description": "Play a recorded hardware replay (runs/<run_id>/telemetry.jsonl) back into the sim world: the arms follow the\nrecorded joint angles, the carousel and sled the recorded axes, and the steps / subgoals / checks change status\nwhen they did in the recording.  Sim only: nothing on the bench moves.",
+   "properties": {
+    "v": {
+     "default": "0.1.0",
+     "description": "schema version of this command",
+     "title": "V",
+     "type": "string"
+    },
+    "id": {
+     "description": "caller-chosen id; echoed in HardwareReply.id",
+     "title": "Id",
+     "type": "string"
+    },
+    "source": {
+     "default": "frontend",
+     "enum": [
+      "frontend",
+      "agent",
+      "operator",
+      "backend",
+      "sequencer"
+     ],
+     "title": "Source",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "description": "free text: why this command was issued (goes in the log)",
+     "title": "Note",
+     "type": "string"
+    },
+    "kind": {
+     "const": "playback",
+     "default": "playback",
+     "title": "Kind",
+     "type": "string"
+    },
+    "run_id": {
+     "description": "a recording, e.g. 'hw-20261018_021902' (GET /api/recordings)",
+     "title": "Run Id",
+     "type": "string"
+    },
+    "speed": {
+     "default": 1.0,
+     "description": "playback speed (1 = as recorded)",
+     "exclusiveMinimum": 0,
+     "maximum": 8.0,
+     "title": "Speed",
+     "type": "number"
+    },
+    "requested_by": {
+     "default": "",
+     "title": "Requested By",
+     "type": "string"
+    }
+   },
+   "required": [
+    "id",
+    "run_id"
+   ],
+   "title": "PlaybackCmd",
+   "type": "object"
+  },
   "Recipe": {
    "additionalProperties": false,
    "properties": {
@@ -1070,6 +1135,7 @@
    "gripper": "#/$defs/GripperCmd",
    "hw_replay": "#/$defs/HwReplayCmd",
    "mega": "#/$defs/MegaSimpleCmd",
+   "playback": "#/$defs/PlaybackCmd",
    "run_control": "#/$defs/RunControlCmd",
    "run_plan": "#/$defs/RunPlanCmd",
    "stage": "#/$defs/StageCmd",
@@ -1120,6 +1186,9 @@
   },
   {
    "$ref": "#/$defs/HwReplayCmd"
+  },
+  {
+   "$ref": "#/$defs/PlaybackCmd"
   }
  ],
  "$schema": "https://json-schema.org/draft/2020-12/schema",

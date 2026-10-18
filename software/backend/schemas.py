@@ -170,6 +170,16 @@ class HwReplayCmd(_Cmd):
     requested_by: str = ""
 
 
+class PlaybackCmd(_Cmd):
+    """Play a recorded hardware replay (runs/<run_id>/telemetry.jsonl) back into the sim world: the arms follow the
+    recorded joint angles, the carousel and sled the recorded axes, and the steps / subgoals / checks change status
+    when they did in the recording.  Sim only: nothing on the bench moves."""
+    kind: Literal["playback"] = "playback"
+    run_id: str = Field(..., description="a recording, e.g. 'hw-20261018_021902' (GET /api/recordings)")
+    speed: float = Field(1.0, gt=0, le=8.0, description="playback speed (1 = as recorded)")
+    requested_by: str = ""
+
+
 class RunControlCmd(_Cmd):
     kind: Literal["run_control"] = "run_control"
     action: Literal["pause", "resume", "safe_stop", "abort", "reset"]
@@ -185,7 +195,7 @@ class ApprovalCmd(_Cmd):
 HardwareCommand = Annotated[
     Union[CarouselCmd, StageCmd, AugerCmd, MegaSimpleCmd, StreamCmd, TareCmd,
           ArmGoalsCmd, ArmTorqueCmd, GripperCmd, ArmStationCmd,
-          RunPlanCmd, RunControlCmd, ApprovalCmd, HwReplayCmd],
+          RunPlanCmd, RunControlCmd, ApprovalCmd, HwReplayCmd, PlaybackCmd],
     Field(discriminator="kind"),
 ]
 
@@ -314,8 +324,9 @@ class Validation(Strict):
 class RunState(Strict):
     run_id: str
     backend: Backend
-    kind: Literal["sequencer", "hw_replay"] = Field("sequencer", description="sequencer = the closed-loop process; "
-                                                   "hw_replay = the planned arm paths played through the hardware code")
+    kind: Literal["sequencer", "hw_replay", "playback"] = Field("sequencer", description="sequencer = the closed-loop "
+                                                   "process; hw_replay = the planned arm paths played through the "
+                                                   "hardware code (recorded); playback = a recording replayed in the sim")
     current_subgoal: str | None = Field(None, description="hw_replay: 'step name / subgoal name' being played now")
     started_at: str | None = None
     finished_at: str | None = None

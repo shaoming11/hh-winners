@@ -41,6 +41,31 @@ open http://127.0.0.1:8000/          # the dashboard
 open http://127.0.0.1:8000/docs      # the API
 ```
 
+## Real bench, mirror, recordings (`hardware.py`, `replay_observer.py`)
+
+`WLB_BACKEND` picks what is behind the dashboard:
+
+| mode | hardware | the sim world shown |
+|---|---|---|
+| `sim` (default) | none; a hardware replay runs the real driver code on emulated USB (`benchsim/backends/emu.py`) | the bench itself |
+| `usb` | both SO-101 buses + the Mega (`WLB_MEGA`, `WLB_POURER`, `WLB_TRANSFER`, else replay_plan's ports) | a **mirror**: arms follow the encoders (gripper: the commanded angle, so grasps carry over), carousel/sled follow the Mega, scale = the real one |
+| `usb-fake` | a hidden sim bench behind emulated USB | a mirror of it (tests the usb path without a bench) |
+
+- The link opens **read-only** (every servo goal, torque write and TT/ST/AUG refused), so starting the backend never
+  moves or drops an arm. It goes live only while an approved `hw_replay` runs (`scripts/replay_plan.py`, unchanged
+  above the bus), then back to read-only.
+- On `usb` only `hw_replay` moves hardware: `start_run` and hand motion commands are refused (they would move the
+  mirror, not the bench). `reset` rebuilds the mirror with the standard loading: put the beakers back by hand.
+- A replay reports like a run: each route step is matched to the process step of the same number (type, target,
+  narration) and split into subgoals (reach, grip, lift, carry, lower, pour, drain, set down, back away, park), each
+  checked from encoder + scale readings. A failed check raises a warning alert; it never stops the replay. Nothing is
+  hand-annotated, so a route change needs no edits (`tests/test_replay_observer.py` checks the derivation).
+- Every replay is recorded to `runs/<run_id>/telemetry.jsonl` (20 Hz: joints, goals, axes, scale, subgoal) and
+  `run.json`. `GET /api/recordings`, then `POST /api/command {"kind":"playback","run_id":...}` plays one back in the
+  sim with its timeline (MCP: `list_recordings`, `play_recording`). Playback re-simulates the physics from the
+  recorded joint angles: the motion and the recorded checks and grams are exact; simulated liquid can land
+  differently.
+
 ## The three contracts (`schemas.py`, JSON Schema in `software/schemas/`)
 
 1. **HardwareCommand -> HardwareReply** (`POST /api/command`). Discriminated on `kind`:

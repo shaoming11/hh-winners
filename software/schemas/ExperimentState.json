@@ -972,10 +972,11 @@
     },
     "kind": {
      "default": "sequencer",
-     "description": "sequencer = the closed-loop process; hw_replay = the planned arm paths played through the hardware code",
+     "description": "sequencer = the closed-loop process; hw_replay = the planned arm paths played through the hardware code (recorded); playback = a recording replayed in the sim",
      "enum": [
       "sequencer",
-      "hw_replay"
+      "hw_replay",
+      "playback"
      ],
      "title": "Kind",
      "type": "string"

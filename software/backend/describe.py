@@ -56,28 +56,30 @@ def _replay_words(r) -> tuple[str, list[str]]:
     """a hardware replay: the planned arm paths played through the hardware code.  It measures (subgoal checks,
     grams on the scale) but never corrects, so say what it found rather than what it achieved."""
     lower = lambda t: t[0].lower() + t[1:] if t else t
+    what = "The hardware replay" if r.kind == "hw_replay" else f"The playback of recording {r.plan.notes if r.plan else ''}"
     step = r.steps[r.current_step] if r.current_step is not None and r.current_step < len(r.steps) else None
     failed = [(st, sg) for st in r.steps for sg in st.subgoals if sg.status == "failed"]
     warned = [(st, sg) for st in r.steps for sg in st.subgoals if sg.status == "warning"]
     if r.outcome == "running" and step is not None:
         now = r.current_subgoal.split(" / ", 1)[-1] if r.current_subgoal else ""
-        head = (f"The hardware replay is on step {r.current_step + 1} of {len(r.steps)}: {lower(_title(step))}"
+        head = (f"{what} is on step {r.current_step + 1} of {len(r.steps)}: {lower(_title(step))}"
                 + (f", now {now}" if now else "") + ".")
     elif r.outcome == "complete":
-        head = (f"The hardware replay played all {len(r.steps)} steps in {r.bench_seconds:.0f} s"
+        head = (f"{what} played all {len(r.steps)} steps in {r.bench_seconds:.0f} s"
                 + (f"; {len(failed)} check{'s' if len(failed) != 1 else ''} failed." if failed else ", every check passed."
                    if not warned else f", with {len(warned)} warning{'s' if len(warned) != 1 else ''}."))
     elif r.outcome == "SAFE_STOP":
         where = _title(step) if step else ""
-        head = (f"The hardware replay was stopped" + (f" during {lower(where)}" if where else "")
+        head = (f"{what} was stopped" + (f" during {lower(where)}" if where else "")
                 + ". The arms are frozen where they were, torque on.")
     else:
-        head = f"The hardware replay ended: {r.outcome}."
+        head = f"{what} ended: {r.outcome}."
     detail = [f"{st.name}: {sg.name} failed - {sg.result}." for st, sg in failed[:3]]
     detail += [f"{st.name}: {sg.name} - {sg.result}." for st, sg in warned[:2] if sg.code == "DOSE_ERROR"]
     if len(failed) > 3:
         detail.append(f"({len(failed) - 3} more failed checks in the run.)")
-    detail.append("A replay plays fixed arm paths and does not correct anything; the checks only report.")
+    detail.append("A replay plays fixed arm paths and does not correct anything; the checks only report."
+                  if r.kind == "hw_replay" else "This is the recorded run replayed in the sim; nothing on the bench moves.")
     return head, detail
 
 
@@ -86,7 +88,7 @@ def describe(s: ExperimentState, last_event_id: int) -> Describe:
     detail: list[str] = []
     needs: str | None = None
     r = s.run
-    if r is not None and r.kind == "hw_replay":
+    if r is not None and r.kind in ("hw_replay", "playback"):
         head, detail = _replay_words(r)
         r = None                                      # the sequencer wording below does not apply
     if r is not None:
