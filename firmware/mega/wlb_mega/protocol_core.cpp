@@ -416,7 +416,7 @@ void default_config(Config& c) {
     c.tt_release = 1;
     c.tt_closed = 1;                                  // [mega] tt_closed: FB5311M-360 on D6, feedback on A3 (2026-10-18)
     c.tt_adc_min = 2; c.tt_adc_max = 670;             // measured: one turn spans A3 2..670, wraps 668 -> 2
-    c.tt_fb_sign = 1; c.tt_dir_sign = 1; c.tt_fb_zero_deg = 0.0f;   // pulse above stop raises A3
+    c.tt_fb_sign = 1; c.tt_dir_sign = 1; c.tt_fb_zero_deg = 244.0f; // pulse above stop raises A3; zero = pick cup on the pick spot (2026-10-18)
     c.tt_us_stop = 1500; c.tt_us_db = 56;             // measured: no motion from 1460 to 1540 us; moves at 1440 / 1560
 #ifdef WLB_TT_OPEN_LOOP
     c.tt_closed = 0;                                  // build flag: the old position servo (M45CHW) on D6, open loop

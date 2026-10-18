@@ -319,7 +319,7 @@ tt_adc_min = 2                              # measured: one turn spans A3 2..670
 tt_adc_max = 670
 tt_fb_sign = 1
 tt_dir_sign = 1
-tt_fb_zero_deg = 0.0
+tt_fb_zero_deg = 244.0                      # 2026-10-18: feedback angle with a cup on the pick spot = deck 0
 tt_us_stop = 1500                           # measured: no motion from 1450 to 1550 us
 tt_us_db = 56                               # measured: no motion from 1460 to 1540 us, moves at 1440 / 1560
 tt_kp = 3.0                                 # us past the deadband per deg of error (tune on the deck)
