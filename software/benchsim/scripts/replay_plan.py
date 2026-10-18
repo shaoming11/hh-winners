@@ -36,6 +36,9 @@ CAL = os.path.join(paths.SIM_ROOT, 'benchsim', 'config', 'hardware_calibration.b
 REACH_DEG = 5.0          # a segment's last waypoint counts as reached inside this (gravity sag is ~3 deg)
 NEAR_DEG = 2.0           # segment ends near the cups (approach / pick / place / retreat)
 GRIP_HOLD_S = 0.4        # after the jaws close or open
+APPROACH_GRIP_DEG = 85.0 # jaws almost fully open on every approach: the widest margin for a cup that is a bit off
+POUR_JUMP_DEG = 3.0      # the planned pour manifold swings the arm through ~17 deg/sample near 84-96 deg tilt: stop before
+POUR_DRAIN_S = 1.5       # hold at the deepest smooth tilt so the beaker empties
 PASS_DEG = 12.0          # intermediate waypoints: move on once inside this (the arm flows through them)
 # rest pose: both arms folded back (lift back, elbow folded), where they hold themselves with the power off
 # (measured 2026-10-18 as the mean of both arms resting, pulled just inside the calibrated limits)
@@ -76,7 +79,31 @@ def go(arm, q, speed, label='', tol=REACH_DEG, timeout=WAYPOINT_TIMEOUT_S, quiet
     return err
 
 
+def bench_segments(segs):
+    """the plan's segments, adjusted for the bench: jaws wide open while approaching a cup (until they close); the
+    pour manifold cut before its arm-flip region, a drain hold, then the pour retraced back to the 40 deg pose
+    (the plan's untilt starts at 40 deg, which made the arm snap back from 105 deg)"""
+    out = []; closed = False
+    for seg in segs:
+        seg = dict(seg); qs = [list(q) for q in seg['qs']]
+        if seg['phase'] == 'pick': qs[0][5] = math.radians(APPROACH_GRIP_DEG); closed = True
+        elif seg['phase'] == 'approach' and not closed:
+            for q in qs: q[5] = math.radians(APPROACH_GRIP_DEG)
+        if seg['name'].startswith('pour manifold'):
+            d = np.degrees(np.abs(np.diff(np.array(qs), axis=0)))[:, :4].max(axis=1)
+            cut = next((i for i, x in enumerate(d) if x > POUR_JUMP_DEG), len(qs) - 1)
+            qs = qs[:cut + 1]
+            seg['qs'] = qs; seg['name'] = 'pour to %.0f deg tilt (smooth part)' % (40 + 65.0 * cut / max(1, len(d))); out.append(seg)
+            out.append(dict(name='drain %.1f s' % POUR_DRAIN_S, phase='drain', kind='hold', qs=[qs[-1]]))
+            out.append(dict(name='retrace the pour to 40 deg', phase='pour_back', kind='cartesian', qs=qs[::-1]))
+            continue
+        seg['qs'] = qs; out.append(seg)
+    return out
+
+
 def play_segment(arm, seg, speed):
+    if seg['kind'] == 'hold':
+        time.sleep(POUR_DRAIN_S); return
     qs = seg['qs']
     if seg['kind'] == 'joint' and len(qs) == 2: qs = qs[1:]          # joint moves: straight to the end
     vmax = arm.vmax_deg_s * speed
@@ -117,7 +144,7 @@ def main():
     # pre-flight: every planned waypoint must be inside the arm's calibrated limits, or nothing moves
     bad = []
     for k in order + [x for x in plans if x not in order][:0]:
-        for seg in plans[k]['segments']:
+        for seg in bench_segments(plans[k]['segments']):
             for q in seg['qs']:
                 try: arms[plans[k]['arm']].check_goal(np.asarray(q, float))
                 except ValueError as e: bad.append('%s / %s: %s' % (k, seg['name'], e))
@@ -161,11 +188,11 @@ def main():
                 r = mega.motion('TT', done_timeout=ms / 1000 + 6, deg=float(deck), ms=ms)
                 print('   carousel at %.1f deg' % r['deg'], flush=True)
             funnel = 'funnel' in k
-            for seg in s['segments']:
-                fast = funnel and seg['phase'] == 'pour' and not seg['name'].startswith('untilt')
+            for seg in bench_segments(s['segments']):
+                fast = funnel and seg['phase'] == 'pour' and not seg['name'].startswith('untilt')   # tilt-in + pour: all at once
                 print('   %-38s %s%s' % (seg['name'], seg['phase'], '  (all at once)' if fast else ''), flush=True)
                 play_segment(arm, seg, 1.0 if fast else a.speed)
-                if funnel and 'P2' in k and seg['name'].startswith('untilt') and mega is not None:
+                if funnel and 'P2' in k and seg['phase'] == 'drain' and mega is not None:
                     St = bench['params']['stage']           # last pour done: the sled carries the flask out right away
                     r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['erupt_deg']), ms=int(St['move_s'] * 1000))
                     print('   sled out to %.0f deg (erupt)' % r['deg'], flush=True)
