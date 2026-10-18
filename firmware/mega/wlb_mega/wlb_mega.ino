@@ -28,7 +28,7 @@
 #else
 #define ESTOP_OPEN() ((PINE & ESTOP_BIT) != 0)
 #endif
-#define HX_DT_BIT _BV(PC6)          // D31 = PC6: HX711 DOUT (D3 -> D11 -> D31 to fit the bench wiring)
+#define HX_DT_BIT _BV(PC7)          // D30 = PC7: HX711 DOUT (D3 -> D11 -> D31 -> D30 to fit the bench wiring, 2026-10-18)
 #define HX_DT_PIN PINC
 #define HX_DT_DDR DDRC
 #define HX_DT_PORT PORTC
