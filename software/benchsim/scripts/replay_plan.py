@@ -18,6 +18,11 @@ import time
 
 import numpy as np
 
+T0 = time.time()
+_print = print
+def print(*args, **kw):                          # every log line carries the elapsed time
+    _print('%6.1fs' % (time.time() - T0), *args, **kw)
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 from benchsim import layout, mechanisms, paths  # noqa: E402
@@ -29,6 +34,8 @@ PORTS = dict(port_mega=os.environ.get('WLB_MEGA', '/dev/cu.usbserial-1130'),
              port_transfer=os.environ.get('WLB_TRANSFER', '/dev/cu.usbmodem58CD1767761'))
 CAL = os.path.join(paths.SIM_ROOT, 'benchsim', 'config', 'hardware_calibration.bench.json')
 REACH_DEG = 5.0          # a segment's last waypoint counts as reached inside this (gravity sag is ~3 deg)
+NEAR_DEG = 2.0           # segment ends near the cups (approach / pick / place / retreat)
+GRIP_HOLD_S = 0.4        # after the jaws close or open
 PASS_DEG = 12.0          # intermediate waypoints: move on once inside this (the arm flows through them)
 # rest pose: both arms folded back (lift back, elbow folded), where they hold themselves with the power off
 # (measured 2026-10-18 as the mean of both arms resting, pulled just inside the calibrated limits)
@@ -45,7 +52,7 @@ def deck_for_step(name, bench):
     return mechanisms.deck_angle(C['pocket_ids_deg'][pocket], brg['pick'], C['deck_range_deg'])
 
 
-def go(arm, q, speed, label='', tol=REACH_DEG, timeout=WAYPOINT_TIMEOUT_S, quiet=False):
+def go(arm, q, speed, label='', tol=REACH_DEG, timeout=WAYPOINT_TIMEOUT_S, quiet=False, joints=5):
     """command one waypoint and wait until every joint is within tol (or the timeout)"""
     try: span = np.degrees(np.abs(arm.read_positions() - np.asarray(q, float)))[:5].max()
     except ConnectionError: span = 90.0
@@ -54,7 +61,7 @@ def go(arm, q, speed, label='', tol=REACH_DEG, timeout=WAYPOINT_TIMEOUT_S, quiet
     t0 = time.time(); err = float('nan'); misses = 0
     while time.time() - t0 < timeout:
         try:
-            err = np.degrees(np.abs(arm.read_positions() - np.asarray(q, float)))[:5].max(); misses = 0
+            err = np.degrees(np.abs(arm.read_positions() - np.asarray(q, float)))[:joints].max(); misses = 0
         except ConnectionError as e:                  # a dropped status packet: the arm keeps its goal, try again
             misses += 1
             if misses >= 10: raise
@@ -80,7 +87,10 @@ def play_segment(arm, seg, speed):
         try: arm.set_goal(q, speed_scale=speed)
         except ConnectionError: pass              # a dropped packet: the next waypoint supersedes it
         time.sleep(max(dt, 0.02)); prev = q
-    go(arm, qs[-1], speed, seg['name'])           # the segment end is waited for
+    near = seg['phase'] in ('approach', 'pick', 'place', 'retreat')        # close to the cups: tighter end
+    grip = seg['phase'] in ('pick', 'place')                                 # the jaws must finish closing / opening
+    go(arm, qs[-1], speed, seg['name'], tol=NEAR_DEG if near else REACH_DEG, joints=6 if grip else 5)
+    if grip: time.sleep(GRIP_HOLD_S)
 
 
 def main():
@@ -150,13 +160,23 @@ def main():
                 ms = int(max(1000, abs(deck - cur) / 45.0 * 1000 * bench['params']['carousel']['min_s_per_45deg']) + 200)
                 r = mega.motion('TT', done_timeout=ms / 1000 + 6, deg=float(deck), ms=ms)
                 print('   carousel at %.1f deg' % r['deg'], flush=True)
+            funnel = 'funnel' in k
             for seg in s['segments']:
-                print('   %-38s %s' % (seg['name'], seg['phase']), flush=True)
-                play_segment(arm, seg, a.speed)
+                fast = funnel and seg['phase'] == 'pour' and not seg['name'].startswith('untilt')
+                print('   %-38s %s%s' % (seg['name'], seg['phase'], '  (all at once)' if fast else ''), flush=True)
+                play_segment(arm, seg, 1.0 if fast else a.speed)
+                if funnel and 'P2' in k and seg['name'].startswith('untilt') and mega is not None:
+                    St = bench['params']['stage']           # last pour done: the sled carries the flask out right away
+                    r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['erupt_deg']), ms=int(St['move_s'] * 1000))
+                    print('   sled out to %.0f deg (erupt)' % r['deg'], flush=True)
             # never start the next step (maybe the other arm) before this arm is really back at park
             end = s['segments'][-1]['qs'][-1]
             err = go(arm, end, a.speed, 'back at park', tol=8.0, timeout=15.0)
             if not err < 8.0: raise TimeoutError('%s arm did not get back to park (%.0f deg off)' % (s['arm'], err))
+        if mega is not None and any('P2 funnel' in k for k in order):
+            St = bench['params']['stage']
+            r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['work_deg']), ms=int(St['move_s'] * 1000))
+            print('sled back to %.0f deg (work)' % r['deg'], flush=True)
         for name, arm in arms.items():
             if not a.yes: input('\nEnter: return %s to the rest pose ' % name)
             go(arm, rest, min(a.speed, 0.3), 'rest ' + name)
