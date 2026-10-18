@@ -37,17 +37,17 @@ arduino-cli compile --fqbn arduino:avr:mega:cpu=atmega2560 firmware/mega/wlb_meg
 arduino-cli upload  --fqbn arduino:avr:mega:cpu=atmega2560 -p /dev/ttyUSB0 firmware/mega/wlb_mega
 ```
 
-**Bring-up build without an e-stop (local testing only).** Before the e-stop is wired, D2 reads as pressed and
-every move answers `err ESTOP`. For bench tests only, build with the flag below: D2 is then ignored, so pulling the
-pack is the only stop. The default build never sets it; never flash it for a run.
+**No e-stop (default).** The bench runs without an e-stop: D2 is ignored and unplugging the pack is the only
+stop. To use one again, wire an NC contact from D2 to GND and build with the flag below; then an open D2 latches
+`ESTOP` as described in electrical.md.
 
 ```bash
-arduino-cli compile --fqbn arduino:avr:mega:cpu=atmega2560 --build-property "build.extra_flags=-DWLB_NO_ESTOP" \
-    --build-path /tmp/wlb_noestop firmware/mega/wlb_mega
+arduino-cli compile --fqbn arduino:avr:mega:cpu=atmega2560 --build-property "build.extra_flags=-DWLB_USE_ESTOP" \
+    --build-path /tmp/wlb_estop firmware/mega/wlb_mega
 ```
 
-**Press the e-stop before flashing or resetting the board** (electrical.md 2): without the relay, servo power is
-live whenever the pack is plugged in and the e-stop is released.
+**Unplug the pack before flashing or resetting the board**: without the relay, servo power is live whenever the
+pack is plugged in.
 
 ## Pins and timers (electrical.md 4)
 

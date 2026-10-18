@@ -18,8 +18,11 @@
 // ------------------------------------------------------------------ pins (electrical.md 4)
 #define ESTOP_PIN 2                 // D2 = PE4 / INT4: NC contact to GND, INPUT_PULLUP; HIGH = pressed or wire broken
 #define ESTOP_BIT _BV(PE4)
-// LOCAL BRING-UP ONLY (never flash for a run): build with -DWLB_NO_ESTOP to treat D2 as released when no
-// e-stop is wired. Unplugging the pack is then the only stop.
+// No e-stop on this bench (decided 2026-10-17: water dry runs, unplugging the pack is the stop). D2 is ignored by
+// default; build with -DWLB_USE_ESTOP to wire one back in (NC contact D2 -> GND, latches like before).
+#ifndef WLB_USE_ESTOP
+#define WLB_NO_ESTOP
+#endif
 #ifdef WLB_NO_ESTOP
 #define ESTOP_OPEN() false
 #else
