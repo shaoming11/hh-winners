@@ -65,7 +65,7 @@ def main():
     mega = bb.mega; time.sleep(2.5)                                  # the port open resets the Mega: wait for its boot
     try: bb.transport.read_lines()
     except Exception: pass
-    mega.command('CLR', home=True)
+    rp.mega_start(mega, bench)                                        # sled out, faults cleared, positions kept
     rp.MEGA = mega
     rp.turn_deck(mega, 0.0, bench)
     cur = mega.command('PING')['tt']                  # a zero-length move where it is: engages the firmware's hold

@@ -244,6 +244,17 @@ def sled_wait():
     while SLED: nap(0.05)
 
 
+def mega_start(mega, bench):
+    """clear faults WITHOUT forgetting where the axes are (CLR home only when the Mega has lost track: it declares the
+    axes at home without moving them), then bring the sled out to WORK, the start position of every run"""
+    p = mega.command('PING')
+    mega.command('CLR', home=True) if p.get('pos') == 'unknown' else mega.command('CLR')
+    St = bench['params']['stage']; st = mega.command('PING').get('st')
+    if st is None or abs(st - St['work_deg']) > 2.0:
+        r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['work_deg']), ms=int(St['move_s'] * 1000))
+        print('sled out to %.0f deg (start position)' % r['deg'], flush=True)
+
+
 def turn_deck(mega, deg, bench):
     """carousel move with one retry: a TT_TIMEOUT that does not reproduce happened once on the bench"""
     for attempt in (1, 2):
@@ -254,7 +265,7 @@ def turn_deck(mega, deg, bench):
         try: return mega.motion('TT', done_timeout=ms / 1000 + 6, deg=float(deg), ms=ms)
         except MegaError as e:
             if attempt == 2: raise
-            print('   carousel: %s, re-homing and retrying once' % e, flush=True); mega.command('CLR', home=True)
+            print('   carousel: %s, retrying once' % e, flush=True); mega_start(mega, bench)
 
 
 def deck_for_step(name, bench):
@@ -379,12 +390,7 @@ def main():
         for name, arm in arms.items(): arm.set_torque(True); print('%s torque on (holding the present pose)' % name)
         rest = np.radians(REST_DEG)
         if mega is not None:
-            mega.command('CLR', home=True)
-            St = bench['params']['stage']               # the sled starts out (flask under the funnel); it retracts only
-            st = mega.command('PING').get('st')         # after the last pour, and stays retracted until the next run
-            if st is None or abs(st - St['work_deg']) > 2.0:
-                r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['work_deg']), ms=int(St['move_s'] * 1000))
-                print('sled out to %.0f deg (start position)' % r['deg'], flush=True)
+            mega_start(mega, bench)                     # sled out (it retracts only after the last pour, until the next run)
         if a.rest:
             for name, arm in arms.items():
                 if not a.yes: input('\nEnter: move %s to the rest pose (slow) ' % name)
