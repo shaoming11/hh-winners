@@ -40,7 +40,7 @@ class Context:
         self.state = dict(beakers={}, masses={}, active_arm=None, pouring=None, contents_g={}, tare_g={}, stage='WORK')
         from .. import layout
         R = layout.load_params()['recipe']
-        if R.get('premixed_yeast_water'):               # P2 is loaded full: never take its loaded weight as its tare
+        if R.get('premixed_yeast_water') and not R.get('yeast_in_flask'):   # P2 loaded full: never take its loaded weight as its tare
             self.state['contents_g']['P2'] = R['yeast_g'] + R['water_g']
         self.deadline = None; self.trace = []; self.trace_dt = trace_dt; self._next_trace = 0.0; self.events = []
         self.on_tick_hooks = []

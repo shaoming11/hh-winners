@@ -56,7 +56,9 @@ class SimDemo:
         self.L.add('dev', 'developer', INITIAL['developer_ml'] * DENSITY['developer'])
         self.L.add('water', 'water', INITIAL['water_ml'] * DENSITY['water']); self.aug.fill(INITIAL['hopper_g'])
         R = P['recipe']
-        if R.get('premixed_yeast_water'):               # P2 is loaded already holding the yeast-water mix
+        if R.get('yeast_in_flask'):                     # MVP: the yeast-water mix is loaded into the flask by hand
+            self.L.add('flask', 'yeast', R['yeast_g']); self.L.add('flask', 'water', R['water_g'])
+        elif R.get('premixed_yeast_water'):             # P2 is loaded already holding the yeast-water mix
             self.L.add('P2', 'yeast', R['yeast_g']); self.L.add('P2', 'water', R['water_g'])
         self.planner = poses.Planner(w.m, w.b); self.gh = grip_heights()
         self.mech = Mechanisms(bb.mega, bench=None)

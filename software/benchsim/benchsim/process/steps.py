@@ -43,8 +43,16 @@ class Step:
 def demo_protocol(recipe=None):
     """docs/demo_process.md section 4, steps 1-9"""
     r = dict(developer_g=39.0, developer_tol_g=2.0, yeast_g=7.0, yeast_tol_g=0.7, water_g=30.0, water_tol_g=2.0, activate_wait_s=60.0,
-             premixed_yeast_water=True)
+             premixed_yeast_water=True, yeast_in_flask=True)
     r.update(recipe or {})
+    if r.get('yeast_in_flask'):                     # MVP: yeast-water already in the flask; peroxide is the only reagent moved
+        return [
+            Step('TRANSFER', dict(beaker='P1', src='carousel_pick', dst='scale_pan'), '1 P1 carousel -> scale'),
+            Step('POUR_TO_SCALE', dict(reagent='developer', beaker='P1', target_g=r['developer_g'], tol_g=r['developer_tol_g'], relative=False),
+                 '2 peroxide (developer) onto P1'),
+            Step('POUR_TO_FUNNEL', dict(beaker='P1', erupt=True), '3 P1 -> funnel, then ERUPT (reaction starts)'),
+            Step('TRANSFER', dict(beaker='P1', src='scale_pan', dst='carousel_pick'), '4 P1 -> carousel'),
+        ]
     if r.get('premixed_yeast_water'):               # P2 arrives as a yeast-water mix: no dose, no water pour, no wait
         return [
             Step('TRANSFER', dict(beaker='P1', src='carousel_pick', dst='scale_pan'), '1 P1 carousel -> scale'),

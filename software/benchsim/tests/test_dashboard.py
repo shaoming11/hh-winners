@@ -68,7 +68,7 @@ def test_narration_covers_the_demo():
     for st in S.demo_protocol():
         d = narration.describe(st.to_dict())
         assert d['title'] and d['detail'] is not None
-    funnel_p2 = [s for s in S.demo_protocol() if s.type == 'POUR_TO_FUNNEL' and s.params['beaker'] == 'P2'][0]
+    funnel_p2 = [s for s in S.demo_protocol() if s.type == 'POUR_TO_FUNNEL' and s.params['erupt']][0]   # the reaction pour
     assert 'O₂' in narration.describe(funnel_p2.to_dict())['science']['equation']
     assert 'ERUPTION' in narration.describe(funnel_p2.to_dict())['title']
     assert narration.clearance(dict(type='POUR_TO_FUNNEL', params={}))['mm'] == 5.3
