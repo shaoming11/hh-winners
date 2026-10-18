@@ -14,6 +14,8 @@ import teach_poses as tp  # noqa: E402
 
 SPOTS = {   # name: (arm, step prefix, plan segment whose START is above the spot)
     'transfer_scale': ('transfer', '1', 'lower onto scale_pan'),
+    'pourer_rack1': ('pourer', '2', 'descend to rack_1'),        # the peroxide beaker in the rack stand nearest the sled
+    'pourer_scale': ('pourer', '3', 'descend to scale_pan'),     # P1 resting in the scale pan
 }
 
 

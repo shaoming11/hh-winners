@@ -139,12 +139,32 @@ def linear_place(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0):
 
 
 TRANSFER_STEPS = {'1': ('transfer_carousel_pick', 'transfer_scale'), '4': ('transfer_scale', 'transfer_carousel_pick')}
+POURER_STEPS = {'2': 'pourer_rack1', '3': 'pourer_scale'}
+
+
+def pourer_taught(segs, q_spot, spot):
+    """pourer step with a hand-taught grab spot: straight-line grab there, the plan's carry / pour / raise in between,
+    and the beaker put back on the same spot with a straight-line place"""
+    names = [g['name'] for g in segs]
+    close = math.degrees(segs[next(i for i, nm in enumerate(names) if nm.startswith('close on'))]['qs'][-1][5])
+    dz = SPOT_DZ_MM.get(spot, 0.0)
+    pick = linear_pick('pourer', q_spot, close, site='grasp_side', dz_mm=dz)
+    place = linear_place('pourer', q_spot, close, site='grasp_side', dz_mm=dz)
+    i_carry = names.index('carry to above pre-pour'); i_raise = names.index('raise from pre-pour')
+    J = lambda name, phase, a, b: dict(name=name, phase=phase, kind='joint', qs=[list(a), list(b)])
+    return ([J('park -> above the grab', 'approach', segs[0]['qs'][0], pick[0]['qs'][0])] + pick +
+            [J('carry to above pre-pour', 'carry', pick[-1]['qs'][-1], segs[i_carry]['qs'][-1])] + segs[i_carry + 1:i_raise + 1] +
+            [J('carry back above the spot', 'carry', segs[i_raise]['qs'][-1], place[0]['qs'][0])] + place +
+            [J('return to park', 'park', place[-1]['qs'][-1], segs[-1]['qs'][-1])])
 
 
 def taught_segments(segs, key):
     """transfer steps whose pick and place spots are both hand-taught: park -> straight-line pick -> carry with the
     beaker clear above the receiver -> straight-line place -> park (the plan's slide / channel moves are not used)"""
-    T = load_taught(); spots = TRANSFER_STEPS.get(key.split()[0])
+    T = load_taught()
+    pour = POURER_STEPS.get(key.split()[0])
+    if pour and pour in T: return pourer_taught(segs, T[pour], pour)
+    spots = TRANSFER_STEPS.get(key.split()[0])
     if not spots or not all(sp in T for sp in spots): return segs
     names = [g['name'] for g in segs]
     close = math.degrees(segs[names.index('close on P1')]['qs'][-1][5])
