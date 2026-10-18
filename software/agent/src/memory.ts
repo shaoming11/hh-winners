@@ -46,6 +46,18 @@ export function markSeen(m: SpaceMemo, eventId: number): void {
   if (eventId > (m.lastEventId ?? 0)) { m.lastEventId = eventId; writeFileSync(join(DIR, m.key + ".json"), JSON.stringify(m, null, 1)); }
 }
 
+/** forget every chat's conversation (kept: who is in it, how to reach them, the last event told about).
+ *  Called when a run starts, so the agent judges each run fresh instead of arguing from earlier runs. */
+export function clearAll(): number {
+  let n = 0;
+  for (const m of allSpaces()) {
+    if (!m.turns.length) continue;
+    m.turns = []; m.summary = undefined; n++;
+    writeFileSync(join(DIR, m.key + ".json"), JSON.stringify(m, null, 1));
+  }
+  return n;
+}
+
 export function allSpaces(): SpaceMemo[] {
   return readdirSync(DIR).filter((f) => f.endsWith(".json"))
     .map((f) => memo(...(f.replace(/\.json$/, "").split("__") as [string, string])));

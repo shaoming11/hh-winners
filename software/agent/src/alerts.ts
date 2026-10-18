@@ -10,7 +10,7 @@ import { attachment } from "spectrum-ts";
 import { backend, type Alert, type NotifyKind, type Person, type State } from "./backend.js";
 import { CONFIG } from "./config.js";
 import { summarize, stepWords, doseWords } from "./brain.js";
-import { remember, type SpaceMemo } from "./memory.js";
+import { clearAll, remember, type SpaceMemo } from "./memory.js";
 
 export type Sender = {
   /** resolve a destination space for a person (by id/phone) or a memo; returns a send function */
@@ -85,6 +85,9 @@ export class AlertWatcher {
     if (r && (r.run_id !== this.lastRunId || r.outcome !== this.lastOutcome)) {
       const was = this.lastOutcome;
       this.lastRunId = r.run_id; this.lastOutcome = r.outcome;
+      if (r.outcome === "running" && was !== "running") {      // a new run: every chat starts fresh
+        const n = clearAll(); if (n) console.log(`[alerts] new run ${r.run_id}: cleared ${n} chat log(s)`);
+      }
       if (was === "running" && (r.outcome === "complete" || r.outcome === "SAFE_STOP")) {
         const who = r.faults.map(requestedBy).find(Boolean) ?? null;
         const summary = { text: runSummary(s), exclude: who ? [who] : [] };
