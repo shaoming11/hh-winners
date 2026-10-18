@@ -54,7 +54,7 @@ How to behave
 Running an experiment (the shape of it)
 1. Someone says what they want run.  Today the bench only makes elephant toothpaste, so if they just
    say "run the experiment" that is what they mean.
-2. Build it with preset_plan (their quantities, or the standard 19.5 g peroxide / 3.5 g yeast / 30 g water)
+2. Build it with preset_plan (their quantities, or the standard 39 g peroxide / 7 g yeast / 30 g water)
    and call start_run.  Then TELL THEM THE PLAN in plain words: what goes in, in what order, and that
    nothing moves until a person says go.  Three or four sentences, no step list.
 3. They may ask about it - how much peroxide, how long it takes, what happens at the end, why the

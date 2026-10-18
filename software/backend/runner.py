@@ -436,12 +436,12 @@ class BenchRunner:
         if self.plan_mode == "demo":
             # The live-demo slot: the yeast and warm water were mixed by hand and are already in the flask
             # (_build loads them in the sim), so only the developer is weighed and poured, and that pour erupts.
-            steps = S.flask_demo_protocol(dict(developer_g=r.developer_g, developer_tol_g=1.0))
+            steps = S.flask_demo_protocol(dict(developer_g=r.developer_g, developer_tol_g=2.0))
             return PlanSchema(title="elephant toothpaste (preset) - live demo, yeast pre-mixed in the flask",
                               source="preset",
                               steps=[PlanStep(type=s.type, params=s.params, label=s.label) for s in steps])
-        steps = S.demo_protocol(dict(developer_g=r.developer_g, developer_tol_g=1.0, yeast_g=r.yeast_g,
-                                     yeast_tol_g=0.35, water_g=r.water_g, water_tol_g=2.0,
+        steps = S.demo_protocol(dict(developer_g=r.developer_g, developer_tol_g=2.0, yeast_g=r.yeast_g,
+                                     yeast_tol_g=0.7, water_g=r.water_g, water_tol_g=2.0,
                                      activate_wait_s=r.activate_s))
         title = "elephant toothpaste (preset)"
         if r.quick:
