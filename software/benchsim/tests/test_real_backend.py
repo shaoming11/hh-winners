@@ -303,9 +303,9 @@ def test_lerobot_adapter_uses_raw_registers_and_keeps_torque_on_disconnect(monke
 
         def disconnect(self, disable_torque=True): calls.append(('disconnect', disable_torque))
 
-        def sync_read(self, reg, normalize=True): calls.append(('read', reg, normalize)); return {n: 2047 for n in JOINTS}
+        def sync_read(self, reg, normalize=True, num_retry=0): calls.append(('read', reg, normalize)); return {n: 2047 for n in JOINTS}
 
-        def sync_write(self, reg, values, normalize=True): calls.append(('write', reg, normalize))
+        def sync_write(self, reg, values, normalize=True, num_retry=0): calls.append(('write', reg, normalize))
 
     motors = types.ModuleType('lerobot.motors'); motors.Motor = Motor
     motors.MotorNormMode = types.SimpleNamespace(RANGE_0_100='r0', RANGE_M100_100='rm')

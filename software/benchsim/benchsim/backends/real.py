@@ -315,9 +315,9 @@ class LeRobotBus:
 
     def disconnect(self): self.bus.disconnect(disable_torque=False)               # never drops a held beaker
 
-    def read(self, reg): return {k: int(v) for k, v in self.bus.sync_read(reg, normalize=False).items()}
+    def read(self, reg): return {k: int(v) for k, v in self.bus.sync_read(reg, normalize=False, num_retry=3).items()}   # the bus drops a status packet now and then
 
-    def write(self, reg, values): self.bus.sync_write(reg, dict(values), normalize=False)
+    def write(self, reg, values): self.bus.sync_write(reg, dict(values), normalize=False, num_retry=3)
 
 
 def decode_load(v):

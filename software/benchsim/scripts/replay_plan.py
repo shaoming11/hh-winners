@@ -42,9 +42,14 @@ def deck_for_step(name, bench):
 def go(arm, q, speed, label=''):
     """command one waypoint and wait until every joint is within REACH_DEG (or the timeout)"""
     arm.set_goal(np.asarray(q, float), speed_scale=speed)
-    t0 = time.time()
+    t0 = time.time(); err = float('nan'); misses = 0
     while time.time() - t0 < WAYPOINT_TIMEOUT_S:
-        err = np.degrees(np.abs(arm.read_positions() - np.asarray(q, float)))[:5].max()
+        try:
+            err = np.degrees(np.abs(arm.read_positions() - np.asarray(q, float)))[:5].max(); misses = 0
+        except ConnectionError as e:                  # a dropped status packet: the arm keeps its goal, try again
+            misses += 1
+            if misses >= 10: raise
+            time.sleep(0.05); continue
         if err < REACH_DEG: return err
         time.sleep(0.03)
     print('   %s: waypoint not reached in %.0f s (largest joint error %.1f deg), continuing' % (label, WAYPOINT_TIMEOUT_S, err), flush=True)
@@ -73,6 +78,10 @@ def main():
     bb = make_bench('real', allow_hardware=True, **kw)
     arms = bb.arms
     mega = None if a.no_mega else bb.mega
+    if mega is not None:                          # opening the CH340 port resets the Mega: wait for the boot line
+        time.sleep(2.5)
+        try: bb.transport.read_lines()
+        except Exception: pass
     # pre-flight: every planned waypoint must be inside the arm's calibrated limits, or nothing moves
     bad = []
     for k in order + [x for x in plans if x not in order][:0]:
@@ -113,7 +122,8 @@ def main():
                 print('   %-38s %s' % (seg['name'], seg['phase']), flush=True)
                 play_segment(arm, seg, a.speed)
         print('\ndone: arms holding their last pose (torque on)')
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ConnectionError, TimeoutError) as stop_reason:
+        print('\nstopping:', type(stop_reason).__name__, stop_reason)
         for name, arm in arms.items():
             try: arm.set_goal(arm.read_positions(), 1.0)
             except Exception as e: print(name, 'freeze failed:', e)
