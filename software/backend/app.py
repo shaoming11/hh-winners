@@ -51,13 +51,14 @@ WEB = SOFTWARE / "benchsim" / "benchsim" / "dashboard" / "web"     # the dashboa
 
 BACKEND = os.environ.get("WLB_BACKEND", "sim")
 RENDER = os.environ.get("WLB_RENDER", "1") != "0"
+FX = os.environ.get("WLB_FX", "1") != "0"           # 0 = the bare MuJoCo scene (benchsim.dashboard --plain)
 AUTOCONNECT = os.environ.get("WLB_AUTOCONNECT", "1") != "0"
 REALTIME = float(os.environ.get("WLB_RT", "1"))      # 1 = pace runs to wall-clock (the demo default), 0 = flat out
 
 cfg = load()
 store = Store()
 RUNS_DIR = store.dir / "runs"        # run folders live beside the store, so WLB_BACKEND_DIR moves both
-runner = BenchRunner(store, cfg, backend=BACKEND, render=RENDER, realtime=REALTIME, out_root=RUNS_DIR)
+runner = BenchRunner(store, cfg, backend=BACKEND, render=RENDER, realtime=REALTIME, out_root=RUNS_DIR, fx=FX)
 mcp = mcp_server.build(store, runner)
 mcp_app = mcp.streamable_http_app(streamable_http_path="/", stateless_http=True, json_response=True)
 

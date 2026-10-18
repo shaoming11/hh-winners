@@ -39,8 +39,9 @@ page and the agent always see the same bench. Then, for the chat agent:
 cd software/agent && npm install && npm run terminal
 ```
 
-Useful environment variables: `WLB_RENDER=0` (headless, no camera), `WLB_RT=0` (run flat out
-instead of wall-clock pacing; the default is `1`), `WLB_BACKEND=real` (hardware).
+Useful environment variables: `WLB_RENDER=0` (headless, no camera), `WLB_FX=0` (camera without
+the liquids, pour streams and foam: the bare MuJoCo scene), `WLB_RT=0` (run flat out instead of
+wall-clock pacing; the default is `1`), `WLB_BACKEND=real` (hardware).
 
 ## Running the bench without the backend
 

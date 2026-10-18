@@ -66,12 +66,13 @@ class BenchRunner:
 
     def __init__(self, store: Store, cfg=None, backend: str = "sim", seed: int = 0,
                  render: bool = True, realtime: float = 1.0, out_root: Path | None = None,
-                 dev: bool = False, record: bool = True):
+                 dev: bool = False, record: bool = True, fx: bool = True):
         self.store = store
         self.cfg = cfg
         self.backend = backend
         self.seed = seed
         self.render = render
+        self.fx = fx                          # the camera look (benchsim.fx: room, liquids, streams, foam)
         self.realtime = float(realtime)
         self.dev = dev
         self.record = record
@@ -155,7 +156,7 @@ class BenchRunner:
         self.pacer = Pacer(r.bb.clock, self.realtime if self.realtime > 0 else 0.0)
         probes = dict(r.probes, runner=self._info)
         if self.render:
-            self.video = Video(self.hub, camera="auto", fps=15.0)
+            self.video = Video(self.hub, camera="auto", fps=15.0, fx=self.fx)
             self.video.snapshot = lambda: self.feed.last if self.feed else None
             probes["video"] = lambda: dict(camera=self.video.camera, shown=self.video.shown,
                                            cameras=self.video.cameras(), view=self.video.view())
