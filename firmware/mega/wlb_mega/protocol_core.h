@@ -135,13 +135,15 @@ struct Config {
     uint8_t tt_release;        // 1 = stop the TT pulses once a move is done (heavy deck: the servo's own loop hunts while holding)
     // closed-loop carousel (tt_closed = 1): continuous servo on D6 + its analog position feedback on A3.
     // deck angle = tt_fb_sign * feedback angle - tt_fb_zero_deg (wrapped into the deck range); the target follows the
-    // same smooth profile as the open-loop move; pulse = tt_us_stop + tt_dir_sign * clamp(kp*err - kd*vel, +-tt_max_off)
+    // same smooth profile as the open-loop move; u = clamp(kp*err - kd*vel, +-tt_max_off) past the servo's deadband:
+    // pulse = tt_us_stop + tt_dir_sign * sign(u) * (tt_us_db + |u|), or tt_us_stop when u = 0
     uint8_t tt_closed;
     uint16_t tt_adc_min, tt_adc_max; // feedback ADC over one turn
     int8_t tt_fb_sign;         // +1: feedback angle grows with the deck angle
     int8_t tt_dir_sign;        // +1: a pulse above tt_us_stop turns the deck toward + deg
     float tt_fb_zero_deg;      // feedback angle (after tt_fb_sign) at deck 0
     uint16_t tt_us_stop;       // continuous servo stop centre
+    uint16_t tt_us_db;         // the servo ignores pulses within this of tt_us_stop: any drive starts just past it
     float tt_kp;               // us per deg of error
     float tt_kd;               // us per deg/s of measured speed
     uint16_t tt_max_off;       // largest pulse offset from the stop centre

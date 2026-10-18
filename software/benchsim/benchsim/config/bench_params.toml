@@ -314,17 +314,18 @@ st_us_per_deg = 7.407407                    # assumed: 2000/270
 # FB5311M-360 auger (electrical.md 4 and 6, software_architecture.md 6)
 aug_us_stop = 1500                          # architecture 6: about 1500 us = stop; measure the exact centre (E8)
 aug_us_offset = 200                         # architecture 6: dosing pulse 1500 +- 200 us
-tt_closed = false                           # carousel on a continuous servo + A3 feedback with the firmware's own P(D) loop; on after the A3 calibration
-tt_adc_min = 0                              # A3 feedback ADC over one turn (calibrate)
-tt_adc_max = 1023
+tt_closed = true                            # 2026-10-18: carousel on an FB5311M-360 (D6) + A3 feedback, firmware P(D) loop
+tt_adc_min = 2                              # measured: one turn spans A3 2..670 (wraps 668 -> 2)
+tt_adc_max = 670
 tt_fb_sign = 1
 tt_dir_sign = 1
 tt_fb_zero_deg = 0.0
-tt_us_stop = 1500
-tt_kp = 4.0                                 # us of pulse offset per deg of error
+tt_us_stop = 1500                           # measured: no motion from 1450 to 1550 us
+tt_us_db = 56                               # measured: no motion from 1460 to 1540 us, moves at 1440 / 1560
+tt_kp = 3.0                                 # us past the deadband per deg of error (tune on the deck)
 tt_kd = 0.0                                 # us per deg/s
-tt_max_off = 150
-tt_tol_deg = 1.5
+tt_max_off = 60
+tt_tol_deg = 2.0
 tt_db_deg = 1.0
 tt_release = true                           # 2026-10-17: the deck's inertia makes the TT servo hunt while holding; firmware stops its pulses after each move
 aug_timed = true                            # 2026-10-17: A2 feedback wire not fitted; firmware doses by time, no stall rule

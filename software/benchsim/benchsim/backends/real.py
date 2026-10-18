@@ -574,7 +574,7 @@ def firmware_config_expected(P=None):
         'stall_min_deg': A['stall_min_deg'], 'max_stalls': A['max_stalls'], 'reverse_deg': A['reverse_rev'] * 360.0,
         'fb_max_step_deg': M['aug_fb_max_step_deg'], 'fb_glitch_resync': M['aug_fb_glitch_resync'],
         'aug_timed': 1.0 if M['aug_timed'] else 0.0, 'tt_release': 1.0 if M['tt_release'] else 0.0, 'tt_closed': 1.0 if M['tt_closed'] else 0.0,
-        **{k: float(M[k]) for k in ('tt_adc_min', 'tt_adc_max', 'tt_fb_sign', 'tt_dir_sign', 'tt_fb_zero_deg', 'tt_us_stop', 'tt_kp', 'tt_kd', 'tt_max_off', 'tt_tol_deg', 'tt_db_deg')}, 'aug_rev_per_s': M['aug_rev_per_s'], 'aug_start_ms': M['aug_start_ms'], 'aug_coast_rev': M['aug_coast_rev'],
+        **{k: float(M[k]) for k in ('tt_adc_min', 'tt_adc_max', 'tt_fb_sign', 'tt_dir_sign', 'tt_fb_zero_deg', 'tt_us_stop', 'tt_us_db', 'tt_kp', 'tt_kd', 'tt_max_off', 'tt_tol_deg', 'tt_db_deg')}, 'aug_rev_per_s': M['aug_rev_per_s'], 'aug_start_ms': M['aug_start_ms'], 'aug_coast_rev': M['aug_coast_rev'],
     }
 
 
