@@ -419,6 +419,7 @@ GRIP_HOLD_S = 0.4        # after the jaws close or open
 APPROACH_GRIP_DEG = 85.0 # jaws almost fully open on every approach: the widest margin for a cup that is a bit off
 POUR_JUMP_DEG = 3.0      # the planned pour manifold swings the arm through ~17 deg/sample near 84-96 deg tilt: stop before
 POUR_DRAIN_S = 1.5       # hold at the deepest smooth tilt so the beaker empties
+SLED_RETURN_DELAY_S = 10.0   # end of run -> sled back out to WORK
 GRAB_HELD_DEG = 1.5      # jaws stopped this far short of the closed command = a beaker is in them (side grip: held 2.9-3.4, missed 0.2-0.5)
 GRABS = []               # (step, held, deg short) for the run summary
 PASS_DEG = 12.0          # intermediate waypoints: move on once inside this (the arm flows through them)
@@ -711,8 +712,14 @@ def replay(bb, a):
             if mega is not None and a.end_turn:             # finale: the carousel turns a.end_turn deg from where it is
                 cur = mega.command('PING').get('tt') or 0.0; lo, hi = bench['params']['carousel']['deck_range_deg']
                 tgt = cur + a.end_turn
-                if not lo <= tgt <= hi: tgt = cur + a.end_turn - math.copysign(360.0, a.end_turn)   # same cup layout, other way round
-                r = turn_deck(mega, tgt, bench); print('carousel turned %+.0f deg to %.0f deg (end)' % (a.end_turn, r['deg']), flush=True)
+                if not lo <= tgt <= hi: tgt = cur - a.end_turn     # past the range end: the short way back (not a 270 deg swing)
+                r = turn_deck(mega, tgt, bench); print('carousel turned %+.0f deg to %.0f deg (end)' % (tgt - cur, r['deg']), flush=True)
+            if mega is not None:                            # and the sled back out to WORK, ready for the next run, after
+                print('sled back out in %.0f s (the foam settles)' % SLED_RETURN_DELAY_S, flush=True)
+                nap(SLED_RETURN_DELAY_S)                    # the reaction has had time to finish at the ERUPT end
+                St = bench['params']['stage']
+                r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['work_deg']), ms=int(St['move_s'] * 1000))
+                print('sled back out to %.0f deg (end)' % r['deg'], flush=True)
         if GRABS:
             print('\ngrabs: %d/%d held' % (sum(g[1] for g in GRABS), len(GRABS)))
             for st, held, short in GRABS: print('   step %s: %s (%.1f deg short of closed)' % (st, 'held' if held else 'MISS?', short))
