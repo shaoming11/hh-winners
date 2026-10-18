@@ -44,6 +44,7 @@ def wait_ok(label):
     print('\n>>> %s: torque OFF, move the arm by hand. Then say it is good (teach_ok) or press Enter.' % label, flush=True)
     while True:
         if os.path.exists(OK_FILE): os.remove(OK_FILE); return
+        rp.nap(0.0)
         r, _, _ = select.select([sys.stdin], [], [], 0.2)
         if r: sys.stdin.readline(); return
 
@@ -60,7 +61,16 @@ def main():
         print('pose corrections cleared'); return 0
     plans = json.loads((rp.paths.SIM_ROOT / 'reports' / 'native_plans.json').read_text())['steps']
     bench = rp.layout.load_bench()
-    bb = rp.make_bench('real', allow_hardware=True, **dict(rp.PORTS, port_mega=None, calibration_path=rp.CAL, dry_run=False))
+    bb = rp.make_bench('real', allow_hardware=True, **dict(rp.PORTS, calibration_path=rp.CAL, dry_run=False))
+    mega = bb.mega; time.sleep(2.5)                                  # the port open resets the Mega: wait for its boot
+    try: bb.transport.read_lines()
+    except Exception: pass
+    mega.command('CLR', home=True)
+    rp.MEGA = mega
+    rp.turn_deck(mega, 0.0, bench)
+    cur = mega.command('PING')['tt']                  # a zero-length move where it is: engages the firmware's hold
+    r = mega.motion('TT', done_timeout=6, deg=round(float(cur), 1), ms=1000)
+    print('carousel held at %.1f deg (pick cup at the pick spot)' % r['deg'], flush=True)
     arms = bb.arms
     ov = rp.load_overrides()
     try:
