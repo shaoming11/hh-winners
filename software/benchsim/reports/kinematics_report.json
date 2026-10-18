@@ -248,8 +248,8 @@
      "binding": "wrist_flex",
      "penetrations": 0,
      "worst_penetration": null,
-     "min_clearance_mm": 18.13,
-     "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w5)"
+     "min_clearance_mm": 11.53,
+     "clearance_at": "transfer/moving_jaw_so101_v1(transfer/finger_moving) x world(dh01_head)"
     },
     {
      "segment": 0,
@@ -1035,22 +1035,22 @@
     "segment": "approach park->above channel entry",
     "phase": "approach",
     "kind": "joint",
-    "configs": 47,
-    "min_margin_deg": 14.4,
+    "configs": 44,
+    "min_margin_deg": 14.5,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 16.18,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w3)"
+    "min_clearance_mm": 15.67,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w9)"
    },
    {
     "segment": "lower to channel entry",
     "phase": "approach",
     "kind": "joint",
-    "configs": 10,
-    "min_margin_deg": 14.4,
+    "configs": 9,
+    "min_margin_deg": 14.5,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -1064,7 +1064,7 @@
     "phase": "approach",
     "kind": "cartesian",
     "configs": 16,
-    "min_margin_deg": 14.4,
+    "min_margin_deg": 14.5,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -1825,8 +1825,8 @@
     "segment": "slide out along finger channel",
     "phase": "retreat",
     "kind": "cartesian",
-    "configs": 16,
-    "min_margin_deg": 13.75,
+    "configs": 17,
+    "min_margin_deg": 13.85,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -1839,15 +1839,15 @@
     "segment": "return to park",
     "phase": "park",
     "kind": "joint",
-    "configs": 56,
-    "min_margin_deg": 13.75,
+    "configs": 53,
+    "min_margin_deg": 13.85,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 13.45,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w2)"
+    "min_clearance_mm": 15.09,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P1(beaker_P1_w9)"
    }
   ],
   "6 P2 carousel->scale": [
@@ -1855,22 +1855,22 @@
     "segment": "approach park->above channel entry",
     "phase": "approach",
     "kind": "joint",
-    "configs": 47,
-    "min_margin_deg": 14.4,
+    "configs": 44,
+    "min_margin_deg": 14.5,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 16.18,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w3)"
+    "min_clearance_mm": 15.67,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w9)"
    },
    {
     "segment": "lower to channel entry",
     "phase": "approach",
     "kind": "joint",
-    "configs": 10,
-    "min_margin_deg": 14.4,
+    "configs": 9,
+    "min_margin_deg": 14.5,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -1884,7 +1884,7 @@
     "phase": "approach",
     "kind": "cartesian",
     "configs": 16,
-    "min_margin_deg": 14.4,
+    "min_margin_deg": 14.5,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -2645,8 +2645,8 @@
     "segment": "slide out along finger channel",
     "phase": "retreat",
     "kind": "cartesian",
-    "configs": 16,
-    "min_margin_deg": 13.75,
+    "configs": 17,
+    "min_margin_deg": 13.85,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
@@ -2659,15 +2659,15 @@
     "segment": "return to park",
     "phase": "park",
     "kind": "joint",
-    "configs": 56,
-    "min_margin_deg": 13.75,
+    "configs": 53,
+    "min_margin_deg": 13.85,
     "binding": "wrist_flex",
     "rule_deg": 5.0,
     "margin_ok": true,
     "contacts": 0,
     "worst_contact": null,
-    "min_clearance_mm": 13.45,
-    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w2)"
+    "min_clearance_mm": 15.09,
+    "clearance_at": "transfer/gripper(transfer/finger_fixed) x beaker_P2(beaker_P2_w9)"
    }
   ]
  },
@@ -3728,5 +3728,5 @@
   "8 P2 funnel pour / close on P2: margin 7.54 deg < rule 10 (wrist_flex)",
   "8 P2 funnel pour / release: margin 8.12 deg < rule 10 (wrist_flex)"
  ],
- "seconds": 10.9
+ "seconds": 21.7
 }

@@ -114,7 +114,7 @@ def test_megaclient_over_serialtransport_matches_the_in_process_transport(built)
         t = real.SerialTransport('loop', baud=250000, serial_factory=loop_factory(dev, chunk=200)).open() if serial else sim.SimTransport(dev)
         mc = MegaClient(t, clock); out = [mc.command('PING')['ok'], mc.command('STREAM', on=True)['ok'], mc.command('TARE')['ok']]
         out.append(round(mc.read_mass(16), 1))
-        out.append(mc.motion('TT', done_timeout=8, deg=45.0, ms=2000)['deg'] > 44.4)
+        out.append(mc.motion('TT', done_timeout=8, deg=45.0, ms=2000)['deg'] >= 45.0 - sim.SimMega.MOVE_TOL_DEG - 1e-9)   # done = inside the firmware tolerance
         out.append(mc.motion('AUG', done_timeout=8, rev=1.0, dir=1)['rev'])
         for cmd, kw in (('TT', dict(deg=400.0, ms=9000)), ('FLY', {})):
             try: mc.command(cmd, **kw); out.append('no error')

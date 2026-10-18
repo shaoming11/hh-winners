@@ -106,10 +106,10 @@
   "carousel": {
    "pitch_r": 84.0,
    "pocket_ids_deg": [
-    220.6,
-    310.6,
-    40.6,
-    130.6
+    116.5,
+    206.5,
+    296.5,
+    26.5
    ],
    "pocket_inner_r": 28.3,
    "pocket_wall_r": 30.3,
@@ -135,8 +135,8 @@
    ],
    "min_s_per_45deg": 2.0,
    "deck_range_deg": [
-    -10.0,
-    280.0
+    -110.0,
+    250.0
    ],
    "timeout_extra_s": 2.0
   },
@@ -158,7 +158,7 @@
    "rev_s": 1.2,
    "first_pass_frac": 0.85,
    "max_topups": 2,
-   "reverse_rev": 0.25,
+   "reverse_rev": 0.0,
    "stall_window_s": 0.15,
    "stall_min_deg": 5.0,
    "max_stalls": 3,
@@ -365,12 +365,16 @@
    "home_tt_deg": 0.0,
    "servo_us_min": 500,
    "servo_us_max": 2500,
-   "tt_us_at_zero": 568.9655,
-   "tt_us_per_deg": 6.896552,
-   "st_us_at_zero": 944.4445,
+   "tt_us_at_zero": 1134.4828,
+   "tt_us_per_deg": 5.440613,
+   "st_us_at_zero": 914.8149,
    "st_us_per_deg": 7.407407,
    "aug_us_stop": 1500,
    "aug_us_offset": 200,
+   "aug_timed": true,
+   "aug_rev_per_s": 0.37,
+   "aug_start_ms": 0,
+   "aug_coast_rev": 0.19,
    "aug_dir_sign": 1,
    "aug_fb_sign": 1,
    "aug_fb_adc_min": 0,
@@ -390,362 +394,358 @@
    {
     "pocket": 0,
     "station": "pick",
-    "pocket_deg": 220.6,
-    "station_bearing_deg": 220.609,
-    "deck_deg": 0.009
+    "pocket_deg": 116.5,
+    "station_bearing_deg": 116.504,
+    "deck_deg": 0.004
    },
    {
     "pocket": 0,
     "station": "auger",
-    "pocket_deg": 220.6,
-    "station_bearing_deg": 40.653,
-    "deck_deg": 180.053
+    "pocket_deg": 116.5,
+    "station_bearing_deg": 20.205,
+    "deck_deg": -96.295
    },
    {
     "pocket": 1,
     "station": "pick",
-    "pocket_deg": 310.6,
-    "station_bearing_deg": 220.609,
-    "deck_deg": 270.009
+    "pocket_deg": 206.5,
+    "station_bearing_deg": 116.504,
+    "deck_deg": -89.996
    },
    {
     "pocket": 1,
     "station": "auger",
-    "pocket_deg": 310.6,
-    "station_bearing_deg": 40.653,
-    "deck_deg": 90.053
+    "pocket_deg": 206.5,
+    "station_bearing_deg": 20.205,
+    "deck_deg": 173.705
    },
    {
     "pocket": 2,
     "station": "pick",
-    "pocket_deg": 40.6,
-    "station_bearing_deg": 220.609,
-    "deck_deg": 180.009
+    "pocket_deg": 296.5,
+    "station_bearing_deg": 116.504,
+    "deck_deg": 180.004
    },
    {
     "pocket": 2,
     "station": "auger",
-    "pocket_deg": 40.6,
-    "station_bearing_deg": 40.653,
-    "deck_deg": 0.053
+    "pocket_deg": 296.5,
+    "station_bearing_deg": 20.205,
+    "deck_deg": 83.705
    },
    {
     "pocket": 3,
     "station": "pick",
-    "pocket_deg": 130.6,
-    "station_bearing_deg": 220.609,
-    "deck_deg": 90.009
+    "pocket_deg": 26.5,
+    "station_bearing_deg": 116.504,
+    "deck_deg": 90.004
    },
    {
     "pocket": 3,
     "station": "auger",
-    "pocket_deg": 130.6,
-    "station_bearing_deg": 40.653,
-    "deck_deg": 270.053
+    "pocket_deg": 26.5,
+    "station_bearing_deg": 20.205,
+    "deck_deg": -6.295
    }
   ],
   "stops": [
    {
-    "cmd_deg": 180.009,
-    "deck_deg": 180.204,
-    "deck_error_deg": 0.195,
-    "span_deg": 180.009,
-    "cmd_ms": 8001,
-    "min_ms": 8000.4,
-    "travel_s": 8.005,
+    "cmd_deg": -96.295,
+    "deck_deg": -96.48,
+    "deck_error_deg": -0.185,
+    "span_deg": 96.295,
+    "cmd_ms": 4280,
+    "min_ms": 4279.8,
+    "travel_s": 4.285,
+    "overrun_s": 0.005,
+    "stations": {
+     "auger": {
+      "pocket": 0,
+      "beaker": "P1",
+      "position_error_mm": 0.274,
+      "table_error_deg": 0.215
+     }
+    },
+    "beakers": {
+     "P1": {
+      "pocket": 0,
+      "offset_mm": 0.246,
+      "tilt_deg": 0.021
+     },
+     "P2": {
+      "pocket": 2,
+      "offset_mm": 0.254,
+      "tilt_deg": 0.041
+     }
+    }
+   },
+   {
+    "cmd_deg": 173.705,
+    "deck_deg": 173.771,
+    "deck_error_deg": 0.066,
+    "span_deg": 269.785,
+    "cmd_ms": 11991,
+    "min_ms": 11990.4,
+    "travel_s": 11.995,
     "overrun_s": 0.004,
     "stations": {
-     "pick": {
+     "auger": {
+      "pocket": 1,
+      "beaker": null,
+      "position_error_mm": 0.103,
+      "table_error_deg": -0.055
+     }
+    },
+    "beakers": {
+     "P1": {
+      "pocket": 0,
+      "offset_mm": 0.214,
+      "tilt_deg": 0.02
+     },
+     "P2": {
       "pocket": 2,
-      "beaker": null,
-      "position_error_mm": 0.291,
-      "table_error_deg": 0.081
-     },
-     "auger": {
-      "pocket": 0,
-      "beaker": "P1",
-      "position_error_mm": 0.226,
-      "table_error_deg": 0.037
-     }
-    },
-    "beakers": {
-     "P1": {
-      "pocket": 0,
-      "offset_mm": 0.195,
-      "tilt_deg": 0.042
-     },
-     "P2": {
-      "pocket": 1,
-      "offset_mm": 0.227,
-      "tilt_deg": 0.028
+      "offset_mm": 0.159,
+      "tilt_deg": 0.025
      }
     }
    },
    {
-    "cmd_deg": 90.009,
-    "deck_deg": 89.605,
-    "deck_error_deg": -0.404,
-    "span_deg": 90.081,
-    "cmd_ms": 4004,
-    "min_ms": 4003.6,
+    "cmd_deg": 83.705,
+    "deck_deg": 83.51,
+    "deck_error_deg": -0.195,
+    "span_deg": 89.945,
+    "cmd_ms": 3998,
+    "min_ms": 3997.6,
     "travel_s": 4.005,
-    "overrun_s": 0.001,
+    "overrun_s": 0.007,
     "stations": {
-     "pick": {
-      "pocket": 3,
-      "beaker": null,
-      "position_error_mm": 0.596,
-      "table_error_deg": -0.089
-     },
      "auger": {
-      "pocket": 1,
+      "pocket": 2,
       "beaker": "P2",
-      "position_error_mm": 0.661,
-      "table_error_deg": -0.133
+      "position_error_mm": 0.29,
+      "table_error_deg": 0.235
      }
     },
     "beakers": {
      "P1": {
       "pocket": 0,
-      "offset_mm": 0.157,
-      "tilt_deg": 0.039
+      "offset_mm": 0.212,
+      "tilt_deg": 0.022
      },
      "P2": {
-      "pocket": 1,
-      "offset_mm": 0.223,
-      "tilt_deg": 0.024
+      "pocket": 2,
+      "offset_mm": 0.176,
+      "tilt_deg": 0.073
      }
     }
    },
    {
-    "cmd_deg": 270.009,
-    "deck_deg": 270.207,
-    "deck_error_deg": 0.198,
-    "span_deg": 180.089,
-    "cmd_ms": 8004,
-    "min_ms": 8004.0,
-    "travel_s": 8.005,
-    "overrun_s": 0.001,
+    "cmd_deg": -6.295,
+    "deck_deg": -6.493,
+    "deck_error_deg": -0.198,
+    "span_deg": 90.235,
+    "cmd_ms": 4011,
+    "min_ms": 4010.4,
+    "travel_s": 4.015,
+    "overrun_s": 0.004,
     "stations": {
-     "pick": {
-      "pocket": 1,
-      "beaker": "P2",
-      "position_error_mm": 0.296,
-      "table_error_deg": 0.081
-     },
      "auger": {
       "pocket": 3,
       "beaker": null,
-      "position_error_mm": 0.231,
-      "table_error_deg": 0.037
+      "position_error_mm": 0.294,
+      "table_error_deg": 0.235
      }
     },
     "beakers": {
      "P1": {
       "pocket": 0,
-      "offset_mm": 0.061,
-      "tilt_deg": 0.023
+      "offset_mm": 0.203,
+      "tilt_deg": 0.022
      },
      "P2": {
-      "pocket": 1,
-      "offset_mm": 0.187,
-      "tilt_deg": 0.051
+      "pocket": 2,
+      "offset_mm": 0.172,
+      "tilt_deg": 0.11
      }
     }
    },
    {
-    "cmd_deg": 0.009,
-    "deck_deg": -0.122,
-    "deck_error_deg": -0.131,
-    "span_deg": 270.081,
-    "cmd_ms": 12004,
-    "min_ms": 12003.6,
-    "travel_s": 12.005,
-    "overrun_s": 0.001,
+    "cmd_deg": 0.004,
+    "deck_deg": 0.386,
+    "deck_error_deg": 0.382,
+    "span_deg": 6.064,
+    "cmd_ms": 270,
+    "min_ms": 269.5,
+    "travel_s": 0.535,
+    "overrun_s": 0.265,
     "stations": {
      "pick": {
       "pocket": 0,
       "beaker": "P1",
-      "position_error_mm": 0.197,
-      "table_error_deg": -0.069
-     },
-     "auger": {
-      "pocket": 2,
-      "beaker": null,
-      "position_error_mm": 0.261,
-      "table_error_deg": -0.113
+      "position_error_mm": 0.564,
+      "table_error_deg": -0.594
      }
     },
     "beakers": {
      "P1": {
       "pocket": 0,
-      "offset_mm": 0.092,
-      "tilt_deg": 0.236
+      "offset_mm": 0.201,
+      "tilt_deg": 0.021
      },
      "P2": {
-      "pocket": 1,
-      "offset_mm": 0.199,
-      "tilt_deg": 0.13
+      "pocket": 2,
+      "offset_mm": 0.155,
+      "tilt_deg": 0.096
      }
     }
    },
    {
-    "cmd_deg": 90.009,
-    "deck_deg": 90.413,
-    "deck_error_deg": 0.404,
-    "span_deg": 90.069,
-    "cmd_ms": 4004,
-    "min_ms": 4003.1,
-    "travel_s": 4.005,
+    "cmd_deg": -89.996,
+    "deck_deg": -90.202,
+    "deck_error_deg": -0.206,
+    "span_deg": 89.406,
+    "cmd_ms": 3974,
+    "min_ms": 3973.6,
+    "travel_s": 3.975,
     "overrun_s": 0.001,
     "stations": {
      "pick": {
-      "pocket": 3,
-      "beaker": null,
-      "position_error_mm": 0.597,
-      "table_error_deg": 0.091
-     },
-     "auger": {
       "pocket": 1,
-      "beaker": "P2",
-      "position_error_mm": 0.532,
-      "table_error_deg": 0.047
+      "beaker": null,
+      "position_error_mm": 0.306,
+      "table_error_deg": 0.236
      }
     },
     "beakers": {
      "P1": {
       "pocket": 0,
-      "offset_mm": 0.136,
-      "tilt_deg": 0.343
+      "offset_mm": 0.194,
+      "tilt_deg": 0.021
      },
      "P2": {
-      "pocket": 1,
-      "offset_mm": 0.206,
-      "tilt_deg": 0.158
+      "pocket": 2,
+      "offset_mm": 0.159,
+      "tilt_deg": 0.139
      }
     }
    },
    {
-    "cmd_deg": 270.009,
-    "deck_deg": 270.198,
-    "deck_error_deg": 0.189,
-    "span_deg": 179.909,
-    "cmd_ms": 7996,
-    "min_ms": 7996.0,
-    "travel_s": 8.005,
-    "overrun_s": 0.009,
+    "cmd_deg": 180.004,
+    "deck_deg": 180.069,
+    "deck_error_deg": 0.065,
+    "span_deg": 269.764,
+    "cmd_ms": 11990,
+    "min_ms": 11989.5,
+    "travel_s": 11.995,
+    "overrun_s": 0.005,
     "stations": {
      "pick": {
-      "pocket": 1,
+      "pocket": 2,
       "beaker": "P2",
-      "position_error_mm": 0.283,
-      "table_error_deg": 0.081
-     },
-     "auger": {
-      "pocket": 3,
-      "beaker": null,
-      "position_error_mm": 0.218,
-      "table_error_deg": 0.037
+      "position_error_mm": 0.101,
+      "table_error_deg": -0.064
      }
     },
     "beakers": {
      "P1": {
       "pocket": 0,
-      "offset_mm": 0.184,
-      "tilt_deg": 0.412
+      "offset_mm": 0.154,
+      "tilt_deg": 0.019
      },
      "P2": {
-      "pocket": 1,
-      "offset_mm": 0.209,
-      "tilt_deg": 0.181
+      "pocket": 2,
+      "offset_mm": 0.15,
+      "tilt_deg": 0.207
+     }
+    }
+   },
+   {
+    "cmd_deg": 90.004,
+    "deck_deg": 89.809,
+    "deck_error_deg": -0.195,
+    "span_deg": 89.936,
+    "cmd_ms": 3998,
+    "min_ms": 3997.2,
+    "travel_s": 4.005,
+    "overrun_s": 0.007,
+    "stations": {
+     "pick": {
+      "pocket": 3,
+      "beaker": null,
+      "position_error_mm": 0.29,
+      "table_error_deg": 0.236
+     }
+    },
+    "beakers": {
+     "P1": {
+      "pocket": 0,
+      "offset_mm": 0.148,
+      "tilt_deg": 0.018
+     },
+     "P2": {
+      "pocket": 2,
+      "offset_mm": 0.167,
+      "tilt_deg": 0.259
      }
     }
    }
   ],
   "rows": [
    {
-    "pocket": 2,
-    "station": "pick",
-    "deck_deg": 180.009,
-    "measured_deck_deg": 180.204,
-    "position_error_mm": 0.291
-   },
-   {
     "pocket": 0,
     "station": "auger",
-    "deck_deg": 180.009,
-    "measured_deck_deg": 180.204,
-    "position_error_mm": 0.226
-   },
-   {
-    "pocket": 3,
-    "station": "pick",
-    "deck_deg": 90.009,
-    "measured_deck_deg": 89.605,
-    "position_error_mm": 0.596
+    "deck_deg": -96.295,
+    "measured_deck_deg": -96.48,
+    "position_error_mm": 0.274
    },
    {
     "pocket": 1,
     "station": "auger",
-    "deck_deg": 90.009,
-    "measured_deck_deg": 89.605,
-    "position_error_mm": 0.661
-   },
-   {
-    "pocket": 1,
-    "station": "pick",
-    "deck_deg": 270.009,
-    "measured_deck_deg": 270.207,
-    "position_error_mm": 0.296
-   },
-   {
-    "pocket": 3,
-    "station": "auger",
-    "deck_deg": 270.009,
-    "measured_deck_deg": 270.207,
-    "position_error_mm": 0.231
-   },
-   {
-    "pocket": 0,
-    "station": "pick",
-    "deck_deg": 0.009,
-    "measured_deck_deg": -0.122,
-    "position_error_mm": 0.197
+    "deck_deg": 173.705,
+    "measured_deck_deg": 173.771,
+    "position_error_mm": 0.103
    },
    {
     "pocket": 2,
     "station": "auger",
-    "deck_deg": 0.009,
-    "measured_deck_deg": -0.122,
-    "position_error_mm": 0.261
-   },
-   {
-    "pocket": 3,
-    "station": "pick",
-    "deck_deg": 90.009,
-    "measured_deck_deg": 90.413,
-    "position_error_mm": 0.597
-   },
-   {
-    "pocket": 1,
-    "station": "auger",
-    "deck_deg": 90.009,
-    "measured_deck_deg": 90.413,
-    "position_error_mm": 0.532
-   },
-   {
-    "pocket": 1,
-    "station": "pick",
-    "deck_deg": 270.009,
-    "measured_deck_deg": 270.198,
-    "position_error_mm": 0.283
+    "deck_deg": 83.705,
+    "measured_deck_deg": 83.51,
+    "position_error_mm": 0.29
    },
    {
     "pocket": 3,
     "station": "auger",
-    "deck_deg": 270.009,
-    "measured_deck_deg": 270.198,
-    "position_error_mm": 0.218
+    "deck_deg": -6.295,
+    "measured_deck_deg": -6.493,
+    "position_error_mm": 0.294
+   },
+   {
+    "pocket": 0,
+    "station": "pick",
+    "deck_deg": 0.004,
+    "measured_deck_deg": 0.386,
+    "position_error_mm": 0.564
+   },
+   {
+    "pocket": 1,
+    "station": "pick",
+    "deck_deg": -89.996,
+    "measured_deck_deg": -90.202,
+    "position_error_mm": 0.306
+   },
+   {
+    "pocket": 2,
+    "station": "pick",
+    "deck_deg": 180.004,
+    "measured_deck_deg": 180.069,
+    "position_error_mm": 0.101
+   },
+   {
+    "pocket": 3,
+    "station": "pick",
+    "deck_deg": 90.004,
+    "measured_deck_deg": 89.809,
+    "position_error_mm": 0.29
    }
   ],
   "gates": {
@@ -950,27 +950,27 @@
   "cv": 0.06,
   "landing": {
    "receiver": "P2",
-   "outlet_to_axis_mm": 0.391,
+   "outlet_to_axis_mm": 0.416,
    "limit_mm": 21.8,
    "outlet_above_lip_mm": 33.92
   },
   "calibration": {
-   "g_per_rev": 0.8143,
+   "g_per_rev": 0.8294,
    "runs": [
     {
      "rev": 10.0,
-     "added_g": 8.4211,
-     "g_per_rev": 0.8421
+     "added_g": 8.3769,
+     "g_per_rev": 0.8377
     },
     {
      "rev": 10.0,
-     "added_g": 8.083,
-     "g_per_rev": 0.8083
+     "added_g": 8.3058,
+     "g_per_rev": 0.8306
     },
     {
      "rev": 10.0,
-     "added_g": 7.9236,
-     "g_per_rev": 0.7924
+     "added_g": 8.1988,
+     "g_per_rev": 0.8199
     }
    ]
   },
@@ -979,37 +979,37 @@
     "beaker": "P2",
     "target_g": 7.0,
     "tol_g": 0.7,
-    "g_per_rev": 0.8142562499999999,
+    "g_per_rev": 0.8293833333333335,
     "passes": [
      {
       "kind": "first",
-      "rev_cmd": 7.3,
-      "rev_done": 7.3,
+      "rev_cmd": 7.2,
+      "rev_done": 7.2,
       "stalls": 0,
-      "t_start": 107.859,
-      "mass_g": 5.7967,
-      "t_end": 116.924
+      "t_start": 76.847,
+      "mass_g": 5.9228,
+      "t_end": 85.492
      },
      {
       "kind": "topup",
-      "rev_cmd": 1.5,
-      "rev_done": 1.5,
+      "rev_cmd": 1.3,
+      "rev_done": 1.3,
       "stalls": 0,
-      "t_start": 133.638,
-      "mass_g": 6.909,
-      "t_end": 135.743
+      "t_start": 94.746,
+      "mass_g": 7.1012,
+      "t_end": 96.311
      }
     ],
-    "measured_g": 6.908999999999999,
-    "error_g": -0.09100000000000108,
+    "measured_g": 7.101187500000002,
+    "error_g": 0.10118750000000176,
     "topups": 1,
     "status": "ok",
     "fault": null,
     "detail": "",
     "ok": true,
-    "revs": 8.8,
-    "truth_g": 6.9117,
-    "truth_error_g": -0.0883,
+    "revs": 8.5,
+    "truth_g": 7.0729,
+    "truth_error_g": 0.0729,
     "spilled_g": 0.0,
     "stalls": 0,
     "n": 1
@@ -1018,37 +1018,37 @@
     "beaker": "P2",
     "target_g": 7.0,
     "tol_g": 0.7,
-    "g_per_rev": 0.8142562499999999,
+    "g_per_rev": 0.8293833333333335,
     "passes": [
      {
       "kind": "first",
-      "rev_cmd": 7.3,
-      "rev_done": 7.3,
+      "rev_cmd": 7.2,
+      "rev_done": 7.2,
       "stalls": 0,
-      "t_start": 152.445,
-      "mass_g": 5.9892,
-      "t_end": 161.51
+      "t_start": 105.553,
+      "mass_g": 6.0661,
+      "t_end": 114.198
      },
      {
       "kind": "topup",
-      "rev_cmd": 1.2,
-      "rev_done": 1.2,
+      "rev_cmd": 1.1,
+      "rev_done": 1.1,
       "stalls": 0,
-      "t_start": 178.224,
-      "mass_g": 6.7359,
-      "t_end": 179.969
+      "t_start": 123.44,
+      "mass_g": 6.9867,
+      "t_end": 124.765
      }
     ],
-    "measured_g": 6.735875,
-    "error_g": -0.26412499999999994,
+    "measured_g": 6.986749999999997,
+    "error_g": -0.01325000000000287,
     "topups": 1,
     "status": "ok",
     "fault": null,
     "detail": "",
     "ok": true,
-    "revs": 8.5,
-    "truth_g": 6.73,
-    "truth_error_g": -0.27,
+    "revs": 8.3,
+    "truth_g": 7.0102,
+    "truth_error_g": 0.0102,
     "spilled_g": 0.0,
     "stalls": 0,
     "n": 2
@@ -1057,37 +1057,37 @@
     "beaker": "P2",
     "target_g": 7.0,
     "tol_g": 0.7,
-    "g_per_rev": 0.8142562499999999,
+    "g_per_rev": 0.8293833333333335,
     "passes": [
      {
       "kind": "first",
-      "rev_cmd": 7.3,
-      "rev_done": 7.3,
+      "rev_cmd": 7.2,
+      "rev_done": 7.2,
       "stalls": 0,
-      "t_start": 196.671,
-      "mass_g": 6.0481,
-      "t_end": 205.736
+      "t_start": 134.019,
+      "mass_g": 6.1931,
+      "t_end": 142.664
      },
      {
       "kind": "topup",
-      "rev_cmd": 1.2,
-      "rev_done": 1.2,
+      "rev_cmd": 1.0,
+      "rev_done": 1.0,
       "stalls": 0,
-      "t_start": 222.45,
-      "mass_g": 6.9051,
-      "t_end": 224.195
+      "t_start": 151.918,
+      "mass_g": 7.0429,
+      "t_end": 153.123
      }
     ],
-    "measured_g": 6.905124999999998,
-    "error_g": -0.09487500000000182,
+    "measured_g": 7.042874999999999,
+    "error_g": 0.042874999999998664,
     "topups": 1,
     "status": "ok",
     "fault": null,
     "detail": "",
     "ok": true,
-    "revs": 8.5,
-    "truth_g": 6.9085,
-    "truth_error_g": -0.0915,
+    "revs": 8.2,
+    "truth_g": 7.0555,
+    "truth_error_g": 0.0555,
     "spilled_g": 0.0,
     "stalls": 0,
     "n": 3
@@ -1096,37 +1096,37 @@
     "beaker": "P2",
     "target_g": 7.0,
     "tol_g": 0.7,
-    "g_per_rev": 0.8142562499999999,
+    "g_per_rev": 0.8293833333333335,
     "passes": [
      {
       "kind": "first",
-      "rev_cmd": 7.3,
-      "rev_done": 7.3,
+      "rev_cmd": 7.2,
+      "rev_done": 7.2,
       "stalls": 0,
-      "t_start": 240.909,
-      "mass_g": 6.1002,
-      "t_end": 249.974
+      "t_start": 162.365,
+      "mass_g": 6.2178,
+      "t_end": 171.01
      },
      {
       "kind": "topup",
-      "rev_cmd": 1.1,
-      "rev_done": 1.1,
+      "rev_cmd": 0.9,
+      "rev_done": 0.9,
       "stalls": 0,
-      "t_start": 266.688,
-      "mass_g": 6.7914,
-      "t_end": 268.313
+      "t_start": 180.252,
+      "mass_g": 6.9842,
+      "t_end": 181.337
      }
     ],
-    "measured_g": 6.791374999999999,
-    "error_g": -0.2086250000000014,
+    "measured_g": 6.984187499999997,
+    "error_g": -0.01581250000000267,
     "topups": 1,
     "status": "ok",
     "fault": null,
     "detail": "",
     "ok": true,
-    "revs": 8.4,
-    "truth_g": 6.8094,
-    "truth_error_g": -0.1906,
+    "revs": 8.1,
+    "truth_g": 6.9765,
+    "truth_error_g": -0.0235,
     "spilled_g": 0.0,
     "stalls": 0,
     "n": 4
@@ -1135,37 +1135,37 @@
     "beaker": "P2",
     "target_g": 7.0,
     "tol_g": 0.7,
-    "g_per_rev": 0.8142562499999999,
+    "g_per_rev": 0.8293833333333335,
     "passes": [
      {
       "kind": "first",
-      "rev_cmd": 7.3,
-      "rev_done": 7.3,
+      "rev_cmd": 7.2,
+      "rev_done": 7.2,
       "stalls": 0,
-      "t_start": 285.027,
-      "mass_g": 5.9233,
-      "t_end": 294.092
+      "t_start": 190.579,
+      "mass_g": 6.0189,
+      "t_end": 199.224
      },
      {
       "kind": "topup",
-      "rev_cmd": 1.3,
-      "rev_done": 1.3,
+      "rev_cmd": 1.2,
+      "rev_done": 1.2,
       "stalls": 0,
-      "t_start": 310.794,
-      "mass_g": 6.7807,
-      "t_end": 312.659
+      "t_start": 208.466,
+      "mass_g": 7.0156,
+      "t_end": 209.911
      }
     ],
-    "measured_g": 6.780687499999999,
-    "error_g": -0.2193125000000009,
+    "measured_g": 7.0155625000000015,
+    "error_g": 0.015562500000001478,
     "topups": 1,
     "status": "ok",
     "fault": null,
     "detail": "",
     "ok": true,
-    "revs": 8.6,
-    "truth_g": 6.7886,
-    "truth_error_g": -0.2114,
+    "revs": 8.4,
+    "truth_g": 7.0244,
+    "truth_error_g": 0.0244,
     "spilled_g": 0.0,
     "stalls": 0,
     "n": 5
@@ -1174,37 +1174,37 @@
     "beaker": "P2",
     "target_g": 7.0,
     "tol_g": 0.7,
-    "g_per_rev": 0.8142562499999999,
+    "g_per_rev": 0.8293833333333335,
     "passes": [
      {
       "kind": "first",
-      "rev_cmd": 7.3,
-      "rev_done": 7.3,
+      "rev_cmd": 7.2,
+      "rev_done": 7.2,
       "stalls": 0,
-      "t_start": 329.373,
-      "mass_g": 5.9653,
-      "t_end": 338.438
+      "t_start": 219.153,
+      "mass_g": 6.1106,
+      "t_end": 227.798
      },
      {
       "kind": "topup",
-      "rev_cmd": 1.3,
-      "rev_done": 1.3,
+      "rev_cmd": 1.1,
+      "rev_done": 1.1,
       "stalls": 0,
-      "t_start": 355.152,
-      "mass_g": 6.8419,
-      "t_end": 357.017
+      "t_start": 237.04,
+      "mass_g": 7.0772,
+      "t_end": 238.365
      }
     ],
-    "measured_g": 6.841874999999998,
-    "error_g": -0.15812500000000185,
+    "measured_g": 7.077249999999999,
+    "error_g": 0.07724999999999937,
     "topups": 1,
     "status": "ok",
     "fault": null,
     "detail": "",
     "ok": true,
-    "revs": 8.6,
-    "truth_g": 6.8454,
-    "truth_error_g": -0.1546,
+    "revs": 8.3,
+    "truth_g": 7.0888,
+    "truth_error_g": 0.0888,
     "spilled_g": 0.0,
     "stalls": 0,
     "n": 6
@@ -1213,37 +1213,37 @@
     "beaker": "P2",
     "target_g": 7.0,
     "tol_g": 0.7,
-    "g_per_rev": 0.8142562499999999,
+    "g_per_rev": 0.8293833333333335,
     "passes": [
      {
       "kind": "first",
-      "rev_cmd": 7.3,
-      "rev_done": 7.3,
+      "rev_cmd": 7.2,
+      "rev_done": 7.2,
       "stalls": 0,
-      "t_start": 373.719,
-      "mass_g": 6.0287,
-      "t_end": 382.784
+      "t_start": 247.619,
+      "mass_g": 6.0558,
+      "t_end": 256.264
      },
      {
       "kind": "topup",
-      "rev_cmd": 1.2,
-      "rev_done": 1.2,
+      "rev_cmd": 1.1,
+      "rev_done": 1.1,
       "stalls": 0,
-      "t_start": 399.498,
-      "mass_g": 6.7925,
-      "t_end": 401.243
+      "t_start": 265.518,
+      "mass_g": 6.9594,
+      "t_end": 266.843
      }
     ],
-    "measured_g": 6.792499999999997,
-    "error_g": -0.20750000000000313,
+    "measured_g": 6.9594375,
+    "error_g": -0.04056250000000006,
     "topups": 1,
     "status": "ok",
     "fault": null,
     "detail": "",
     "ok": true,
-    "revs": 8.5,
-    "truth_g": 6.7764,
-    "truth_error_g": -0.2236,
+    "revs": 8.3,
+    "truth_g": 6.9609,
+    "truth_error_g": -0.0391,
     "spilled_g": 0.0,
     "stalls": 0,
     "n": 7
@@ -1252,37 +1252,37 @@
     "beaker": "P2",
     "target_g": 7.0,
     "tol_g": 0.7,
-    "g_per_rev": 0.8142562499999999,
+    "g_per_rev": 0.8293833333333335,
     "passes": [
      {
       "kind": "first",
-      "rev_cmd": 7.3,
-      "rev_done": 7.3,
+      "rev_cmd": 7.2,
+      "rev_done": 7.2,
       "stalls": 0,
-      "t_start": 417.945,
-      "mass_g": 6.0649,
-      "t_end": 427.01
+      "t_start": 276.097,
+      "mass_g": 6.2818,
+      "t_end": 284.742
      },
      {
       "kind": "topup",
-      "rev_cmd": 1.1,
-      "rev_done": 1.1,
+      "rev_cmd": 0.9,
+      "rev_done": 0.9,
       "stalls": 0,
-      "t_start": 443.724,
-      "mass_g": 6.8212,
-      "t_end": 445.349
+      "t_start": 293.996,
+      "mass_g": 7.0431,
+      "t_end": 295.081
      }
     ],
-    "measured_g": 6.821187500000001,
-    "error_g": -0.17881249999999937,
+    "measured_g": 7.043062499999998,
+    "error_g": 0.04306249999999778,
     "topups": 1,
     "status": "ok",
     "fault": null,
     "detail": "",
     "ok": true,
-    "revs": 8.4,
-    "truth_g": 6.8373,
-    "truth_error_g": -0.1627,
+    "revs": 8.1,
+    "truth_g": 7.0573,
+    "truth_error_g": 0.0573,
     "spilled_g": 0.0,
     "stalls": 0,
     "n": 8
@@ -1291,37 +1291,37 @@
     "beaker": "P2",
     "target_g": 7.0,
     "tol_g": 0.7,
-    "g_per_rev": 0.8142562499999999,
+    "g_per_rev": 0.8293833333333335,
     "passes": [
      {
       "kind": "first",
-      "rev_cmd": 7.3,
-      "rev_done": 7.3,
+      "rev_cmd": 7.2,
+      "rev_done": 7.2,
       "stalls": 0,
-      "t_start": 462.063,
-      "mass_g": 5.8006,
-      "t_end": 471.128
+      "t_start": 304.335,
+      "mass_g": 5.8843,
+      "t_end": 312.98
      },
      {
       "kind": "topup",
-      "rev_cmd": 1.5,
-      "rev_done": 1.5,
+      "rev_cmd": 1.3,
+      "rev_done": 1.3,
       "stalls": 0,
-      "t_start": 487.842,
-      "mass_g": 6.7809,
-      "t_end": 489.947
+      "t_start": 322.234,
+      "mass_g": 7.0239,
+      "t_end": 323.799
      }
     ],
-    "measured_g": 6.780875000000002,
-    "error_g": -0.21912499999999824,
+    "measured_g": 7.023875,
+    "error_g": 0.023875000000000313,
     "topups": 1,
     "status": "ok",
     "fault": null,
     "detail": "",
     "ok": true,
-    "revs": 8.8,
-    "truth_g": 6.7966,
-    "truth_error_g": -0.2034,
+    "revs": 8.5,
+    "truth_g": 7.0318,
+    "truth_error_g": 0.0318,
     "spilled_g": 0.0,
     "stalls": 0,
     "n": 9
@@ -1330,37 +1330,37 @@
     "beaker": "P2",
     "target_g": 7.0,
     "tol_g": 0.7,
-    "g_per_rev": 0.8142562499999999,
+    "g_per_rev": 0.8293833333333335,
     "passes": [
      {
       "kind": "first",
-      "rev_cmd": 7.3,
-      "rev_done": 7.3,
+      "rev_cmd": 7.2,
+      "rev_done": 7.2,
       "stalls": 0,
-      "t_start": 506.661,
-      "mass_g": 6.0497,
-      "t_end": 515.726
+      "t_start": 333.041,
+      "mass_g": 6.1121,
+      "t_end": 341.686
      },
      {
       "kind": "topup",
-      "rev_cmd": 1.2,
-      "rev_done": 1.2,
+      "rev_cmd": 1.1,
+      "rev_done": 1.1,
       "stalls": 0,
-      "t_start": 532.44,
-      "mass_g": 6.8362,
-      "t_end": 534.185
+      "t_start": 350.928,
+      "mass_g": 7.0164,
+      "t_end": 352.253
      }
     ],
-    "measured_g": 6.836187499999998,
-    "error_g": -0.16381250000000236,
+    "measured_g": 7.0163749999999965,
+    "error_g": 0.016374999999996476,
     "topups": 1,
     "status": "ok",
     "fault": null,
     "detail": "",
     "ok": true,
-    "revs": 8.5,
-    "truth_g": 6.8675,
-    "truth_error_g": -0.1325,
+    "revs": 8.3,
+    "truth_g": 7.0362,
+    "truth_error_g": 0.0362,
     "spilled_g": 0.0,
     "stalls": 0,
     "n": 10
@@ -1368,12 +1368,12 @@
   ],
   "stats": {
    "n": 10,
-   "mean_error_g": -0.1805,
-   "std_error_g": 0.0554,
-   "max_abs_error_g": 0.2641,
-   "truth_mean_error_g": -0.1729,
-   "truth_std_error_g": 0.0583,
-   "truth_max_abs_error_g": 0.27,
+   "mean_error_g": 0.0251,
+   "std_error_g": 0.0432,
+   "max_abs_error_g": 0.1012,
+   "truth_mean_error_g": 0.0315,
+   "truth_std_error_g": 0.0405,
+   "truth_max_abs_error_g": 0.0888,
    "topups": {
     "0": 0,
     "1": 10,
@@ -1386,113 +1386,113 @@
    {
     "host_over_calibrated": 0.8,
     "status": "ok",
-    "measured_g": 7.465499999999999,
-    "truth_g": 7.4891,
+    "measured_g": 7.570437500000001,
+    "truth_g": 7.5973,
     "topups": 0,
-    "first_rev": 9.1,
-    "revs": 9.1
+    "first_rev": 9.0,
+    "revs": 9.0
    },
    {
     "host_over_calibrated": 0.8,
     "status": "ok",
-    "measured_g": 7.294062499999999,
-    "truth_g": 7.2881,
+    "measured_g": 7.315687499999996,
+    "truth_g": 7.3439,
     "topups": 0,
-    "first_rev": 9.1,
-    "revs": 9.1
+    "first_rev": 9.0,
+    "revs": 9.0
    },
    {
     "host_over_calibrated": 0.9,
     "status": "ok",
-    "measured_g": 6.6640625,
-    "truth_g": 6.6671,
+    "measured_g": 6.864562499999998,
+    "truth_g": 6.8798,
     "topups": 0,
-    "first_rev": 8.1,
-    "revs": 8.1
+    "first_rev": 8.0,
+    "revs": 8.0
    },
    {
     "host_over_calibrated": 0.9,
     "status": "ok",
-    "measured_g": 6.605249999999998,
-    "truth_g": 6.6285,
+    "measured_g": 6.701875000000001,
+    "truth_g": 6.7026,
     "topups": 0,
-    "first_rev": 8.1,
-    "revs": 8.1
+    "first_rev": 8.0,
+    "revs": 8.0
    },
    {
     "host_over_calibrated": 1.1,
     "status": "ok",
-    "measured_g": 6.646625,
-    "truth_g": 6.6618,
+    "measured_g": 6.906124999999999,
+    "truth_g": 6.9096,
     "topups": 1,
-    "first_rev": 6.6,
-    "revs": 8.4
+    "first_rev": 6.5,
+    "revs": 8.2
    },
    {
     "host_over_calibrated": 1.1,
     "status": "ok",
-    "measured_g": 6.772687499999996,
-    "truth_g": 6.7682,
+    "measured_g": 6.962062499999998,
+    "truth_g": 6.9796,
     "topups": 1,
-    "first_rev": 6.6,
-    "revs": 8.6
-   },
-   {
-    "host_over_calibrated": 1.2,
-    "status": "ok",
-    "measured_g": 6.448437499999997,
-    "truth_g": 6.4525,
-    "topups": 1,
-    "first_rev": 6.1,
+    "first_rev": 6.5,
     "revs": 8.3
    },
    {
     "host_over_calibrated": 1.2,
     "status": "ok",
-    "measured_g": 6.467812500000001,
-    "truth_g": 6.4672,
+    "measured_g": 6.624812499999997,
+    "truth_g": 6.6434,
     "topups": 1,
-    "first_rev": 6.1,
-    "revs": 8.2
+    "first_rev": 6.0,
+    "revs": 8.0
+   },
+   {
+    "host_over_calibrated": 1.2,
+    "status": "ok",
+    "measured_g": 6.688437499999999,
+    "truth_g": 6.7145,
+    "topups": 1,
+    "first_rev": 6.0,
+    "revs": 8.0
    }
   ],
   "transient_jam": {
    "status": "ok",
    "first_pass_stalls": 1,
-   "measured_g": 6.879750000000001,
+   "measured_g": 7.003374999999998,
    "fault": null
   },
   "jam": {
    "status": "fault",
    "fault": "AUGER_JAM",
    "stalls": 3,
-   "detail": "Mega fault {'rev': 0.0, 'seq': 8072, 't': 882967}"
+   "detail": "Mega fault {'rev': 0.0, 'seq': 5335, 't': 581545}"
   },
   "hopper_empty": {
    "status": "fault",
    "fault": "HOPPER_EMPTY",
-   "detail": "Mega fault {'g_last': 0.346, 'revs': 10, 't': 911504}",
-   "revs": 7.3,
+   "detail": "Mega fault {'g_last': 0.619, 'revs': 10, 't': 602002}",
+   "revs": 7.2,
    "passes": 1,
-   "measured_g": -0.02206250000000054
+   "measured_g": 0.0033749999999983515
   },
   "hopper_empty_host": {
    "status": "fault",
    "fault": "HOPPER_EMPTY",
-   "detail": "host scale check: 0.01 g over 15.9 rev",
-   "revs": 15.9,
-   "measured_g": 0.01249999999999929
+   "detail": "host scale check: -0.04 g over 15.6 rev",
+   "revs": 15.6,
+   "measured_g": -0.039312500000001194
   },
   "model_totals": {
    "delivered_g": {
-    "P2": 154.0347
+    "P2": 157.9668
    },
    "spilled_g": 0.0,
    "hopper_g": 0.0,
-   "forward_rev": 217.9,
+   "forward_rev": 212.6,
    "reverse_rev": 0.0,
-   "net_rev": 207.15,
-   "dispensing_rev": 207.4,
+   "net_rev": 212.6,
+   "dispensing_rev": 212.6,
    "g_per_rev_true": 0.85,
    "cv": 0.06
   },
@@ -2189,5 +2189,5 @@
  },
  "pass_": true,
  "failed": [],
- "wall_s": 162.4
+ "wall_s": 122.9
 }

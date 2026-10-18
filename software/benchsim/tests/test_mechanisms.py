@@ -10,7 +10,7 @@ from benchsim.bench import make_bench
 from benchsim.chem.auger import AugerModel
 from benchsim.chem.foam import FoamModel, load_flask, o2_yield_ml
 from benchsim.chem.vessels import Ledger
-from benchsim.mechanisms import (Mechanisms, crank_for_travel, deck_angle, first_pass_rev, slider_crank_travel, station_table, topup_rev,
+from benchsim.mechanisms import (station_bearings, Mechanisms, crank_for_travel, deck_angle, first_pass_rev, slider_crank_travel, station_table, topup_rev,
                                  travel_ms)
 from benchsim.units import m, mm
 from benchsim.verify_mechanisms import ScaleHooks, place
@@ -51,8 +51,13 @@ def test_carousel_station_angles(fresh):
     model, b = fresh; bench = b.bench; C = bench['params']['carousel']; st = bench['stations']
     tab = {(r['pocket'], r['station']): r['deck_deg'] for r in station_table(bench)}
     # deck range measured on the bench 2026-10-17 is [-110, 250]: the 270-deg stops are reached as -90
-    want = {(0, 'pick'): 0, (0, 'auger'): 180, (1, 'pick'): -90, (1, 'auger'): 90, (2, 'pick'): 180, (2, 'auger'): 0, (3, 'pick'): 90, (3, 'auger'): -90}
+    want = {(0, 'pick'): 0, (1, 'pick'): -90, (2, 'pick'): 180, (3, 'pick'): 90}
     for k, v in want.items(): assert tab[k] == pytest.approx(v, abs=0.1), k
+    # the auger may sit anywhere on the pocket circle (trial saddle layout: ~96 deg from the pick): each pocket's auger stop
+    # is its pick stop minus the pick-to-auger bearing, wrapped into the deck range
+    brg = station_bearings(bench); delta = brg['pick'] - brg['auger']
+    for k in range(4):
+        assert ((tab[(k, 'auger')] - (tab[(k, 'pick')] - delta) + 180.0) % 360.0) - 180.0 == pytest.approx(0.0, abs=0.1), k
     assert all(C['deck_range_deg'][0] <= v <= C['deck_range_deg'][1] for v in tab.values())
     assert deck_angle(0.0, 300.0, C['deck_range_deg']) == pytest.approx(-60.0)   # 300 deg is reached the short way round
     assert deck_angle(0.0, 300.0, (-10.0, 280.0)) is None                      # outside a 290-deg window
@@ -66,12 +71,14 @@ def test_carousel_station_angles(fresh):
 def test_pocket_bookkeeping():
     class Stub: clock = None
     mech = Mechanisms(Stub())
-    assert mech.beaker_at('pick') == 'P1' and mech.pocket_of('P2') == 1 and mech.pocket_at('auger') == 2
+    assert mech.beaker_at('pick') == 'P1' and mech.pocket_of('P2') == 2      # P2 starts opposite P1 (trial saddle layout)
     with pytest.raises(ValueError): mech.remove('P2')                   # P2 is not at the pick at deck 0
-    mech.deck = mech.deck_for(1, 'pick'); assert mech.beaker_at('pick') == 'P2' and mech.pocket_at('auger') == 3
-    assert mech.remove('P2') == 1 and mech.pockets == ['P1', None, None, None]
+    for k in range(4):
+        mech.deck = mech.deck_for(k, 'auger'); assert mech.pocket_at('auger') == k
+    mech.deck = mech.deck_for(2, 'pick'); assert mech.beaker_at('pick') == 'P2'
+    assert mech.remove('P2') == 2 and mech.pockets == ['P1', None, None, None]
     with pytest.raises(KeyError): mech.pocket_of('P2')
-    assert mech.insert('P2') == 1
+    assert mech.insert('P2') == 2
     with pytest.raises(ValueError): mech.insert('P2')
 
 
@@ -95,7 +102,7 @@ def test_auger_g_per_rev_statistics(fresh):
 
 def test_auger_reverse_returns_nothing_and_landing(fresh):
     w, mega, L, aug = auger_rig(*fresh); aug.fill(50.0)
-    p = mm(w.d.site('pocket2').xpos); place(w, 'P2', p[:2], p[2])     # P2 under the outlet (pocket 2 at deck 0)
+    p = mm(w.d.site('pocket2').xpos); place(w, 'P2', mm(w.d.site('auger_outlet').xpos)[:2], p[2])     # P2 right under the outlet
     assert aug.receiver() == 'P2'
     turn(mega, aug, 1.0); g1 = L.mass('P2'); assert g1 > 0 and aug.spilled_g == 0
     h = L.mass('hopper'); turn(mega, aug, -0.25)

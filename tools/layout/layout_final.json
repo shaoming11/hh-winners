@@ -497,7 +497,29 @@
     -104.0
    ],
    "beaker_bottom_z": 61.7,
-   "mount": "TRIAL: TT-01 rail saddle on Y-right, M4 bolts at Y 282/312 (12/42 mm from the Y-right south end, Y 270); auger post on E5 bolted out from Y-right, E5 at Y 386-406"
+   "mount": "TRIAL: TT-01 rail saddle on Y-right, M4 bolts at Y 282/312 (12/42 mm from the Y-right south end, Y 270); auger post on E5 bolted out from Y-right, E5 at Y 386-406",
+   "auger_post_box": [
+    846.5,
+    386.0,
+    0.0,
+    886.5,
+    438.0,
+    160.0
+   ],
+   "auger_head_box": [
+    791.5,
+    315.0,
+    160.0,
+    881.5,
+    446.0,
+    230.0
+   ],
+   "auger_rail_E5": [
+    685.0,
+    386.0,
+    1085.0,
+    406.0
+   ]
   },
   "rack_stands": [
    {

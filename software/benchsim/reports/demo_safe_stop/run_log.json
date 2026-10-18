@@ -1,12 +1,12 @@
 {
  "schema": "benchsim.runlog/1",
- "run_id": "20261017T054106Z-sim",
+ "run_id": "20261018T004321Z-sim",
  "mode": "sim",
- "started_utc": "2026-10-17T05:41:06Z",
- "finished_utc": "2026-10-17T05:41:11Z",
+ "started_utc": "2026-10-18T00:43:21Z",
+ "finished_utc": "2026-10-18T00:43:26Z",
  "config": {
   "layout_source": "tools/layout/layout_final.json:update13_final",
-  "params_sha256": "f6cec6dedc96ab639d7358b41b1d82e8735c18112e582e65d055ce82b688b342",
+  "params_sha256": "13cf0995af935137d2a95c15c44d7423b8b3ac68769648f3844650d62d943918",
   "so101_revision": "5f6d2b876a53a4872e405b991dd925556c9e38a4",
   "seed": 0
  },
@@ -37,7 +37,8 @@
    {
     "type": "POUR_TO_FUNNEL",
     "params": {
-     "beaker": "P1"
+     "beaker": "P1",
+     "erupt": false
     },
     "label": "3 P1 -> funnel"
    },
@@ -100,9 +101,10 @@
    {
     "type": "POUR_TO_FUNNEL",
     "params": {
-     "beaker": "P2"
+     "beaker": "P2",
+     "erupt": true
     },
-    "label": "8 P2 -> funnel (reaction starts)"
+    "label": "8 P2 -> funnel, then ERUPT (reaction starts)"
    },
    {
     "type": "TRANSFER",
@@ -112,13 +114,6 @@
      "dst": "carousel_pick"
     },
     "label": "9 P2 -> carousel"
-   },
-   {
-    "type": "STAGE",
-    "params": {
-     "position": "ERUPT"
-    },
-    "label": "10 ERUPT"
    }
   ],
   "validation": {
@@ -126,7 +121,7 @@
    "problems": []
   },
   "approved_by": "operator (sim, preset)",
-  "approved_utc": "2026-10-17T05:41:06Z"
+  "approved_utc": "2026-10-18T00:43:21Z"
  },
  "steps": [
   {
@@ -141,19 +136,19 @@
    "status": "passed",
    "reason": "grasp grasped",
    "t_start": 0.496,
-   "t_end": 11.96,
+   "t_end": 10.848,
    "target": {},
    "measured": {
-    "grasp_jaw_deg": 23.12,
+    "grasp_jaw_deg": 22.85,
     "scale": [
      {
       "event": "place",
-      "before_g": 0.04,
-      "after_g": 18.03
+      "before_g": 0.02,
+      "after_g": 18.02
      }
     ],
-    "scale_after_g": 17.976,
-    "beaker_tare_g": 17.976
+    "scale_after_g": 18.004,
+    "beaker_tare_g": 18.004
    },
    "faults": []
   },
@@ -170,8 +165,8 @@
    },
    "status": "failed",
    "reason": "safe stop: operator stop during the developer pour",
-   "t_start": 11.96,
-   "t_end": 33.188,
+   "t_start": 10.848,
+   "t_end": 32.051,
    "target": {},
    "measured": {},
    "faults": []
@@ -181,7 +176,8 @@
    "type": "POUR_TO_FUNNEL",
    "label": "3 P1 -> funnel",
    "params": {
-    "beaker": "P1"
+    "beaker": "P1",
+    "erupt": false
    },
    "status": "skipped",
    "reason": "not run: safe stop: operator stop during the developer pour",
@@ -298,9 +294,10 @@
   {
    "index": 10,
    "type": "POUR_TO_FUNNEL",
-   "label": "8 P2 -> funnel (reaction starts)",
+   "label": "8 P2 -> funnel, then ERUPT (reaction starts)",
    "params": {
-    "beaker": "P2"
+    "beaker": "P2",
+    "erupt": true
    },
    "status": "skipped",
    "reason": "not run: safe stop: operator stop during the developer pour",
@@ -326,21 +323,6 @@
    "target": {},
    "measured": {},
    "faults": []
-  },
-  {
-   "index": 12,
-   "type": "STAGE",
-   "label": "10 ERUPT",
-   "params": {
-    "position": "ERUPT"
-   },
-   "status": "skipped",
-   "reason": "not run: safe stop: operator stop during the developer pour",
-   "t_start": null,
-   "t_end": null,
-   "target": {},
-   "measured": {},
-   "faults": []
   }
  ],
  "faults": [],
@@ -358,82 +340,82 @@
    "label": "1 P1 carousel -> scale"
   },
   {
-   "t": 4.547,
+   "t": 3.733,
    "kind": "attach",
    "arm": "transfer",
    "beaker": "P1"
   },
   {
-   "t": 4.916,
+   "t": 4.096,
    "kind": "grasp",
    "arm": "transfer",
    "outcome": "grasped",
-   "jaw_deg": 23.12,
+   "jaw_deg": 22.85,
    "expected_deg": 22.94
   },
   {
-   "t": 6.957,
+   "t": 5.797,
    "kind": "detach",
    "arm": "transfer",
    "beaker": "P1"
   },
   {
-   "t": 7.504,
+   "t": 6.392,
    "kind": "release",
    "arm": "transfer",
    "jaw_deg": 33.75
   },
   {
-   "t": 11.96,
+   "t": 10.848,
    "kind": "step_done",
    "index": 1,
    "status": "passed"
   },
   {
-   "t": 11.96,
+   "t": 10.848,
    "kind": "step_start",
    "index": 2,
    "type": "POUR_TO_SCALE",
    "label": "2 developer onto P1"
   },
   {
-   "t": 16.804,
+   "t": 15.697,
    "kind": "attach",
    "arm": "pourer",
    "beaker": "dev"
   },
   {
-   "t": 17.14,
+   "t": 16.068,
    "kind": "grasp",
    "arm": "pourer",
    "outcome": "grasped",
-   "jaw_deg": 8.44,
+   "jaw_deg": 8.17,
    "expected_deg": 7.72
   },
   {
-   "t": 33.188,
+   "t": 32.051,
    "kind": "stop_requested",
    "reason": "operator stop during the developer pour"
   },
   {
-   "t": 33.188,
+   "t": 32.051,
    "kind": "safe_stop",
    "reason": "operator stop during the developer pour"
   },
   {
-   "t": 34.393,
+   "t": 33.256,
    "kind": "safe_stop_untilt",
    "ok": true
   },
   {
-   "t": 34.393,
+   "t": 33.256,
    "kind": "safe_stop_hold",
    "arm": "pourer",
    "torque": true,
-   "jaw_deg": 8.44
+   "jaw_deg": 8.17
   },
   {
-   "t": 34.393,
+   "t": 33.256,
    "kind": "safe_stop_hold",
    "arm": "transfer",
    "torque": true,
@@ -465,63 +447,63 @@
    "label": "before pick P1"
   },
   {
-   "t": 11.96,
+   "t": 10.848,
    "camera": "bench_cam",
-   "path": "frames/0011.96_bench_cam.png",
+   "path": "frames/0010.85_bench_cam.png",
    "label": "after 1 P1 carousel -> scale"
   },
   {
-   "t": 22.988,
+   "t": 21.876,
    "camera": "overview",
-   "path": "frames/0022.99_overview.png",
+   "path": "frames/0021.88_overview.png",
    "label": "pour start 2 developer onto P1"
   },
   {
-   "t": 34.893,
+   "t": 33.756,
    "camera": "foam_cam",
-   "path": "frames/0034.89_foam_cam.png",
+   "path": "frames/0033.76_foam_cam.png",
    "label": "foam t+0.5 s"
   },
   {
-   "t": 36.893,
+   "t": 35.756,
    "camera": "foam_cam",
-   "path": "frames/0036.89_foam_cam.png",
+   "path": "frames/0035.76_foam_cam.png",
    "label": "foam t+2.5 s"
   },
   {
-   "t": 38.893,
+   "t": 37.756,
    "camera": "foam_cam",
-   "path": "frames/0038.89_foam_cam.png",
+   "path": "frames/0037.76_foam_cam.png",
    "label": "foam t+4.5 s"
   },
   {
-   "t": 40.893,
+   "t": 39.756,
    "camera": "foam_cam",
-   "path": "frames/0040.89_foam_cam.png",
+   "path": "frames/0039.76_foam_cam.png",
    "label": "foam t+6.5 s"
   },
   {
-   "t": 42.893,
+   "t": 41.756,
    "camera": "foam_cam",
-   "path": "frames/0042.89_foam_cam.png",
+   "path": "frames/0041.76_foam_cam.png",
    "label": "foam t+8.5 s"
   },
   {
-   "t": 44.893,
+   "t": 43.756,
    "camera": "foam_cam",
-   "path": "frames/0044.89_foam_cam.png",
+   "path": "frames/0043.76_foam_cam.png",
    "label": "foam t+10.5 s"
   },
   {
-   "t": 46.893,
+   "t": 45.756,
    "camera": "foam_cam",
-   "path": "frames/0046.89_foam_cam.png",
+   "path": "frames/0045.76_foam_cam.png",
    "label": "foam t+12.5 s"
   },
   {
-   "t": 48.893,
+   "t": 47.756,
    "camera": "foam_cam",
-   "path": "frames/0048.89_foam_cam.png",
+   "path": "frames/0047.76_foam_cam.png",
    "label": "foam t+14.5 s"
   }
  ],
@@ -530,15 +512,15 @@
   "state": "SAFE_STOP",
   "passed": 1,
   "failed": 1,
-  "skipped": 10,
+  "skipped": 9,
   "masses": {
    "vessels": {
     "P1": {
-     "developer": 12.018
+     "developer": 11.9585
     },
     "P2": {},
     "dev": {
-     "developer": 48.2738
+     "developer": 48.3336
     },
     "water": {
      "water": 49.6
@@ -553,23 +535,23 @@
    },
    "measured": {
     "1 P1 carousel -> scale": {
-     "grasp_jaw_deg": 23.12,
+     "grasp_jaw_deg": 22.85,
      "scale": [
       {
        "event": "place",
-       "before_g": 0.04,
-       "after_g": 18.03
+       "before_g": 0.02,
+       "after_g": 18.02
       }
      ],
-     "scale_after_g": 17.976,
-     "beaker_tare_g": 17.976
+     "scale_after_g": 18.004,
+     "beaker_tare_g": 18.004
     }
    }
   },
   "spilled_g": 0.028,
   "foam_peak_mm": 0.0,
   "foam": {
-   "t": 48.89,
+   "t": 47.75,
    "t_contact": null,
    "t_foam_at_neck": null,
    "t_peak": null,
@@ -586,7 +568,7 @@
    "headspace_ml": 281.37
   },
   "notes": [],
-  "sim_seconds": 48.89,
+  "sim_seconds": 47.76,
   "wall_seconds": 4.7,
   "stop_during_pour_test": true,
   "final_state": {
@@ -598,8 +580,8 @@
     "transfer": true
    },
    "beaker_tilt_deg": {
-    "P1": 0.05,
-    "P2": 0.06,
+    "P1": 0.06,
+    "P2": 0.03,
     "dev": 0.39,
     "water": 0.0
    },

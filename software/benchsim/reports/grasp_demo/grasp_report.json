@@ -13,85 +13,85 @@
       "name": "approach park->above channel entry",
       "kind": "joint",
       "t_start": 0.095,
-      "t_end": 2.495
+      "t_end": 1.815
      },
      {
       "name": "lower to channel entry",
       "kind": "joint",
-      "t_start": 2.495,
-      "t_end": 2.895
+      "t_start": 1.815,
+      "t_end": 2.215
      },
      {
       "name": "slide in along finger channel",
       "kind": "cartesian",
-      "t_start": 2.895,
-      "t_end": 3.415
+      "t_start": 2.215,
+      "t_end": 2.595
      },
      {
       "name": "descend to carousel_pick",
       "kind": "cartesian",
-      "t_start": 3.415,
-      "t_end": 3.755
+      "t_start": 2.595,
+      "t_end": 2.935
      },
      {
       "name": "touch fixed finger to P1",
       "kind": "cartesian",
-      "t_start": 3.755,
-      "t_end": 3.895
+      "t_start": 2.935,
+      "t_end": 3.075
      },
      {
       "name": "close on P1",
       "kind": "grip",
-      "t_start": 3.895,
-      "t_end": 4.515
+      "t_start": 3.075,
+      "t_end": 3.695
      },
      {
       "name": "lift from carousel_pick",
       "kind": "cartesian",
-      "t_start": 4.515,
-      "t_end": 4.895
+      "t_start": 3.695,
+      "t_end": 4.055
      },
      {
       "name": "carry carousel_pick->scale_pan",
       "kind": "joint",
-      "t_start": 4.895,
-      "t_end": 6.075
+      "t_start": 4.055,
+      "t_end": 4.915
      },
      {
       "name": "lower onto scale_pan",
       "kind": "cartesian",
-      "t_start": 6.075,
-      "t_end": 6.543
+      "t_start": 4.915,
+      "t_end": 5.383
      },
      {
       "name": "release",
       "kind": "grip",
-      "t_start": 6.543,
-      "t_end": 7.771
+      "t_start": 5.383,
+      "t_end": 6.571
      },
      {
       "name": "move fixed finger off P1",
       "kind": "cartesian",
-      "t_start": 7.771,
-      "t_end": 7.911
+      "t_start": 6.571,
+      "t_end": 6.711
      },
      {
       "name": "lift 20 mm",
       "kind": "cartesian",
-      "t_start": 7.911,
-      "t_end": 8.251
+      "t_start": 6.711,
+      "t_end": 7.051
      },
      {
       "name": "slide out along finger channel",
       "kind": "cartesian",
-      "t_start": 8.251,
-      "t_end": 8.771
+      "t_start": 7.051,
+      "t_end": 7.571
      },
      {
       "name": "return to park",
       "kind": "joint",
-      "t_start": 8.771,
-      "t_end": 11.331
+      "t_start": 7.571,
+      "t_end": 10.131
      }
     ],
     "grasps": [
@@ -99,21 +99,21 @@
       "outcome": "grasped",
       "jaw_deg": 23.12,
       "expected_deg": 22.94,
-      "load_permille": 3.0,
+      "load_permille": -3.0,
       "detail": "jaw stopped 0.18 deg from the expected contact angle"
      }
     ],
     "scale": [
      {
       "event": "place",
-      "before_g": -0.01,
-      "after_g": 17.99
+      "before_g": 0.01,
+      "after_g": 18.06
      }
     ]
    },
-   "hold_slip_max_mm": 0.006,
-   "hold_tilt_max_deg": 0.084,
-   "sim_seconds": 11.83,
+   "hold_slip_max_mm": 0.007,
+   "hold_tilt_max_deg": 0.064,
+   "sim_seconds": 10.63,
    "stills": [
     {
      "t": 0.095,
@@ -122,31 +122,31 @@
      "camera": "bench_cam"
     },
     {
-     "t": 4.515,
+     "t": 3.695,
      "path": "carousel_to_scale_5_grasp.png",
      "label": "grasp: close on P1",
      "camera": "bench_cam"
     },
     {
-     "t": 4.895,
+     "t": 4.055,
      "path": "carousel_to_scale_6_lift.png",
      "label": "lift: lift from carousel_pick",
      "camera": "bench_cam"
     },
     {
-     "t": 6.075,
+     "t": 4.915,
      "path": "carousel_to_scale_7_carry.png",
      "label": "carry: carry carousel_pick->scale_pan",
      "camera": "bench_cam"
     },
     {
-     "t": 7.771,
+     "t": 6.571,
      "path": "carousel_to_scale_9_placement.png",
      "label": "placement: release",
      "camera": "bench_cam"
     },
     {
-     "t": 11.831,
+     "t": 10.631,
      "path": "carousel_to_scale_9_final.png",
      "label": "final pose",
      "camera": "bench_cam"
@@ -155,8 +155,8 @@
    "video": "carousel_to_scale.mp4",
    "final_beaker_positions": {
     "P1": [
-     620.1,
-     406.4,
+     620.0,
+     406.7,
      63.5
     ],
     "dev": [
@@ -167,13 +167,13 @@
    },
    "events": [
     {
-     "t": 4.147,
+     "t": 3.326,
      "kind": "attach",
      "arm": "transfer",
      "beaker": "P1"
     },
     {
-     "t": 4.515,
+     "t": 3.695,
      "kind": "grasp",
      "arm": "transfer",
      "outcome": "grasped",
@@ -181,13 +181,13 @@
      "expected_deg": 22.94
     },
     {
-     "t": 6.567,
+     "t": 5.407,
      "kind": "detach",
      "arm": "transfer",
      "beaker": "P1"
     },
     {
-     "t": 7.163,
+     "t": 5.963,
      "kind": "release",
      "arm": "transfer",
      "jaw_deg": 33.75
@@ -318,8 +318,8 @@
    "video": "rack_to_scale.mp4",
    "final_beaker_positions": {
     "P1": [
-     744.1,
-     468.8,
+     718.2,
+     372.2,
      61.6
     ],
     "dev": [
@@ -371,31 +371,31 @@
       "name": "approach park->above channel entry",
       "kind": "joint",
       "t_start": 0.095,
-      "t_end": 2.495
+      "t_end": 1.815
      },
      {
       "name": "lower to channel entry",
       "kind": "joint",
-      "t_start": 2.495,
-      "t_end": 2.895
+      "t_start": 1.815,
+      "t_end": 2.215
      },
      {
       "name": "slide in along finger channel",
       "kind": "cartesian",
-      "t_start": 2.895,
-      "t_end": 3.415
+      "t_start": 2.215,
+      "t_end": 2.595
      },
      {
       "name": "descend to carousel_pick",
       "kind": "cartesian",
-      "t_start": 3.415,
-      "t_end": 3.755
+      "t_start": 2.595,
+      "t_end": 2.935
      },
      {
       "name": "touch fixed finger to P1",
       "kind": "cartesian",
-      "t_start": 3.755,
-      "t_end": 3.895
+      "t_start": 2.935,
+      "t_end": 3.075
      }
     ],
     "grasps": [
@@ -403,7 +403,7 @@
       "outcome": "miss",
       "jaw_deg": 16.96,
       "expected_deg": 22.94,
-      "load_permille": 18.0,
+      "load_permille": 16.0,
       "detail": "jaw stopped -5.98 deg from the expected contact angle"
      }
     ],
@@ -411,7 +411,7 @@
    },
    "hold_slip_max_mm": 0.0,
    "hold_tilt_max_deg": 0.0,
-   "sim_seconds": 12.59,
+   "sim_seconds": 10.21,
    "stills": [
     {
      "t": 0.095,
@@ -420,13 +420,13 @@
      "camera": "bench_cam"
     },
     {
-     "t": 12.095,
+     "t": 9.715,
      "path": "deliberate_miss_8_failed.png",
      "label": "task failed: GRASP_MISS (jaw stopped -5.98 deg from the expected contact angle)",
      "camera": "bench_cam"
     },
     {
-     "t": 12.595,
+     "t": 10.215,
      "path": "deliberate_miss_9_final.png",
      "label": "final pose",
      "camera": "bench_cam"
@@ -447,7 +447,7 @@
    },
    "events": [
     {
-     "t": 4.635,
+     "t": 3.815,
      "kind": "grasp",
      "arm": "transfer",
      "outcome": "miss",
@@ -455,7 +455,7 @@
      "expected_deg": 22.94
     },
     {
-     "t": 12.095,
+     "t": 9.715,
      "kind": "abort_retreat",
      "arm": "transfer"
     }

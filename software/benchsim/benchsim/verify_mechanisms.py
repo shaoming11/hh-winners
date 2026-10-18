@@ -179,14 +179,20 @@ def check_carousel(model, builder, log=print):
     bb = bench(model, builder); w = bb.world; mech = Mechanisms(bb.mega); C = w.P['carousel']; st = mech.bench['stations']
     table = station_table(mech.bench); rows = []; stops = []
     seat = {b: mech.pocket_of(b) for b in ('P1', 'P2')}
-    for deg in (180.0, 90.0, 270.0, 0.0, 90.0, 270.0):        # every station angle, spans 180/90/180/270/90/180; ends at the demo moves
-        target = min(table, key=lambda r: abs(r['deck_deg'] - deg))['deck_deg']
+    # every (pocket, station) deck angle from the table; the auger need not be opposite the pick (trial saddle layout), so
+    # pick and auger stops can be different deck angles. Ends at P2 at the pick, as in the demo.
+    targets = []
+    for r in sorted(table, key=lambda r: (r['station'], r['pocket'])):
+        if r['deck_deg'] is not None and all(abs(r['deck_deg'] - t) > 0.5 for t in targets): targets.append(r['deck_deg'])
+    for target in targets:
         mv = mech.turn_deck(target); w.advance(SETTLE_S)
         deck = math.degrees(w.d.joint('carousel').qpos[0]); need = 1000.0 * C['min_s_per_45deg'] * mv['span_deg'] / 45.0
         stop = dict(cmd_deg=target, deck_deg=round(deck, 3), deck_error_deg=round(deck - target, 3), span_deg=mv['span_deg'], cmd_ms=mv['cmd_ms'],
                     min_ms=round(need, 1), travel_s=mv['travel_s'], overrun_s=round(mv['travel_s'] - mv['cmd_ms'] / 1000.0, 3), stations={}, beakers={})
         for s in ('pick', 'auger'):
-            k, aerr = mech.nearest_pocket(s); p = mm(w.d.site('pocket%d' % k).xpos)
+            k, aerr = mech.nearest_pocket(s)
+            if abs(aerr) > 1.0: continue                         # no pocket parked at this station on this stop
+            p = mm(w.d.site('pocket%d' % k).xpos)
             e = float(np.linalg.norm(p[:2] - np.asarray(st['carousel_' + s]['xy'])))
             stop['stations'][s] = dict(pocket=k, beaker=mech.pockets[k], position_error_mm=round(e, 3), table_error_deg=round(aerr, 3))
             rows.append(dict(pocket=k, station=s, deck_deg=target, measured_deck_deg=round(deck, 3), position_error_mm=round(e, 3)))
@@ -195,9 +201,9 @@ def check_carousel(model, builder, log=print):
             tilt = math.degrees(math.acos(np.clip(w.d.body('beaker_' + b).xmat[8], -1, 1)))
             stop['beakers'][b] = dict(pocket=k, offset_mm=round(float(np.linalg.norm(pb[:2] - ps[:2])), 3), tilt_deg=round(tilt, 3))
         stops.append(stop)
-        log('deck %6.1f: err %+.3f deg, travel %.2f s (cmd %.2f s), pick pocket %d %.3f mm, auger pocket %d %.3f mm' % (
-            target, deck - target, mv['travel_s'], mv['cmd_ms'] / 1000.0, stop['stations']['pick']['pocket'], stop['stations']['pick']['position_error_mm'],
-            stop['stations']['auger']['pocket'], stop['stations']['auger']['position_error_mm']))
+        log('deck %6.1f: err %+.3f deg, travel %.2f s (cmd %.2f s), %s' % (
+            target, deck - target, mv['travel_s'], mv['cmd_ms'] / 1000.0,
+            ', '.join('%s pocket %d %.3f mm' % (k, v['pocket'], v['position_error_mm']) for k, v in stop['stations'].items())))
     covered = {(r['pocket'], r['station']) for r in rows}
     gates = dict(
         all_pocket_station_pairs_visited=covered == {(r['pocket'], r['station']) for r in table},
@@ -414,10 +420,10 @@ def write_report(rep):
           '| Deck cmd (deg) | Span (deg) | Cmd (s) | Travel (s) | Deck error (deg) | Pick: pocket, error (mm) | Auger: pocket, error (mm) | P1 offset (mm) | P2 offset (mm) |',
           '|---|---|---|---|---|---|---|---|---|']
     for x in b['stops']:
-        L.append('| %.2f | %.1f | %.3f | %.3f | %+.3f | %d (%s), %.3f | %d (%s), %.3f | %.3f | %.3f |' % (
-            x['cmd_deg'], x['span_deg'], x['cmd_ms'] / 1000.0, x['travel_s'], x['deck_error_deg'], x['stations']['pick']['pocket'], x['stations']['pick']['beaker'],
-            x['stations']['pick']['position_error_mm'], x['stations']['auger']['pocket'], x['stations']['auger']['beaker'], x['stations']['auger']['position_error_mm'],
-            x['beakers']['P1']['offset_mm'], x['beakers']['P2']['offset_mm']))
+        cell = lambda v: '-' if v is None else '%d (%s), %.3f' % (v['pocket'], v['beaker'], v['position_error_mm'])   # no pocket parked there
+        L.append('| %.2f | %.1f | %.3f | %.3f | %+.3f | %s | %s | %.3f | %.3f |' % (
+            x['cmd_deg'], x['span_deg'], x['cmd_ms'] / 1000.0, x['travel_s'], x['deck_error_deg'], cell(x['stations'].get('pick')),
+            cell(x['stations'].get('auger')), x['beakers']['P1']['offset_mm'], x['beakers']['P2']['offset_mm']))
     L[-len(b['stops']):] = [x.replace('(None)', '(-)') for x in L[-len(b['stops']):]]
     L += ['', '## (c) Stage slider-crank', '', 'Analytic s(theta) = (r + L) - r cos(theta) - sqrt(L^2 - r^2 sin^2(theta)), r %.0f, L %.0f; s(%.0f deg) = %.4f mm.' % (
               P['stage']['crank_r'], P['stage']['rod_l'], P['stage']['erupt_deg'], c['analytic_150_mm']), '',

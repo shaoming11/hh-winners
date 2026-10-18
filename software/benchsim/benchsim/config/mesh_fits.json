@@ -17,14 +17,14 @@
   "part": "TT-04 v4 beaker ring",
   "file": "TT-04_beaker-ring-v4-4x100mL_qty1.stl",
   "body": "carousel",
-  "yaw_deg": 18.105325832605825,
+  "yaw_deg": -85.99467416739415,
   "t": [
-   -0.016734985655944,
-   0.0018549595239392147,
+   0.005875967059751019,
+   0.015778898277631015,
    58.6
   ],
   "verified": "fit: 4 pocket bores to the r84 pockets + floor Z",
-  "residual_mm": 0.12335734710567181,
+  "residual_mm": 0.12335734710563924,
   "note": "body frame = carousel deck at angle 0; bore r 30.34, locating ribs r 28.25"
  },
  {
@@ -143,10 +143,10 @@
   "part": "TT-01 v2 turntable base",
   "file": "TT-01_turntable-base-v2_qty1.stl",
   "body": "world",
-  "yaw_deg": 220.6,
+  "yaw_deg": 180.0,
   "t": [
-   807.9,
-   523.5,
+   755.7,
+   297.0,
    0.0
   ],
   "verified": "assumed: local origin on the carousel axis, rotated with the unit by update13_final carousel.rotation_deg",
