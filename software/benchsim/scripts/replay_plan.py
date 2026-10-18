@@ -88,7 +88,7 @@ def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td'):
         for pt, g in zip(pts, grips):
             qs, perr, aerr = K.ik(arm, site, pt, z_axis=R0[:, 2], q0=q[:5].tolist() + [q[5]], w_ori=20.0)   # straight line first; the tool may tilt (<= ~15 deg at the top: the wrist flex limit)
             q = np.r_[np.asarray(qs, float)[:5], math.radians(g)]
-            if perr > 2.0: raise ValueError('pick IK: %.1f mm off at %s' % (perr, np.round(pt, 1)))
+            if perr > 4.0: raise ValueError('pick IK: %.1f mm off at %s' % (perr, np.round(pt, 1)))
             out.append(q.tolist())
         return out
     A = p0 + P['back_mm'] * back + P['up_mm'] * up; B = p0 + P['back_mm'] * back
@@ -102,19 +102,53 @@ def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td'):
             dict(name='lift straight up', phase='carry', kind='cartesian', qs=lift)]
 
 
+def linear_place(arm, q_touch, grip_close_deg, site='grasp_td'):
+    """straight-line place around a hand-taught hold pose (relative, like linear_pick): arrive above it with the beaker
+    clear of the receiver's lip -> straight down -> open the jaws -> back off -> straight up. Returns (above_q, segments)."""
+    K, m = kin(); P = PICK
+    q_touch = np.asarray(q_touch, float); q_touch[5] = math.radians(grip_close_deg)
+    p0, R0 = K.site(arm, q_touch, site); K.set(arm, q_touch)
+    gpos = lambda n: [K.d.geom_xpos[i] * 1000 for i in range(m.ngeom) if m.geom(i).name == '%s/%s' % (arm, n)][0]
+    back = np.r_[(gpos('finger_fixed') - gpos('finger_moving'))[:2], 0.0]; back /= np.linalg.norm(back)
+    up = np.array([0.0, 0.0, 1.0])
+    def solve(pts, seed, grips):
+        out = []; q = seed.copy()
+        for pt, g in zip(pts, grips):
+            qs, perr, aerr = K.ik(arm, site, pt, z_axis=R0[:, 2], q0=q[:5].tolist() + [q[5]], w_ori=20.0)
+            q = np.r_[np.asarray(qs, float)[:5], math.radians(g)]
+            if perr > 4.0: raise ValueError('place IK: %.1f mm off at %s' % (perr, np.round(pt, 1)))
+            out.append(q.tolist())
+        return out
+    lin = lambda a, c, n: [a + (c - a) * t for t in np.linspace(0, 1, n)]
+    above = p0 + P['up_mm'] * up
+    down = solve(lin(above, p0, P['n_descend']), q_touch, [grip_close_deg] * P['n_descend'])
+    release = [down[-1][:5] + [math.radians(grip_close_deg)], down[-1][:5] + [math.radians(P['open_deg'])]]
+    off = solve(lin(p0, p0 + P['back_mm'] * back, P['n_advance']), np.asarray(release[-1]), [P['open_deg']] * P['n_advance'])
+    rise = solve(lin(p0 + P['back_mm'] * back, p0 + P['back_mm'] * back + P['lift_mm'] * up, P['n_lift']), np.asarray(off[-1]),
+                 [P['open_deg']] * P['n_lift'])
+    return [dict(name='straight down into the receiver', phase='carry', kind='cartesian', qs=down),
+            dict(name='release', phase='place', kind='grip', qs=release),
+            dict(name='back off the cup', phase='retreat', kind='cartesian', qs=off),
+            dict(name='straight up', phase='retreat', kind='cartesian', qs=rise)]
+
+
+TRANSFER_STEPS = {'1': ('transfer_carousel_pick', 'transfer_scale'), '4': ('transfer_scale', 'transfer_carousel_pick')}
+
+
 def taught_segments(segs, key):
-    """steps with a hand-taught pick: the plan's approach / slide / descend / touch / close / lift are replaced by the
-    straight-line pick around the taught pose; the plan's park approach now ends above it, its carry starts from the lift"""
-    T = load_taught()
-    if key.startswith('1 ') and 'transfer_carousel_pick' in T:
-        names = [g['name'] for g in segs]
-        i0, i1 = names.index('approach park->above channel entry'), names.index('lift from carousel_pick')
-        close = math.degrees(segs[names.index('close on P1')]['qs'][-1][5])
-        pick = linear_pick('transfer', T['transfer_carousel_pick'], close)
-        first = dict(segs[i0], qs=[segs[i0]['qs'][0], pick[0]['qs'][0]])     # park -> above the taught pick
-        carry = dict(segs[i1 + 1]); carry['qs'] = [pick[-1]['qs'][-1]] + carry['qs'][1:]
-        return segs[:i0] + [first] + pick + [carry] + segs[i1 + 2:]
-    return segs
+    """transfer steps whose pick and place spots are both hand-taught: park -> straight-line pick -> carry with the
+    beaker clear above the receiver -> straight-line place -> park (the plan's slide / channel moves are not used)"""
+    T = load_taught(); spots = TRANSFER_STEPS.get(key.split()[0])
+    if not spots or not all(sp in T for sp in spots): return segs
+    names = [g['name'] for g in segs]
+    close = math.degrees(segs[names.index('close on P1')]['qs'][-1][5])
+    park0, park1 = segs[0]['qs'][0], segs[-1]['qs'][-1]
+    pick = linear_pick('transfer', T[spots[0]], close)
+    place = linear_place('transfer', T[spots[1]], close)
+    J = lambda name, phase, a, b: dict(name=name, phase=phase, kind='joint', qs=[list(a), list(b)])
+    return ([J('park -> above the pick', 'approach', park0, pick[0]['qs'][0])] + pick +
+            [J('carry, beaker clear above the receiver', 'carry', pick[-1]['qs'][-1], place[0]['qs'][0])] + place +
+            [J('return to park', 'park', place[-1]['qs'][-1], park1)])
 
 
 def apply_overrides(segs, key, ov=None):
