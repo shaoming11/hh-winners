@@ -93,6 +93,9 @@ export class AlertWatcher {
         const summary = { text: runSummary(s), exclude: who ? [who] : [] };
         if (this.critTimer) this.pendingSummary = summary;              // merge into the alert message
         else await this.broadcast(summary.text, r.outcome === "SAFE_STOP", `run:${r.run_id}:${r.outcome}`, null, summary.exclude, r.outcome === "SAFE_STOP" ? "critical" : "run_complete");
+        // the task is finished: once the summary is out, every chat log is cleared (the run itself stays on the backend)
+        setTimeout(() => { const n = clearAll(); if (n) console.log(`[alerts] run ${r.run_id} ${r.outcome}: cleared ${n} chat log(s)`); },
+                   CONFIG.warningBatchMs + 15000);
       }
     }
   }
