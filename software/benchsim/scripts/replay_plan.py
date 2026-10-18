@@ -65,13 +65,17 @@ def kin():
     return _KIN['K'], _KIN['m']
 
 
+SPOT_DZ_MM = {'transfer_carousel_pick': 15.0,   # bench 2026-10-18: the grab was 1-2 cm low (caught the carousel ring)
+              'transfer_scale': 10.0}          # and the place on the scale 1 cm low
+
+
 def load_taught():
     try:
         with open(TAUGHT) as f: return json.load(f)
     except (OSError, ValueError): return {}
 
 
-def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td'):
+def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0):
     """straight-line top-down pick around a hand-taught touch pose, built RELATIVE to it (sim kinematics give the
     directions; the absolute sim/bench offset at this pose cancels): above-and-back -> straight down (jaws wide) ->
     advance onto the cup while the jaws close -> straight up. Returns four segments (joint, descend, advance, lift)."""
@@ -79,6 +83,7 @@ def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td'):
     q_touch = np.asarray(q_touch, float)
     p0, R0 = K.site(arm, q_touch, site)
     K.set(arm, q_touch)
+    p0 = p0 + np.array([0.0, 0.0, dz_mm])                                   # height correction for this spot
     gpos = lambda n: [K.d.geom_xpos[i] * 1000 for i in range(m.ngeom) if m.geom(i).name == '%s/%s' % (arm, n)][0]
     ff, fm = gpos('finger_fixed'), gpos('finger_moving')
     back = np.r_[(ff - fm)[:2], 0.0]; back /= np.linalg.norm(back)          # away from the cup, toward the fixed finger
@@ -102,12 +107,13 @@ def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td'):
             dict(name='lift straight up', phase='carry', kind='cartesian', qs=lift)]
 
 
-def linear_place(arm, q_touch, grip_close_deg, site='grasp_td'):
+def linear_place(arm, q_touch, grip_close_deg, site='grasp_td', dz_mm=0.0):
     """straight-line place around a hand-taught hold pose (relative, like linear_pick): arrive above it with the beaker
     clear of the receiver's lip -> straight down -> open the jaws -> back off -> straight up. Returns (above_q, segments)."""
     K, m = kin(); P = PICK
     q_touch = np.asarray(q_touch, float); q_touch[5] = math.radians(grip_close_deg)
     p0, R0 = K.site(arm, q_touch, site); K.set(arm, q_touch)
+    p0 = p0 + np.array([0.0, 0.0, dz_mm])                                   # height correction for this spot
     gpos = lambda n: [K.d.geom_xpos[i] * 1000 for i in range(m.ngeom) if m.geom(i).name == '%s/%s' % (arm, n)][0]
     back = np.r_[(gpos('finger_fixed') - gpos('finger_moving'))[:2], 0.0]; back /= np.linalg.norm(back)
     up = np.array([0.0, 0.0, 1.0])
@@ -143,8 +149,8 @@ def taught_segments(segs, key):
     names = [g['name'] for g in segs]
     close = math.degrees(segs[names.index('close on P1')]['qs'][-1][5])
     park0, park1 = segs[0]['qs'][0], segs[-1]['qs'][-1]
-    pick = linear_pick('transfer', T[spots[0]], close)
-    place = linear_place('transfer', T[spots[1]], close)
+    pick = linear_pick('transfer', T[spots[0]], close, dz_mm=SPOT_DZ_MM.get(spots[0], 0.0))
+    place = linear_place('transfer', T[spots[1]], close, dz_mm=SPOT_DZ_MM.get(spots[1], 0.0))
     J = lambda name, phase, a, b: dict(name=name, phase=phase, kind='joint', qs=[list(a), list(b)])
     return ([J('park -> above the pick', 'approach', park0, pick[0]['qs'][0])] + pick +
             [J('carry, beaker clear above the receiver', 'carry', pick[-1]['qs'][-1], place[0]['qs'][0])] + place +
