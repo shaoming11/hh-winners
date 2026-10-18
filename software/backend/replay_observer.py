@@ -40,6 +40,19 @@ STATION_WORDS = {"carousel_pick": "the carousel", "scale_pan": "the scale", "rac
                  "funnel": "the funnel"}
 
 
+def carry_verb(name: str) -> str:
+    """what a 'carry' segment does, by meaning, not by its exact wording (taught paths renamed them: 'lift straight up',
+    'carry, beaker clear above the receiver', 'straight down into the receiver')"""
+    n = name.lower()
+    if n.startswith("raise"):
+        return "raise"
+    if n.startswith("lift") or "straight up" in n:
+        return "lift"
+    if n.startswith("lower") or "straight down" in n or "down into" in n or "down onto" in n:
+        return "lower"
+    return "carry"
+
+
 def _where(s):
     return STATION_WORDS.get(s, s)
 
@@ -104,7 +117,7 @@ class ReplayModel:
         for i, sg in enumerate(segs):
             ph = sg["phase"]
             # the plan's "carry" phase is lift + carry across + lower: three things with different checks
-            verb = sg["name"].split(" ")[0] if ph == "carry" else ph
+            verb = carry_verb(sg["name"]) if ph == "carry" else ph
             if out and out[-1]["phase"] == ph and out[-1]["verb"] == verb:
                 out[-1]["segs"].append(i); continue
             n = seen[(ph, verb)] = seen.get((ph, verb), 0) + 1
