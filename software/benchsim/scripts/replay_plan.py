@@ -70,6 +70,7 @@ SPOT_DZ_MM = {'transfer_carousel_pick': 15.0,   # bench 2026-10-18: the grab was
               'pourer_rack1': 30.0}            # the pourer's peroxide grab 3 cm higher (2 + 1 after the second test)
 OPEN_DEG = {'pourer': 55.0}                    # approach opening per arm (the pourer's side grasp: less wide)
 BACK_MM = {'pourer': 8.0}                      # approach offset per arm
+POUR_DZ_MM = {'2': -20.0}                      # bench 2026-10-18: the peroxide pour over the scale 2 cm lower
 CLOSE_AFTER_ADVANCE = {'pourer'}               # advance with the jaws open, THEN close (closing while moving shoved the beaker)
 CARRY_TUCK_MM, CARRY_RISE_MM, CARRY_N = 30.0, 25.0, 16   # pourer carries arc around its base, closer to the arms
 
@@ -176,7 +177,23 @@ def carry_arc(arm, q_from, q_to, site='grasp_side', name='carry'):
     return dict(name=name + ' (arc, close to the arms)', phase='carry', kind='cartesian', qs=out)
 
 
-def pourer_taught(segs, q_spot, spot):
+def shift_block(arm, block, dz_mm, site='grasp_side'):
+    """the same poses dz_mm lower/higher: every waypoint re-solved with its full gripper orientation kept"""
+    if not dz_mm: return block
+    K, m = kin(); out = []
+    for g in block:
+        qs = []
+        for q in g['qs']:
+            q = np.asarray(q, float); p, R = K.site(arm, q, site)
+            sol, perr, aerr = K.ik(arm, site, p + np.array([0.0, 0.0, dz_mm]), z_axis=R[:, 2], x_axis=R[:, 0],
+                                   q0=q[:5].tolist() + [q[5]], w_ori=100.0, max_dev=0.25)
+            if perr > 3.0 or aerr > 3.0: raise ValueError('pour shift: %.1f mm / %.1f deg off' % (perr, aerr))
+            qs.append(np.r_[np.asarray(sol, float)[:5], q[5]].tolist())
+        out.append(dict(g, qs=qs))
+    return out
+
+
+def pourer_taught(segs, q_spot, spot, step=None):
     """pourer step with a hand-taught grab spot: straight-line grab there, the plan's carry / pour / raise in between,
     and the beaker put back on the same spot with a straight-line place"""
     names = [g['name'] for g in segs]
@@ -186,9 +203,10 @@ def pourer_taught(segs, q_spot, spot):
     place = linear_place('pourer', q_spot, close, site='grasp_side', dz_mm=dz)
     i_carry = names.index('carry to above pre-pour'); i_raise = names.index('raise from pre-pour')
     J = lambda name, phase, a, b: dict(name=name, phase=phase, kind='joint', qs=[list(a), list(b)])
+    pour = shift_block('pourer', segs[i_carry + 1:i_raise + 1], POUR_DZ_MM.get(step, 0.0))   # lower / tilt / pour / untilt / raise
     return ([J('park -> above the grab', 'approach', segs[0]['qs'][0], pick[0]['qs'][0])] + pick +
-            [carry_arc('pourer', pick[-1]['qs'][-1], segs[i_carry]['qs'][-1], name='carry to above pre-pour')] + segs[i_carry + 1:i_raise + 1] +
-            [carry_arc('pourer', segs[i_raise]['qs'][-1], place[0]['qs'][0], name='carry back above the spot')] + place +
+            [carry_arc('pourer', pick[-1]['qs'][-1], pour[0]['qs'][0], name='carry to above pre-pour')] + pour +
+            [carry_arc('pourer', pour[-1]['qs'][-1], place[0]['qs'][0], name='carry back above the spot')] + place +
             [J('return to park', 'park', place[-1]['qs'][-1], segs[-1]['qs'][-1])])
 
 
@@ -197,7 +215,7 @@ def taught_segments(segs, key):
     beaker clear above the receiver -> straight-line place -> park (the plan's slide / channel moves are not used)"""
     T = load_taught()
     pour = POURER_STEPS.get(key.split()[0])
-    if pour and pour in T: return pourer_taught(segs, T[pour], pour)
+    if pour and pour in T: return pourer_taught(segs, T[pour], pour, key.split()[0])
     spots = TRANSFER_STEPS.get(key.split()[0])
     if not spots or not all(sp in T for sp in spots): return segs
     names = [g['name'] for g in segs]
