@@ -320,7 +320,9 @@ def turn_deck(mega, deg, bench):
         try: return mega.motion('TT', done_timeout=ms / 1000 + 6, deg=float(deg), ms=ms)
         except MegaError as e:
             if attempt == 2: raise
-            print('   carousel: %s, retrying once' % e, flush=True); mega_start(mega, bench)
+            print('   carousel: %s, retrying once' % e, flush=True)
+            p = mega.command('PING')                    # clear only: the sled stays where it is
+            mega.command('CLR', home=True) if p.get('pos') == 'unknown' else mega.command('CLR')
 
 
 def deck_for_step(name, bench):
