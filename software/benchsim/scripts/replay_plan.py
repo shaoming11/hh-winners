@@ -46,6 +46,77 @@ def save_overrides(ov):
     with open(OVERRIDES, 'w') as f: json.dump(ov, f, indent=1)
 
 
+TAUGHT = os.path.join(paths.SIM_ROOT, 'benchsim', 'config', 'taught_poses.json')   # absolute hand-taught grasp poses
+PICK = dict(back_mm=15.0, up_mm=70.0, lift_mm=60.0, n_descend=12, n_advance=8, n_lift=8, open_deg=85.0)
+_KIN = {}
+
+
+def kin():
+    if not _KIN:
+        from benchsim import scene
+        from benchsim.kinematics import Kin
+        m, b = scene.build(); K = Kin(m)
+        cal = json.load(open(CAL))['arms']                 # IK bounds = the arms' calibrated (physical) limits, not the MJCF's
+        names = ('shoulder_pan', 'shoulder_lift', 'elbow_flex', 'wrist_flex', 'wrist_roll')
+        for arm in K.range:
+            for j, n in enumerate(names):
+                J = cal[arm]['joints'][n]; K.range[arm][j] = [math.radians(J['min_deg']), math.radians(J['max_deg'])]
+        _KIN['K'] = K; _KIN['m'] = m
+    return _KIN['K'], _KIN['m']
+
+
+def load_taught():
+    try:
+        with open(TAUGHT) as f: return json.load(f)
+    except (OSError, ValueError): return {}
+
+
+def linear_pick(arm, q_touch, grip_close_deg, site='grasp_td'):
+    """straight-line top-down pick around a hand-taught touch pose, built RELATIVE to it (sim kinematics give the
+    directions; the absolute sim/bench offset at this pose cancels): above-and-back -> straight down (jaws wide) ->
+    advance onto the cup while the jaws close -> straight up. Returns four segments (joint, descend, advance, lift)."""
+    K, m = kin()
+    q_touch = np.asarray(q_touch, float)
+    p0, R0 = K.site(arm, q_touch, site)
+    K.set(arm, q_touch)
+    gpos = lambda n: [K.d.geom_xpos[i] * 1000 for i in range(m.ngeom) if m.geom(i).name == '%s/%s' % (arm, n)][0]
+    ff, fm = gpos('finger_fixed'), gpos('finger_moving')
+    back = np.r_[(ff - fm)[:2], 0.0]; back /= np.linalg.norm(back)          # away from the cup, toward the fixed finger
+    up = np.array([0.0, 0.0, 1.0]); P = PICK
+    def solve(pts, seed, grips):
+        out = []; q = seed.copy()
+        for pt, g in zip(pts, grips):
+            qs, perr, aerr = K.ik(arm, site, pt, z_axis=R0[:, 2], q0=q[:5].tolist() + [q[5]], w_ori=20.0)   # straight line first; the tool may tilt (<= ~15 deg at the top: the wrist flex limit)
+            q = np.r_[np.asarray(qs, float)[:5], math.radians(g)]
+            if perr > 2.0: raise ValueError('pick IK: %.1f mm off at %s' % (perr, np.round(pt, 1)))
+            out.append(q.tolist())
+        return out
+    A = p0 + P['back_mm'] * back + P['up_mm'] * up; B = p0 + P['back_mm'] * back
+    lin = lambda a, c, n: [a + (c - a) * t for t in np.linspace(0, 1, n)]
+    descend = solve(lin(A, B, P['n_descend']), q_touch, [P['open_deg']] * P['n_descend'])
+    adv_g = list(np.linspace(P['open_deg'], grip_close_deg, P['n_advance']))
+    advance = solve(lin(B, p0, P['n_advance']), np.asarray(descend[-1]), adv_g)
+    lift = solve(lin(p0, p0 + P['lift_mm'] * up, P['n_lift']), np.asarray(advance[-1]), [grip_close_deg] * P['n_lift'])
+    return [dict(name='straight down, jaws wide (15 mm back)', phase='approach', kind='cartesian', qs=descend),
+            dict(name='advance onto the cup while closing', phase='pick', kind='cartesian', qs=advance),
+            dict(name='lift straight up', phase='carry', kind='cartesian', qs=lift)]
+
+
+def taught_segments(segs, key):
+    """steps with a hand-taught pick: the plan's approach / slide / descend / touch / close / lift are replaced by the
+    straight-line pick around the taught pose; the plan's park approach now ends above it, its carry starts from the lift"""
+    T = load_taught()
+    if key.startswith('1 ') and 'transfer_carousel_pick' in T:
+        names = [g['name'] for g in segs]
+        i0, i1 = names.index('approach park->above channel entry'), names.index('lift from carousel_pick')
+        close = math.degrees(segs[names.index('close on P1')]['qs'][-1][5])
+        pick = linear_pick('transfer', T['transfer_carousel_pick'], close)
+        first = dict(segs[i0], qs=[segs[i0]['qs'][0], pick[0]['qs'][0]])     # park -> above the taught pick
+        carry = dict(segs[i1 + 1]); carry['qs'] = [pick[-1]['qs'][-1]] + carry['qs'][1:]
+        return segs[:i0] + [first] + pick + [carry] + segs[i1 + 2:]
+    return segs
+
+
 def apply_overrides(segs, key, ov=None):
     """hand-taught corrections (deg per joint) for poses of step ``key``: the taught segment and the slow (non-joint)
     segments touching it shift by the offset; the neighbouring joint moves end / start at the shifted pose"""
@@ -163,7 +234,7 @@ def bench_segments(segs, key=None):
     pour manifold cut before its arm-flip region, a drain hold, then the pour retraced back to the 40 deg pose
     (the plan's untilt starts at 40 deg, which made the arm snap back from 105 deg)"""
     out = []; closed = False
-    if key is not None: segs = apply_overrides(segs, key)
+    if key is not None: segs = taught_segments(apply_overrides(segs, key), key)
     for seg in segs:
         seg = dict(seg); qs = [list(q) for q in seg['qs']]
         if seg['phase'] == 'pick': qs[0][5] = math.radians(APPROACH_GRIP_DEG); closed = True
