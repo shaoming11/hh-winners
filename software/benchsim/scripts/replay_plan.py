@@ -28,11 +28,13 @@ PORTS = dict(port_mega=os.environ.get('WLB_MEGA', '/dev/cu.usbserial-1130'),
              port_pourer=os.environ.get('WLB_POURER', '/dev/cu.usbmodem58760435221'),
              port_transfer=os.environ.get('WLB_TRANSFER', '/dev/cu.usbmodem58CD1767761'))
 CAL = os.path.join(paths.SIM_ROOT, 'benchsim', 'config', 'hardware_calibration.bench.json')
-REACH_DEG = 3.0          # a waypoint counts as reached inside this (largest joint error)
+REACH_DEG = 5.0          # a segment's last waypoint counts as reached inside this (gravity sag is ~3 deg)
+PASS_DEG = 12.0          # intermediate waypoints: move on once inside this (the arm flows through them)
 # rest pose: both arms folded back (lift back, elbow folded), where they hold themselves with the power off
 # (measured 2026-10-18 as the mean of both arms resting, pulled just inside the calibrated limits)
 REST_DEG = [-9.0, -99.0, 93.0, -10.0, 0.0, 0.0]
-WAYPOINT_TIMEOUT_S = 8.0
+WAYPOINT_TIMEOUT_S = 2.0          # last waypoint of a segment
+PASS_TIMEOUT_S = 0.4              # intermediate waypoints
 
 
 def deck_for_step(name, bench):
@@ -43,32 +45,33 @@ def deck_for_step(name, bench):
     return mechanisms.deck_angle(C['pocket_ids_deg'][pocket], brg['pick'], C['deck_range_deg'])
 
 
-def go(arm, q, speed, label=''):
-    """command one waypoint and wait until every joint is within REACH_DEG (or the timeout)"""
+def go(arm, q, speed, label='', tol=REACH_DEG, timeout=WAYPOINT_TIMEOUT_S, quiet=False):
+    """command one waypoint and wait until every joint is within tol (or the timeout)"""
     arm.set_goal(np.asarray(q, float), speed_scale=speed)
     t0 = time.time(); err = float('nan'); misses = 0
-    while time.time() - t0 < WAYPOINT_TIMEOUT_S:
+    while time.time() - t0 < timeout:
         try:
             err = np.degrees(np.abs(arm.read_positions() - np.asarray(q, float)))[:5].max(); misses = 0
         except ConnectionError as e:                  # a dropped status packet: the arm keeps its goal, try again
             misses += 1
             if misses >= 10: raise
             time.sleep(0.05); continue
-        if err < REACH_DEG: return err
+        if err < tol: return err
         time.sleep(0.03)
-    print('   %s: waypoint not reached in %.0f s (largest joint error %.1f deg), continuing' % (label, WAYPOINT_TIMEOUT_S, err), flush=True)
+    if not quiet: print('   %s: %.1f deg off after %.1f s, continuing' % (label, err, timeout), flush=True)
     return err
 
 
 def play_segment(arm, seg, speed):
     qs = seg['qs']
     if seg['kind'] == 'joint' and len(qs) == 2: qs = qs[1:]          # joint moves: straight to the end
-    for q in qs: go(arm, q, speed, seg['name'])
+    for q in qs[:-1]: go(arm, q, speed, seg['name'], PASS_DEG, PASS_TIMEOUT_S, quiet=True)
+    go(arm, qs[-1], speed, seg['name'])
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--speed', type=float, default=0.3, help='fraction of the calibration max speed (default 0.3)')
+    ap.add_argument('--speed', type=float, default=0.6, help='fraction of the calibration max speed (default 0.6)')
     ap.add_argument('--steps', nargs='*', help='step numbers to run (default all), e.g. 1 4')
     ap.add_argument('--no-mega', action='store_true', help='leave the carousel alone')
     ap.add_argument('--yes', action='store_true', help='do not wait for Enter between steps')
@@ -105,23 +108,22 @@ def main():
     for w in getattr(bb, 'warnings', []): print('warning:', w)
     try:
         for name, arm in arms.items(): arm.set_torque(True); print('%s torque on (holding the present pose)' % name)
+        rest = np.radians(REST_DEG)
         if mega is not None:
             mega.command('CLR', home=True)
-        rest = np.radians(REST_DEG)
         if a.rest:
             for name, arm in arms.items():
                 if not a.yes: input('\nEnter: move %s to the rest pose (slow) ' % name)
                 go(arm, rest, min(a.speed, 0.3), 'rest ' + name)
             for arm in arms.values(): arm.set_torque(False)
             print('both arms at rest, torque off'); return 0
-        # park both arms first, one at a time (the plan assumes the other arm is parked)
+        # from wherever they are (usually rest) both arms go to the plan's park pose, one at a time
         park = {}
         for k in plans:
-            arm_name = plans[k]['arm']
-            if arm_name not in park: park[arm_name] = plans[k]['segments'][0]['qs'][0]
+            if plans[k]['arm'] not in park: park[plans[k]['arm']] = plans[k]['segments'][0]['qs'][0]
         for name, q in park.items():
-            if not a.yes: input('\nEnter: move %s to its park pose (slow) ' % name)
-            go(arms[name], q, min(a.speed, 0.3), 'park ' + name)
+            if not a.yes: input('\nEnter: move %s to the park pose ' % name)
+            go(arms[name], q, a.speed, 'park ' + name)
         for k in order:
             s = plans[k]; arm = arms[s['arm']]
             deck = deck_for_step(k, bench)
