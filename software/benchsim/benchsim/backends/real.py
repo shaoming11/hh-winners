@@ -438,7 +438,8 @@ class LeRobotArm:
         vpk = self.vmax_deg_s * speed_scale * self.tpr / 360.0                      # ticks/s for the largest move
         t_move = max(dq.max() / vpk, 1e-3)
         unit = self.sts['goal_velocity_unit_ticks_s']
-        vel = {n: int(min(max(round(dq[i] / t_move / unit), 1), round(vpk / unit))) for i, n in enumerate(JOINTS)}
+        floor = 0.3 * vpk / unit                  # never a crawl speed: Goal_Velocity goes out in a sync write (no reply), so a
+        vel = {n: int(min(max(round(dq[i] / t_move / unit), floor), round(vpk / unit))) for i, n in enumerate(JOINTS)}   # lost write must not leave a joint at 1 step/s
         self._write('Goal_Velocity', vel)
         self._write('Goal_Position', ticks)
         self._goal = ticks

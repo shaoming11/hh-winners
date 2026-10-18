@@ -220,8 +220,10 @@ def test_live_arm_connect_limp_enable_without_snap_and_synchronised_goal(cal):
     assert (r1, r2) == ('Goal_Velocity', 'Goal_Position')
     assert goal == a.map.q_to_ticks(q)
     dq = {n: abs(goal[n] - bus.regs['Present_Position'][n]) for n in JOINTS}
-    t = [dq[n] / vel[n] for n in JOINTS if dq[n] > 50]
-    assert max(vel.values()) == round(30.0 * 4096 / 360) and max(t) - min(t) < 0.05      # all joints arrive together
+    vpk = round(30.0 * 4096 / 360); floor = 0.3 * vpk
+    t = [dq[n] / vel[n] for n in JOINTS if dq[n] > 50 and vel[n] > floor + 1]
+    assert max(vel.values()) == vpk and max(t) - min(t) < 0.05      # joints above the floor arrive together
+    assert min(vel.values()) >= int(floor)                        # no crawl speeds (a lost sync write must not strand a joint)
     with pytest.raises(ValueError): a.set_goal(np.radians([150.0, 0, 0, 0, 0, 0]))      # outside the calibrated range
     with pytest.raises(ValueError): a.set_goal(q, speed_scale=1.5)
     assert len(bus.writes) == n0 + 2
