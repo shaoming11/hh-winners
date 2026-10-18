@@ -413,6 +413,7 @@ void default_config(Config& c) {
     c.home_st_deg = 0.0f;                             // [stage] work_deg
     // FB5311M-360 auger ([mega] aug_*; [auger] stall rule)
     c.aug_us_stop = 1500; c.aug_us_offset = 200;
+    c.tt_release = 1;                                 // [mega] tt_release: deck held by friction between moves (2026-10-17)
     c.aug_timed = 1;                                  // [mega] aug_timed: the A2 feedback wire is not fitted yet
     c.aug_rev_per_s = 0.37f;                          // [mega] aug_rev_per_s: fit 2026-10-17, turns = 0.37 * s + 0.19 (4 doses)
     c.aug_start_ms = 0;                               // [mega] aug_start_ms
@@ -679,6 +680,7 @@ void Core::axis_tick(uint32_t now) {
         x.rest_deg = x.cur_deg = mv_.deg1;
         x.us = mv_.us1;
         x.known = true;
+        if (i == 0 && cfg_.tt_release) x.driven = false;   // limp between moves; the next move starts from rest_deg
         motion_ = M_NONE;
         save();
         Writer w;

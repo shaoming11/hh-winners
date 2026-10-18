@@ -252,7 +252,7 @@ def test_sketch_register_logic_against_stub_avr_registers(tmp_path):
     for h in ('io.h', 'interrupt.h'): (tmp_path / 'avr' / h).write_text('#pragma once\n#include "../Arduino.h"\n')
     (tmp_path / 'smoke.cpp').write_text(SMOKE.replace('SKETCH', str(real.SKETCH / 'wlb_mega.ino')))
     exe = tmp_path / 'smoke'
-    r = subprocess.run([CXX, '-std=c++11', '-Wall', '-Wextra', '-I', str(tmp_path), '-o', str(exe), str(tmp_path / 'smoke.cpp'),
+    r = subprocess.run([CXX, '-std=c++11', '-DWLB_USE_ESTOP', '-Wall', '-Wextra', '-I', str(tmp_path), '-o', str(exe), str(tmp_path / 'smoke.cpp'),
                         str(real.SKETCH / 'protocol_core.cpp')], capture_output=True, text=True)
     assert r.returncode == 0, r.stderr[-3000:]
     lines = [protocol.encode(dict(cmd='CLR', seq=1, home=True)), protocol.encode(dict(cmd='TT', seq=2, deg=10.0, ms=2000)),

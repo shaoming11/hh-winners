@@ -131,7 +131,8 @@ struct Config {
     uint8_t aug_timed;         // 1 = no feedback wire: progress from time at aug_rev_per_s, no stall rule
     float aug_rev_per_s;       // measured auger speed at aug_us_offset (timed mode)
     uint32_t aug_start_ms;     // timed mode: spin-up time not counted as progress at the start of each dose
-    float aug_coast_rev;       // timed mode: turns the screw coasts after the stop pulse; credited at the start of a dose
+    float aug_coast_rev;
+    uint8_t tt_release;        // 1 = stop the TT pulses once a move is done (heavy deck: the servo's own loop hunts while holding)       // timed mode: turns the screw coasts after the stop pulse; credited at the start of a dose
     uint16_t aug_adc_min, aug_adc_max;
     uint32_t stall_window_ms;
     float stall_min_deg;

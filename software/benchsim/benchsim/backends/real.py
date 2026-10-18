@@ -573,7 +573,7 @@ def firmware_config_expected(P=None):
         'aug_adc_min': M['aug_fb_adc_min'], 'aug_adc_max': M['aug_fb_adc_max'], 'stall_window_ms': A['stall_window_s'] * 1000,
         'stall_min_deg': A['stall_min_deg'], 'max_stalls': A['max_stalls'], 'reverse_deg': A['reverse_rev'] * 360.0,
         'fb_max_step_deg': M['aug_fb_max_step_deg'], 'fb_glitch_resync': M['aug_fb_glitch_resync'],
-        'aug_timed': 1.0 if M['aug_timed'] else 0.0, 'aug_rev_per_s': M['aug_rev_per_s'], 'aug_start_ms': M['aug_start_ms'], 'aug_coast_rev': M['aug_coast_rev'],
+        'aug_timed': 1.0 if M['aug_timed'] else 0.0, 'tt_release': 1.0 if M['tt_release'] else 0.0, 'aug_rev_per_s': M['aug_rev_per_s'], 'aug_start_ms': M['aug_start_ms'], 'aug_coast_rev': M['aug_coast_rev'],
     }
 
 
