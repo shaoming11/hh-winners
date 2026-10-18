@@ -83,6 +83,17 @@ def sled_wait():
     while SLED: nap(0.05)
 
 
+def turn_deck(mega, deg, bench):
+    """carousel move with one retry: a TT_TIMEOUT that does not reproduce happened once on the bench"""
+    for attempt in (1, 2):
+        cur = mega.command('PING').get('tt') or 0.0
+        ms = int(max(1000, abs(deg - cur) / 45.0 * 1000 * bench['params']['carousel']['min_s_per_45deg']) + 200)
+        try: return mega.motion('TT', done_timeout=ms / 1000 + 6, deg=float(deg), ms=ms)
+        except MegaError as e:
+            if attempt == 2: raise
+            print('   carousel: %s, clearing and retrying once' % e, flush=True); mega.command('CLR')
+
+
 def deck_for_step(name, bench):
     """deck angle that puts the step's carousel pocket at the pick spot (None: the step does not use the carousel)"""
     if 'carousel' not in name: return None
@@ -162,6 +173,7 @@ def main():
     ap.add_argument('--steps', nargs='*', help='step numbers to run (default all), e.g. 1 4')
     ap.add_argument('--no-mega', action='store_true', help='leave the carousel alone')
     ap.add_argument('--yes', action='store_true', help='do not wait for Enter between steps')
+    ap.add_argument('--end-turn', type=float, default=90.0, help='carousel angle at the very end (0 = no turn; default 90)')
     ap.add_argument('--rest', action='store_true', help='only send both arms to the rest pose, then torque off')
     ap.add_argument('--check', action='store_true', help='pre-flight only: open the ports read-only, check every waypoint, move nothing')
     a = ap.parse_args()
@@ -225,9 +237,7 @@ def main():
             if a.yes: print(msg)
             else: input(msg)
             if deck is not None and mega is not None:
-                cur = mega.command('PING').get('tt') or 0.0
-                ms = int(max(1000, abs(deck - cur) / 45.0 * 1000 * bench['params']['carousel']['min_s_per_45deg']) + 200)
-                r = mega.motion('TT', done_timeout=ms / 1000 + 6, deg=float(deck), ms=ms)
+                r = turn_deck(mega, deck, bench)
                 print('   carousel at %.1f deg' % r['deg'], flush=True)
             funnel = 'funnel' in k
             for seg in bench_segments(s['segments']):
@@ -243,6 +253,8 @@ def main():
             end = s['segments'][-1]['qs'][-1]
             err = go(arm, end, a.speed, 'back at park', tol=8.0, timeout=15.0)
             if not err < 8.0: raise TimeoutError('%s arm did not get back to park (%.0f deg off)' % (s['arm'], err))
+        if mega is not None and a.end_turn:             # finale: the next cup comes round to the pick spot
+            r = turn_deck(mega, a.end_turn, bench); print('carousel turned to %.0f deg (end)' % r['deg'], flush=True)
         if mega is not None and last_funnel:
             St = bench['params']['stage']
             r = mega.motion('ST', done_timeout=St['move_s'] + St['timeout_extra_s'] + 3, deg=float(St['work_deg']), ms=int(St['move_s'] * 1000))
