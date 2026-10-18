@@ -470,7 +470,11 @@ def sled_wait():
 def mega_start(mega, bench):
     """clear faults WITHOUT forgetting where the axes are (CLR home only when the Mega has lost track: it declares the
     axes at home without moving them), then bring the sled out to WORK, the start position of every run"""
-    p = mega.command('PING')
+    for attempt in range(3):          # the first command after the backend opens the port can go unanswered: ask again
+        try: p = mega.command('PING'); break
+        except TimeoutError:
+            if attempt == 2: raise
+            print('Mega did not answer PING, asking again', flush=True); CLOCK.sleep(0.5)
     mega.command('CLR', home=True) if p.get('pos') == 'unknown' else mega.command('CLR')
     St = bench['params']['stage']; st = mega.command('PING').get('st')
     if st is None or abs(st - St['work_deg']) > 2.0:
