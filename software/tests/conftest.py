@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "benchsim"))   # be
 # this the suite's chat/people/run records land in the demo's shared out/backend - test handles
 # like "+1999" used to pile up in out/backend/people.json and run folders in out/backend/runs.
 os.environ.setdefault("WLB_BACKEND_DIR", tempfile.mkdtemp(prefix="wlb-test-store-"))
+os.environ.setdefault("WLB_PLAN_MODE", "full")      # the tests were written against the full process
 
 
 @pytest.fixture(scope="session")

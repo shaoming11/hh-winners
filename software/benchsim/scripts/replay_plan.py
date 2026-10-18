@@ -569,6 +569,94 @@ def bench_segments(segs, key=None, arm=None):
     return out
 
 
+# ---------------------------------------------------------------- step 2: the peroxide pour onto P1, closed loop by weight
+CLOSED_LOOP_STEPS = ('2',)       # route steps whose pour runs on the scale (benchsim.process.pour.PourController)
+UNTILT_RATE_DEG_S = 60.0         # after the controller is done: back to upright at this rate (demo_run's untilt)
+SETTLE_S = 1.5                   # then let the scale settle before the final reading
+
+
+def closed_loop_span(key, segs):
+    """(first, last) index of the played segments a closed-loop pour replaces in step ``key`` - the tilt-in, the
+    smooth pour, the drain hold, the retrace and the untilt back to pre-pour - or None (the step pours open loop)"""
+    if key.split()[0] not in CLOSED_LOOP_STEPS: return None
+    first = next((i for i, g in enumerate(segs) if g['phase'] == 'pour'), None)
+    last = next((i for i, g in enumerate(segs) if g['phase'] == 'pour' and g['name'].startswith('untilt')), None)
+    return (first, last) if first is not None and last is not None and last > first else None
+
+
+def pour_table(arm_name, segs, info):
+    """(thetas, qs) along the PLAYED pour path (taught / re-solved poses included): 'tilt-in 0->40' then the smooth
+    part of the manifold. theta = the held beaker's axis from vertical, by forward kinematics with the grasp the plan
+    assumed (benchsim.process.pour_sim.manifold_table, on these segments instead of a planner's)"""
+    from benchsim.trajectories import _held_T
+    K, _ = kin()
+    tilt = [g for g in segs if g['phase'] == 'pour' and not g['name'].startswith('untilt')]
+    qs = []
+    for g in tilt:
+        qs += [list(q) for q in (g['qs'] if not qs else g['qs'][1:])]
+    T = _held_T(info['sign'], info['grip_h_used'])
+    th = []
+    for q in qs:
+        _, R = K.site(arm_name, np.asarray(q, float), 'grasp_side'); u = R @ T[:3, :3][:, 2]
+        th.append(math.degrees(math.acos(float(np.clip(u[2], -1, 1)))))
+    th = np.asarray(th); qs = np.asarray(qs, float)
+    keep = np.r_[True, np.diff(th) > 1e-6]               # the table must rise monotonically in theta
+    return th[keep], qs[keep]
+
+
+class _Paced:
+    """an ArmBackend view whose goals go out at the replay's speed (ManifoldTilt calls set_goal(q))"""
+    def __init__(self, arm, speed): self.arm = arm; self.speed = speed
+    def set_goal(self, q, speed_scale=None): self.arm.set_goal(q, speed_scale=self.speed)
+
+
+def closed_loop_pour(arm, arm_name, segs, mega, info, speed, reagent='developer'):
+    """pour onto the receiver on the scale by weight instead of along the fixed tilt: PourController (FAST to 40 deg,
+    RAMP to the first drop, FLOW on the scale, CUT, DRIP, SETTLE, TOPUP) drives the tilt along the played pour path
+    from the Mega's live scale samples; target and tolerance from the recipe. Leaves the arm at the end of the
+    replaced 'untilt to pre-pour' segment, where the next taught segment starts. Returns the PourResult summary."""
+    from benchsim.chem.liquid import beaker_cylinder
+    from benchsim.chem.vessels import DENSITY
+    from benchsim.process.pour import PourController
+    from benchsim.process.pour_sim import ManifoldTilt
+    P = layout.load_params(); R = P['recipe']
+    target, tol = float(R['%s_g' % reagent]), float(R['%s_tol_g' % reagent])
+    th, qs = pour_table(arm_name, segs, info)
+    q6 = float(segs[0]['qs'][0][5])                      # the jaw stays where the grip commanded it
+    tilt = ManifoldTilt(_Paced(arm, speed), th, qs, q6)
+    cfg = dict(P['pour']); cfg['theta_max_deg'] = min(float(cfg['theta_max_deg']), float(th[-1]))   # the played path ends here
+    mega.command('STREAM', on=True)
+    base_g = mega.read_mass(32)                          # the receiver as it stands: the dose is what lands on top
+    def samples():
+        return [(x['t'] / 1000.0, x['w'] - base_g) for x in mega.take_samples()]
+    pc = PourController(cfg, beaker_cylinder(P), DENSITY[reagent], target, tol, reagent)
+    print('   closed loop: %.0f +- %.1f g of %s on the scale (tilt %.0f..%.0f deg along the played path, scale %.1f g)'
+          % (target, tol, reagent, th[0], th[-1], base_g), flush=True)
+    seen = [0]
+    def set_theta(theta):
+        tilt.set_theta(theta)
+        for e in pc.res.events[seen[0]:]:
+            if 'state' not in e: continue
+            extra = ' '.join('%s=%s' % (k, v) for k, v in e.items() if k not in ('state', 't', 'theta', 'm'))
+            print('     %-12s t %5.1f s  tilt %5.1f deg  %s g  %s' % (e['state'], e['t'], e['theta'],
+                  '-' if e.get('m') is None else '%.1f' % e['m'], extra), flush=True)
+        seen[0] = len(pc.res.events)
+    res = pc.run(CLOCK, samples, set_theta)
+    theta = tilt.last if tilt.last is not None else 0.0  # back upright along the same path
+    while theta > th[0]:
+        theta = max(theta - UNTILT_RATE_DEG_S * 0.025, th[0]); tilt.set_theta(theta); CLOCK.sleep(0.025)
+    go(arm, segs[-1]['qs'][-1], speed, 'pre-pour after the closed-loop pour')
+    CLOCK.sleep(SETTLE_S)
+    added = mega.read_mass(32) - base_g
+    out = dict(res.summary(), added_g=round(added, 2))
+    ok = res.outcome in ('OK', 'OVERSHOOT') and abs(added - target) <= tol
+    print('   closed loop %s: %s, %.1f g added (target %.0f +- %.1f, error %+.1f g), cut at %s deg, %d top-up pulse(s)%s'
+          % ('ok' if ok else 'OFF TARGET', res.outcome, added, target, tol, added - target,
+             '-' if res.theta_cut_deg is None else '%.0f' % res.theta_cut_deg, res.topup_pulses,
+             (': ' + res.reason) if res.reason else ''), flush=True)
+    return out
+
+
 def play_segment(arm, seg, speed):
     if seg['kind'] == 'hold':
         nap(POUR_DRAIN_S); return
@@ -611,9 +699,14 @@ def main():
     ap.add_argument('--check', action='store_true', help='pre-flight only: open the ports read-only, check every waypoint, move nothing')
     a = ap.parse_args()
     if a.emulate:
+        import tempfile
+        from benchsim import demo_run
         from benchsim.backends.emu import make_emulated_bench
         global CLOCK
-        sim_bb = make_bench('sim')
+        demo = demo_run.SimDemo(tempfile.mkdtemp(prefix='replay_emulate_'), video=False)   # liquids + the demo's reagent loads
+        sim_bb = demo.bb
+        first = select_steps(load_plans(), a.steps)[:1]
+        stage_beakers(sim_bb.world, first[0].split()[0] if first else '1')
         bb = make_emulated_bench(sim_bb, CAL, dry_run=a.check, with_mega=not a.no_mega)
         CLOCK = bb.clock
         print('emulated bench: LeRobotArm + SerialTransport on the simulator (no ports opened)')
@@ -622,6 +715,24 @@ def main():
         if a.no_mega: kw['port_mega'] = None
         bb = make_bench('real', allow_hardware=True, **kw)
     return replay(bb, a)
+
+
+# --emulate only: where the beakers stand when a run STARTS at this step (the operator's loading for it; on the real
+# bench they put them there by hand). Steps not listed start from the standard loading.
+EMULATE_START = {'2': {'P1': 'scale_pan'}, '3': {'P1': 'scale_pan'}, '4': {'P1': 'scale_pan'},
+                 '7': {'P2': 'scale_pan'}, '8': {'P2': 'scale_pan'}, '9': {'P2': 'scale_pan'}}
+
+
+def stage_beakers(w, first_token):
+    import mujoco
+    moved = []
+    for bk, stn in EMULATE_START.get(first_token, {}).items():
+        st = w.b.st[stn]; j = w.m.body('beaker_' + bk).jntadr[0]; qa = w.m.jnt_qposadr[j]; da = w.m.jnt_dofadr[j]
+        w.d.qpos[qa:qa + 3] = np.r_[st['xy'], st['z']] * 1e-3; w.d.qpos[qa + 3:qa + 7] = [1.0, 0.0, 0.0, 0.0]
+        w.d.qvel[da:da + 6] = 0.0; moved.append('%s at %s' % (bk, stn))
+    if moved:
+        mujoco.mj_forward(w.m, w.d); w.advance(0.5)          # let it settle on what it stands on
+        print('emulated loading for step %s: %s' % (first_token, ', '.join(moved)))
 
 
 def load_plans():
@@ -707,7 +818,16 @@ def replay(bb, a):
                     r = turn_deck(mega, deck, bench)
                     print('   carousel at %.1f deg' % r['deg'], flush=True)
                 funnel = 'funnel' in k
-                for seg in bench_segments(s['segments'], k, s['arm']):
+                segs = bench_segments(s['segments'], k, s['arm'])
+                span = closed_loop_span(k, segs) if mega is not None else None
+                for i, seg in enumerate(segs):
+                    if span and span[0] <= i <= span[1]:          # step 2's pour: by weight (taught grab/place untouched)
+                        for h in SEG_HOOKS: h(k, seg, 'start')
+                        if i == span[0]:
+                            print('   %-38s %s' % ('closed-loop pour (replaces %d segments)' % (span[1] - span[0] + 1), 'pour'), flush=True)
+                            closed_loop_pour(arm, s['arm'], segs[span[0]:span[1] + 1], mega, s['info'], a.speed)
+                        for h in SEG_HOOKS: h(k, seg, 'done')
+                        continue
                     fast = funnel and seg['phase'] == 'pour' and not seg['name'].startswith('untilt')   # tilt-in + pour: all at once
                     print('   %-38s %s%s' % (seg['name'], seg['phase'], '  (all at once)' if fast else ''), flush=True)
                     for h in SEG_HOOKS: h(k, seg, 'start')

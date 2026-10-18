@@ -177,6 +177,19 @@ def build(store: Store, runner) -> MCPServer:
     def run_control(action: Literal["pause", "resume", "safe_stop", "abort", "reset"], by: str = "agent") -> dict:
         return runner.control(action, by=by).model_dump()
 
+    @mcp.tool(description="Which preset start_run uses - the dashboard's 'full run | demo' switch. 'full' = the whole "
+                          "process (yeast dose, water, activation, eruption); 'demo' = the ~80 s live-demo slot (yeast-water "
+                          "pre-mixed in the flask: weigh the peroxide, pour it into the funnel, erupt). Omit mode to just read "
+                          "it. Changing it rebuilds the sim bench (like reset), so it is refused while a run is active; sim "
+                          "only, no approval. The hardware replay plays the same route either way.")
+    def run_mode(mode: Literal["full", "demo"] | None = None, by: str = "agent") -> dict:
+        if mode is None:
+            steps = runner.preset_plan().steps
+            return {"ok": True, "mode": runner.plan_mode, "steps": [st.label for st in steps]}
+        rep = runner.set_plan_mode(mode, by=by).model_dump()
+        rep["mode"] = runner.plan_mode
+        return rep
+
     @mcp.tool(description="Send one HardwareCommand (see get_schema('HardwareCommand')): carousel/stage/auger/"
                           "tare/stream/mega(status|weight|ver|stop|clr)/arm_goals/gripper/arm_station/arm_torque/hw_replay. "
                           "Read-only and stop commands run at once; motion is refused during a run and, from an "
