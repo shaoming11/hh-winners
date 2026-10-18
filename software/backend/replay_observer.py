@@ -184,10 +184,20 @@ class ReplayObserver:
 
     # ---------------------------------------------------------------- readings
     def scale(self):
+        """the scale now, WITHOUT blocking the replay: the mean of the samples already streamed in the last ~0.6 s
+        (the stream is on for the whole replay). Waiting for 16 fresh samples (1.6 s at the bench's 10 Hz, more with
+        mirror ticks in the waits) at every subgoal check stalled the arms 10-25 s per step."""
         if self.mega is None:
             return None
         try:
-            return round(float(self.mega.read_mass(16)), 2)
+            self.mega._pump()
+            log = self.mega.sample_log
+            if log and log[-1][0] is not None:
+                t_last = log[-1][0]
+                recent = [w for t, w, _ in log[-16:] if t is not None and t_last - t <= 600]
+                if recent:
+                    return round(float(np.mean(recent)), 2)
+            return round(float(self.mega.read_mass(3, timeout=1.0)), 2)   # nothing streamed yet: a short read
         except Exception:  # noqa: BLE001 - a silent scale is reported as no reading, never a crash
             return None
 

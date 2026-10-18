@@ -82,8 +82,11 @@ class TickClock:
     """the clock replay_plan and the MegaClient wait on during a replay: the hardware's time, and every wait is cut
     into <= SAMPLE_S slices with ``tick`` (mirror + recorder) run between them"""
 
+    TICK_EVERY_S = 0.5                    # a mirror tick costs >= 0.25 s on the real bench (world step + render): at most
+                                          # twice a second, so the replay's waits stay waits and the arms are never held up
+
     def __init__(self, inner, tick):
-        self.inner = inner; self.tick = tick
+        self.inner = inner; self.tick = tick; self.t_tick = -1e9
 
     def now(self): return self.inner.now()
 
@@ -93,7 +96,8 @@ class TickClock:
             left = t_end - self.inner.now()
             if left <= 0: return              # exactly 0, not "close enough": replay_plan.nap loops until left <= 0
             self.inner.sleep(min(left, SAMPLE_S))
-            self.tick()
+            if self.inner.now() - self.t_tick >= self.TICK_EVERY_S and t_end - self.inner.now() > 0.3:
+                self.t_tick = self.inner.now(); self.tick()   # only when the wait has room for it
 
 
 # ====================================================================== the link
